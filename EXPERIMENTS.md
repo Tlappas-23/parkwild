@@ -122,6 +122,11 @@ Format: date, what, number, kept?, why, where it lives.
 - **Kept:** no. Majority rule (share >= 0.5): grizzly 99%, wolf 99%, bighorn 89%, river otter 100%, great grey owl 100% stay coarsened; everything under 5% is mapped normally. Nothing sits between 13% and 85%.
 - **Also found:** GBIF and iNaturalist spell the same animal differently (Bos bison / Bison bison; Cervus elaphus / canadensis) and subspecies rows split counts. Names are normalised at export (config/taxonomy.toml); bison is one species with one count.
 
+### E-020: the test suite wrote into the real decision ledger
+- **What:** `log_filter` resolved its output path at import time, so every pytest and smoke run appended its six-row fixture filters to reports/decision_log.jsonl.
+- **Number:** dozens of entries with corridor "test" or n_in under 20 among the real ones; found when a stash conflict showed bias and review entries timestamped at a test run.
+- **Kept:** no. Path resolves at call time from PARKWILD_DECISION_LOG; conftest and smoke.py set it to a temp file; the ledger was scrubbed of entries with corridor "test" or fixture-sized inputs.
+
 ## Open questions with a planned experiment
 
 - **Q-1 SpeciesNet determinism.** Answered (E-013).
