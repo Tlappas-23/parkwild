@@ -40,3 +40,15 @@ def test_domestic_species_fold_into_unidentified():
     bison = "x;mammalia;cetartiodactyla;bovidae;bison;bison;american bison"
     assert _species_from_label(bison, 0.95)[0] == "Bison bison"
     assert _species_from_label(bison, 0.5)[0] == "Mammalia"
+
+
+def test_unidentified_model_bucket_appears_in_species_json(store, tmp_path):
+    import json
+
+    from parkwild.export import species_json
+    seed_phase0(store, tmp_path)
+    detections_to_sightings(store, "test", "yellowstone")
+    species_json(store, "yellowstone", tmp_path / "s.json")
+    sp = {x["scientific_name"]: x for x in json.loads((tmp_path / "s.json").read_text())["species"]}
+    assert sp["Mammalia"]["common_name"] == "unidentified large mammal (model)"
+    assert sp["Mammalia"]["confidence_basis"]["model_predicted"] == 1 and sp["Bison bison"]["confidence_basis"]["model_predicted"] == 1
