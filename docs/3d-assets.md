@@ -9,6 +9,30 @@ Rules (BUILD_SPEC.md): stylised low-poly is preferred; glTF, Draco-compressed,
 under 2 MB each; license recorded per asset and credited on the attribution
 page; unclear license is a stop-and-ask; Apple's assets are not an option.
 
+## Candidates found by browsing Poly Pizza (2026-09-05, nothing downloaded yet)
+
+Read from each model page in a real browser (the site blocks scripted
+fetches). Licence is the page's own licence line. CC BY 3.0 requires a credit
+line on the attribution page; CC0 needs none but gets one anyway.
+
+| Species | Model | Author | Poly Pizza URL | Licence line on page | Format | Notes |
+|---|---|---|---|---|---|---|
+| American bison | Bizon | madtrollstudio | https://poly.pizza/m/RqkLNYPnfx | "Mar 12, 2024 • FBX/GLTF format • Creative Commons Attribution" (CC BY 3.0) | FBX/GLTF, 1.1k tris | stylised, good proportions; part of the author's "Animal Kit" |
+| American bison (alt) | Bison | Poly by Google | https://poly.pizza/m/9sTrha-TxdS | "Oct 23, 2017 • OBJ/GLTF format • Creative Commons Attribution" (CC BY 3.0) | OBJ/GLTF | Google Poly archive |
+| Elk | Stag | Quaternius | https://poly.pizza/m/tQdzbZ1Cmw | "Sep 6, 2021 • FBX/GLTF format • Public Domain (CC0)" | FBX/GLTF, animated | Poly Pizza's licence line says CC0 for this upload; resolves O-5 for this file |
+| Gray wolf / coyote | Wolf | Quaternius | https://poly.pizza/m/P1gU3Qkr9r | "Sep 6, 2021 • FBX/GLTF format • Public Domain (CC0)" | FBX/GLTF, animated | coyote as a recolour |
+| Mule / white-tailed deer | Deer | Quaternius | https://poly.pizza/m/T6Cs7tmMHJ | expected CC0 (same pack); read the page before download | FBX/GLTF, animated | |
+| American black bear | Black bear | Poly by Google | https://poly.pizza/m/56ym_pyVnel | Google Poly archive, expected CC BY 3.0; read the page before download | OBJ/GLTF | |
+| Grizzly bear | Bear (brown) | Poly by Google | https://poly.pizza/m/0PXWfxfb0Hu | Google Poly archive, expected CC BY 3.0; read the page before download | OBJ/GLTF | |
+| Pronghorn | Antelope | Poly by Google | https://poly.pizza/m/dC2-G-IF8rz | Google Poly archive, expected CC BY 3.0; read the page before download | OBJ/GLTF | a generic antelope; closest stylised stand-in for a pronghorn |
+| Mule deer | Mule deer | Poly by Google | https://poly.pizza/m/e6mV6AYvIrE | Google Poly archive, expected CC BY 3.0; read the page before download | OBJ/GLTF | a real mule deer, preferred over the generic Deer |
+| Red fox | Fox | Quaternius | https://poly.pizza/m/Bc97C66HKi | expected CC0 (same pack as Stag/Wolf); read the page before download | FBX/GLTF, animated | alternatives: Fox by madtrollstudio (CC BY), Fox by Poly by Google |
+| Moose | none | | | | | only "Moose antlers" exists on Poly Pizza; try Sketchfab with the CC0 filter |
+| Bighorn sheep | none | | | | | searches for bighorn returned bison and antelope; try "ram" / "sheep" and Sketchfab |
+
+Download is a browser action and waits for the owner's go-ahead; each file's
+SHA-256 goes into this table at that point.
+
 ## Target species (Yellowstone first)
 
 The list will be replaced by the top species from `data/export/yellowstone/species.json`

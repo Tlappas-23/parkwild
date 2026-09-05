@@ -12,12 +12,12 @@ Phases follow BUILD_SPEC.md (three tracks; Phase 0 routes, it does not gate).
 |---|---|---|
 | 0. Feasibility (routing) | **steps 1 to 3 done for perspective frames; panorama slicing built; detection pending** | live coverage, index, 400-frame download, Overpass; offline tests + smoke |
 | 1. Track A reference data | **built; Yellowstone ingest in progress** | live iNaturalist place lookup and GBIF counts; fixture tests |
-| 2. Track B at scale | not started (waits on routing) | |
+| 2. Track B at scale | **in progress at supplementary scope**: all 3,690 Lamar perspective frames downloading, CPU inference next, then `track_b.py sightings` | ADR-0013/0014 |
 | 3. Dedup, validation, bias | cluster counting built for Phase 0; rest not started | |
 | 4. Positions and export | Track A export built (cells.geojson, species.json, parquet, manifest) | fixture tests |
-| 5. Application | not started | |
+| 5. Application | **skeleton live-tested locally**: map, species, detail, about on real data; deploys to GitHub Pages on merge | screenshots 2026-09-05 |
 | 6. 3D layer | not started (model sourcing is a long-lead item) | |
-| 7. Ship | not started | |
+| 7. Ship | Pages workflow + JS budget in CI; offline, Lighthouse, a11y pass not started | |
 
 Done: token works, coverage measured, Lamar Valley indexed (27,430 images),
 400 frames downloaded. Blocked on: an OK to run `make setup-ml` (PyTorch +
@@ -235,6 +235,17 @@ Top ensemble labels on images with an animal box >= 0.2: unknown (28), blank (26
 - camera types: spherical: 23,740, perspective: 3,690
 
 <!-- phase0:lamar_valley:pano:claude:end -->
+
+## Phase 2: Track B at supplementary scope
+
+Scope from ADR-0013: Lamar Valley perspective frames only, all 3,690 of
+them; detector confidence >= 0.5; ensemble labels human / vehicle / blank
+dropped; one sighting per frame-chain; species named only at classifier
+>= 0.8, otherwise "unidentified large mammal (model)"; camera position with
+150 m as the stated accuracy (ADR-0014). Panoramas out until the rig is
+masked.
+
+_Numbers land here when the full-corridor inference finishes._
 
 ## Phase 1: Track A reference data
 
