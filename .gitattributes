@@ -1,0 +1,2 @@
+# The decision ledger is append-only; when two branches both append, keep both sides.
+reports/decision_log.jsonl merge=union
