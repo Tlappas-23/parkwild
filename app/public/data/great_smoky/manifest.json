@@ -1,0 +1,37 @@
+{
+  "built": "2026-09-05T23:56:37+00:00",
+  "git_commit": "00758fd45fc6393700585d6672d82c4fcf952cbf",
+  "files": {
+    "cells.geojson": {
+      "sha256": "9ce81f40ddae487f733ab0b238e5501be23bd2ae0622a3e063b0a3f9891d32ad",
+      "bytes": 808033
+    },
+    "species.json": {
+      "sha256": "1f1517e8646c462783494e9defd3e58bfafad94a9ae15ce8d12db644afe88bee",
+      "bytes": 105718
+    },
+    "sightings.parquet": {
+      "sha256": "73df89c296a011035a2b57e19b556e6e2f38217dec7ebd956221631028f6b8a1",
+      "bytes": 1171711
+    },
+    "photos_species.json": {
+      "sha256": "423508c29ca558e3cb3fdbf669e4f1ce6dc9274dc310f04c292c80836f6b4a71",
+      "bytes": 126890
+    },
+    "photos_cells.json": {
+      "sha256": "350132e55df647e06b6395fcd000442adcb5dee05bad5febb72dec20b6b690ad",
+      "bytes": 281346
+    },
+    "landmarks.json": {
+      "sha256": "4d1c1f31c34ede0c9b71f6d5d2e827de25336e9440031ded59c5c63744e56fe1",
+      "bytes": 15644
+    },
+    "boundary.geojson": {
+      "sha256": "7b6447a72a712c4718875b538b54dcc633bb05a0b27e74828841599378da9f82",
+      "bytes": 17209
+    }
+  },
+  "park": "great_smoky",
+  "name": "Great Smoky Mountains National Park",
+  "state": "TN"
+}

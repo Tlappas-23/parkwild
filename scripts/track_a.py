@@ -7,6 +7,7 @@ Track A driver: reference sightings from iNaturalist and GBIF.
     track_a.py dedupe  --park yellowstone
     track_a.py export  --park yellowstone      # data/export/<park>/{cells.geojson,species.json,sightings.parquet,manifest.json}
     track_a.py summary --park yellowstone
+    track_a.py landmarks --park yellowstone   # boundary.geojson + landmarks.json for the tour
     track_a.py all     --park yellowstone      # ingest all + dedupe + export
 
 Every step is idempotent: re-running refreshes the mirror and re-derives the
@@ -28,6 +29,7 @@ from parkwild.config import EXPORT_DIR, RESULTS_MD, get_corridor, get_park  # no
 from parkwild.decisionlog import print_decision_summary  # noqa: E402
 from parkwild.export import export_park  # noqa: E402
 from parkwild.inaturalist import find_places  # noqa: E402
+from parkwild.landmarks import build_landmarks  # noqa: E402
 from parkwild.report import update_results_md  # noqa: E402
 from parkwild.sightings import dedupe, ingest_gbif, ingest_inaturalist, park_summary  # noqa: E402
 from parkwild.storage import Store  # noqa: E402
@@ -99,6 +101,13 @@ def cmd_bias(args):
         print(f"updated {RESULTS_MD}; wrote {out} (re-run `export` to refresh the manifest)")
 
 
+def cmd_landmarks(args):
+    """Boundary + landmarks + tour stops for one park (network: iNaturalist,
+    Overpass, Wikipedia; no database). Rehashes the manifest afterwards."""
+    park = get_park(args.park)
+    print(json.dumps(build_landmarks(park, EXPORT_DIR / park.key, summaries=not args.no_summaries), indent=2))
+
+
 def cmd_all(args):
     args.source = "all"
     args.gbif_counts_only = False
@@ -146,6 +155,11 @@ def build_parser():
     p.add_argument("--ring", type=int, default=1, help="H3 r9 rings around an image cell that count as covered")
     p.add_argument("--write", action="store_true")
     p.set_defaults(func=cmd_bias)
+
+    p = sub.add_parser("landmarks", help="park boundary, OSM landmarks and the curated tour (network, no database)")
+    p.add_argument("--park", required=True)
+    p.add_argument("--no-summaries", action="store_true", help="skip the Wikipedia excerpts")
+    p.set_defaults(func=cmd_landmarks)
 
     p = sub.add_parser("all", help="ingest all sources, dedupe, export, summarise")
     p.add_argument("--park", required=True)

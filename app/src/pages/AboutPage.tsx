@@ -4,7 +4,7 @@ import { useStore } from "../store";
 // and the bias figures in plain language. Numbers come from the pipeline's
 // exports where they exist; where they do not yet, the page says so.
 export default function AboutPage() {
-  const { species, manifest, cells, bias } = useStore();
+  const { species, manifest, cells, bias, parkName, landmarks } = useStore();
   const named = (list: string[]) => list.map((n) => species?.species.find((s) => s.scientific_name === n)?.common_name ?? n).join(", ");
   const excluded = Object.keys(cells?.suppressed.excluded ?? {});
   const coarsened = Object.keys(cells?.suppressed.coarsened ?? {});
@@ -12,7 +12,7 @@ export default function AboutPage() {
     <article className="page prose">
       <h1>About this map</h1>
       <p className="lede">
-        Where and when animals have been recorded in Yellowstone, from public observations, aggregated into hexagonal cells about 170 m across.
+        Where and when animals have been recorded in {parkName}, from public observations, aggregated into hexagonal cells about 170 m across.
         Most of it is people logging what they saw. It is not a survey.
       </p>
 
@@ -61,7 +61,8 @@ export default function AboutPage() {
         <li>iNaturalist observations and photographs: each carries its observer's chosen licence. Photographs are shown only under CC0, CC BY, CC BY-SA, CC BY-NC or CC BY-NC-SA, always with the observer's name and a link; no-derivatives and all-rights-reserved photographs are not shown.</li>
         <li>GBIF-mediated datasets: per-record licence and dataset credit stored with every record. The iNaturalist mirror in GBIF is excluded to avoid double counting; eBird is not included.</li>
         <li>Street-level imagery: Mapillary, CC BY-SA 4.0; image ID and contributor stored with every derived record. Images themselves are not redistributed.</li>
-        <li>Basemap: <a href="https://openfreemap.org" target="_blank" rel="noreferrer">OpenFreeMap</a>, © OpenStreetMap contributors, ODbL.</li>
+        <li>Basemap: <a href="https://openfreemap.org" target="_blank" rel="noreferrer">OpenFreeMap</a>, © OpenStreetMap contributors, ODbL. Satellite view: USGS The National Map, public domain. Relief and 3D terrain: Mapzen/AWS Terrain Tiles (USGS 3DEP, SRTM), open data.</li>
+        <li>Landmarks and tour stops: OpenStreetMap features with a Wikidata link, ODbL{landmarks ? ` (${landmarks.landmarks.length} in ${parkName})` : ""}. Stop descriptions are the opening of each Wikipedia article, CC BY-SA 4.0, linked beside the text. The park outline is the iNaturalist place polygon the sightings were filtered by.</li>
         <li>
           3D models:{" "}
           {(species?.species.filter((x) => x.model) ?? []).length === 0 ? "none yet." : species!.species.filter((x) => x.model).map((x) => (

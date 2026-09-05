@@ -1,14 +1,14 @@
 {
-  "built": "2026-09-05T20:57:27+00:00",
-  "git_commit": "1ec9abb3a81fb7d9118f792e7e448220c21b610f",
+  "built": "2026-09-05T23:56:19+00:00",
+  "git_commit": "00758fd45fc6393700585d6672d82c4fcf952cbf",
   "files": {
     "cells.geojson": {
-      "sha256": "339c5d2c567ad27e075126b22f4d5083a0be0d46ce62a2f7053b791de29cbe58",
-      "bytes": 2738692
+      "sha256": "35880b68779e56a866233d8f7367bf7acb0cc2ee1738e9fa8ae50c148d74cd2e",
+      "bytes": 2738680
     },
     "species.json": {
-      "sha256": "19446acc1359ba5302eece7a898930827b8bed7064cd5f16f72a55e42966de44",
-      "bytes": 125565
+      "sha256": "5e653d26cedef1bbf62cecc8837c56413dce9b72a31b03ca937e1e0f1402c7f5",
+      "bytes": 133239
     },
     "sightings.parquet": {
       "sha256": "db0b5535341570b26cecc76fae45f83b805d2ea9da7a734e5c3dbc0fe9ba0135",
@@ -19,13 +19,23 @@
       "bytes": 175566
     },
     "photos_cells.json": {
-      "sha256": "ab10e1ae8944e4654de577743255c1851ecc8ae4a0d87211190de20ed9cf951e",
-      "bytes": 767802
+      "sha256": "35a69e2fe0e0f6765a11fd80102aec5f074c7bca92f31e796481040640a98174",
+      "bytes": 1251096
     },
     "bias.json": {
       "sha256": "3f7f2a3130de777ee07cb73cd76840068c6c4c218b9e6b77447ce2a2de0f9fc4",
       "bytes": 937
+    },
+    "landmarks.json": {
+      "sha256": "b6d44ea00098fcee27119b9fc7d2526080e935a043a1f22d44772ae8029c7d1c",
+      "bytes": 23702
+    },
+    "boundary.geojson": {
+      "sha256": "5b3506c4225ae5ae6076525f9b60ea9682a9ff15969f2800c7e8acc50a1a1bf0",
+      "bytes": 1052
     }
   },
-  "park": "yellowstone"
+  "park": "yellowstone",
+  "name": "Yellowstone National Park",
+  "state": "WY"
 }

@@ -5,7 +5,7 @@
 // (import.meta.glob below), so a file swapped on the CDN after the build fails
 // the hash check and is refused. In development, with no baked manifest, the
 // check is skipped and a warning is logged instead of blocking work.
-import type { BiasFile, CellsFile, Manifest, PhotosCellsFile, PhotosSpeciesFile, SpeciesFile } from "./types";
+import type { BiasFile, BoundaryFile, CellsFile, LandmarksFile, Manifest, PhotosCellsFile, PhotosSpeciesFile, SpeciesFile } from "./types";
 
 const baked = import.meta.glob<Manifest>("../public/data/*/manifest.json", { eager: true, import: "default" });
 
@@ -14,6 +14,17 @@ function bakedManifest(park: string): Manifest | null {
     if (path.includes(`/data/${park}/`)) return m;
   }
   return null;
+}
+
+// The parks this build knows are exactly the data folders baked into it; the
+// pipeline writes each park's display name into its manifest, so no second
+// list has to be kept in step. Yellowstone stays first as the default.
+export function availableParks(): { key: string; name: string; state: string | null }[] {
+  const list = Object.entries(baked).map(([path, m]) => {
+    const key = path.split("/data/")[1].split("/")[0];
+    return { key, name: m.name ?? key, state: m.state ?? null };
+  });
+  return list.sort((a, b) => (a.key === "yellowstone" ? -1 : b.key === "yellowstone" ? 1 : a.name.localeCompare(b.name)));
 }
 
 async function sha256Hex(buf: ArrayBuffer): Promise<string> {
@@ -63,13 +74,15 @@ async function refreshOnce(): Promise<boolean> {
 
 export async function loadPark(park: string) {
   const manifest = bakedManifest(park);
-  const [cells, species, bias, photosSpecies] = await Promise.all([
+  const [cells, species, bias, photosSpecies, landmarks, boundary] = await Promise.all([
     fetchVerified<CellsFile>(park, "cells.geojson", manifest),
     fetchVerified<SpeciesFile>(park, "species.json", manifest),
     fetchVerified<BiasFile>(park, "bias.json", manifest).catch(() => null),
     fetchVerified<PhotosSpeciesFile>(park, "photos_species.json", manifest).catch(() => null),
+    fetchVerified<LandmarksFile>(park, "landmarks.json", manifest).catch(() => null),      // tour: optional until landmarks ran
+    fetchVerified<BoundaryFile>(park, "boundary.geojson", manifest).catch(() => null),
   ]);
-  return { cells, species, bias, photosSpecies, manifest };
+  return { cells, species, bias, photosSpecies, landmarks, boundary, manifest };
 }
 
 // The per-cell photo file is a megabyte; it is fetched the first time a cell is opened.

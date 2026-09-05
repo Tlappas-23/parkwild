@@ -75,3 +75,11 @@ def test_overpass_requests_identify_themselves():
     from parkwild.overpass import HEADERS, OVERPASS_URLS
     assert "parkwild" in HEADERS["User-Agent"]
     assert OVERPASS_URLS[0].startswith("https://lz4.overpass-api.de")
+
+
+def test_point_in_geometry_polygon_and_multipolygon():
+    from parkwild.geo import point_in_geometry
+    square = {"type": "Polygon", "coordinates": [[[0, 0], [2, 0], [2, 2], [0, 2], [0, 0]]]}
+    assert point_in_geometry(1, 1, square) and not point_in_geometry(3, 1, square)
+    multi = {"type": "MultiPolygon", "coordinates": [square["coordinates"], [[[10, 10], [12, 10], [12, 12], [10, 12], [10, 10]]]]}
+    assert point_in_geometry(11, 11, multi) and not point_in_geometry(5, 5, multi)

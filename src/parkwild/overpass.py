@@ -37,7 +37,7 @@ OVERPASS_URLS = (
     "https://overpass-api.de/api/interpreter",
     "https://overpass.kumi.systems/api/interpreter",
 )
-HEADERS = {"User-Agent": "parkwild/0.0.1 (wildlife side project; road length per park corridor)"}
+HEADERS = {"User-Agent": "parkwild/0.1 (wildlife side project; https://github.com/Tlappas-23/parkwild)"}
 
 # ROAD_TAGS — BORROWED (OSM wiki, Key:highway; the driveable classes)
 # What a Mapillary contributor's car drives on. `track` is deliberately in
@@ -61,6 +61,21 @@ def fetch_highways(bbox: BBox, *, timeout_s: int = 120) -> list[dict]:
     so a long highway that clips a corner comes back entire; the length
     summary clips it back."""
     query = f'[out:json][timeout:{timeout_s}];way["highway"]({bbox.as_overpass()});out geom;'
+    return [
+        {
+            "id": el["id"],
+            "highway": el.get("tags", {}).get("highway"),
+            "name": el.get("tags", {}).get("name"),
+            "coords": [(pt["lon"], pt["lat"]) for pt in el.get("geometry", [])],
+        }
+        for el in run_query(query, timeout_s=timeout_s)
+        if el.get("type") == "way"
+    ]
+
+
+def run_query(query: str, *, timeout_s: int = 120) -> list[dict]:
+    """POST one Overpass QL query, walking the mirrors and backing off on the
+    codes that mean "busy" rather than "wrong". Returns the raw elements."""
     last_error: Exception | None = None
     for url in OVERPASS_URLS:
         for attempt in range(3):
@@ -72,17 +87,7 @@ def fetch_highways(bbox: BBox, *, timeout_s: int = 120) -> list[dict]:
                     time.sleep(10 * (attempt + 1))
                     continue
                 resp.raise_for_status()
-                elements = resp.json().get("elements", [])
-                return [
-                    {
-                        "id": el["id"],
-                        "highway": el.get("tags", {}).get("highway"),
-                        "name": el.get("tags", {}).get("name"),
-                        "coords": [(pt["lon"], pt["lat"]) for pt in el.get("geometry", [])],
-                    }
-                    for el in elements
-                    if el.get("type") == "way"
-                ]
+                return resp.json().get("elements", [])
             except requests.RequestException as exc:
                 last_error = exc
                 log.warning("Overpass %s failed (%s); retrying", url, exc)

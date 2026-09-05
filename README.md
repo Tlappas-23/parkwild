@@ -144,14 +144,29 @@ and the app do not wait for this.
 make track-a PARK=yellowstone          # ingest iNaturalist + GBIF, dedupe, export, summary
 .venv/bin/python scripts/track_a.py ingest --park yellowstone --gbif-counts-only   # what GBIF holds, by dataset
 .venv/bin/python scripts/track_a.py ingest --park yellowstone --include-ebird      # only after ADR-0011 is decided
+.venv/bin/python scripts/track_a.py landmarks --park yellowstone   # park outline + OSM landmarks + tour stops (network, no DB)
 ```
 
+### Adding a park
+
+1. `track_a.py places --query "Grand Teton"` for the iNaturalist place id; add
+   a `[key]` table to `config/parks.toml` with name, state, place id, bbox and
+   an ordered `tour` list (OSM feature names; `tour_fallback` gives a
+   coordinate and an `@wiki` article title for stops OSM cannot name).
+2. `make track-a PARK=key`, then `track_a.py landmarks --park key`, then
+   `make app-data PARK=key`. The app lists every park whose data folder was
+   baked in; `?park=key` opens it directly. Suppression and taxonomy rules
+   apply everywhere; the imagery track and bias figures are per corridor.
+
 Outputs land in `data/export/<park>/`: `cells.geojson` (H3 resolution 9, one
-feature per cell and species, open coordinates only, sensitive species
-excluded or coarsened per `config/suppression.toml`), `species.json` (counts,
-seasonality, obscured share, source mix, suppression treatment),
-`sightings.parquet` (full canonical records with attribution) and
-`manifest.json` (SHA-256 per file, git commit). `make bias` adds the road and
+feature per cell with a compact species list, open coordinates only,
+sensitive species excluded or coarsened per `config/suppression.toml`),
+`species.json` (counts, seasonality, obscured share, source mix, suppression
+treatment, the other common names a species has carried), `sightings.parquet`
+(full canonical records with attribution), `photos_*.json` (licensed
+iNaturalist photographs by species and by cell), `landmarks.json` and
+`boundary.geojson` (tour stops and the park outline) and `manifest.json`
+(SHA-256 per file, git commit, the park's display name). `make bias` adds the road and
 seasonal bias block to RESULTS.md. `make app-data` copies the exports into
 `app/public/data/<park>/`, where the app compiles the manifest in and refuses
 any data file whose hash does not match.
@@ -163,9 +178,15 @@ only. Photographs from iNaturalist observations are the evidence layer
 (ADR-0015): card art and hero per species, a "seen here" strip per cell,
 each credited to its observer with its licence and a link. `make app` installs, builds and enforces the JS budget (entry chunk
 under 200 KB gzipped; the map and 3D libraries are lazy chunks with their own
-caps). Pages: map of H3 cells with species and year filters and a cell detail
-panel; species grid and detail with month histogram and a lazy 3D viewer;
-About with methods, limitations, suppression and licensing. Deploy target is
+caps). Pages: a map of the park (OpenFreeMap vector basemap under a hillshade and
+3D terrain from the AWS terrain tiles, a USGS imagery toggle, everything
+outside the iNaturalist park polygon washed out) with H3 cells, species and
+year filters, landmarks, a guided tour that flies stop to stop and lists the
+species recorded within 2.5 km of each, and a cell panel that follows the
+species filter and links the same box on iNaturalist; species grid and detail
+with month histogram and a lazy 3D viewer; About with methods, limitations,
+suppression and licensing. A park select switches between every park baked
+into the build (ADR-0017). Deploy target is
 Cloudflare Pages with `app/public/_headers` for CSP.
 
 Rough cost on this machine: steps 1 to 3 are a few minutes of API calls and

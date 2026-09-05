@@ -1,5 +1,6 @@
 // Shapes of the static files the pipeline bakes (parkwild/export.py,
-// parkwild/photos.py). The app depends on these, never on the pipeline.
+// parkwild/photos.py, parkwild/landmarks.py). The app depends on these, never
+// on the pipeline.
 
 export type ConfidenceBasis = "human_verified" | "model_predicted";
 
@@ -20,9 +21,11 @@ export interface CellProps {
 
 export interface SpeciesIndexEntry { n: string; c: string | null; k: string | null; }
 
+export type Ring = number[][];
+
 export interface CellFeature {
   type: "Feature";
-  geometry: { type: "Polygon"; coordinates: number[][][] };
+  geometry: { type: "Polygon"; coordinates: Ring[] };
   properties: CellProps;
 }
 
@@ -42,6 +45,7 @@ export interface Species {
   class: string | null;
   taxon_id: string | null;
   aliases: string[];
+  other_names?: string[];             // the common names that lost the vote ("American Elk" for Wapiti); searchable
   suppression: { action: "exclude" | "coarsen"; res: number | null; why: string } | null;
   sightings: number;
   open_coordinates: number;
@@ -65,6 +69,8 @@ export interface Manifest {
   built: string;
   git_commit: string | null;
   park: string;
+  name?: string;                      // display name, written by the pipeline from config/parks.toml
+  state?: string;
   files: Record<string, { sha256: string; bytes: number }>;
 }
 
@@ -87,3 +93,22 @@ export interface PhotosSpeciesFile { park: string; photo_hosts: string[]; specie
 export interface PhotosCellsFile { park: string; photo_hosts: string[]; species_index: string[]; cells: Record<string, CellPhotoEntry[]>; licence_rule: string; }
 
 export type PhotoSize = "square" | "small" | "medium" | "large";
+
+// A landmark from OpenStreetMap; `tour` is the stop index when it is on the
+// curated route, and only stops carry a Wikipedia summary.
+export interface LandmarkSummary { extract: string | null; url: string; licence: string; attribution: string; }
+export interface Landmark {
+  id: string; name: string; kind: string; lon: number; lat: number; ele_m: number | null;
+  wikidata: string | null; url: string | null; tour?: number; summary?: LandmarkSummary | null;
+}
+export interface LandmarksFile {
+  park: string; fetched: string; attribution: Record<string, string>;
+  landmarks: Landmark[]; tour: string[]; missing_stops: string[];
+}
+
+// The park outline, an iNaturalist place polygon.
+export interface BoundaryFile {
+  type: "Feature";
+  geometry: { type: "Polygon"; coordinates: Ring[] } | { type: "MultiPolygon"; coordinates: Ring[][] };
+  properties: { park: string; name: string; source: string; place_id: number; source_url: string };
+}

@@ -11,7 +11,7 @@ Phases follow BUILD_SPEC.md (three tracks; Phase 0 routes, it does not gate).
 | Phase | State | Verified |
 |---|---|---|
 | 0. Feasibility (routing) | **steps 1 to 3 done for perspective frames; panorama slicing built; detection pending** | live coverage, index, 400-frame download, Overpass; offline tests + smoke |
-| 1. Track A reference data | **built; Yellowstone ingest in progress** | live iNaturalist place lookup and GBIF counts; fixture tests |
+| 1. Track A reference data | **built; Yellowstone, Grand Teton and Great Smoky Mountains ingested and exported** | live iNaturalist place lookup and GBIF counts; fixture tests |
 | 2. Track B at scale | **done at supplementary scope**: 3,690 Lamar frames scored on CPU, 31 model-predicted sightings in the schema and on the map | ADR-0013/0014, run rows in `runs` |
 | 3. Dedup, validation, bias | cluster counting built for Phase 0; rest not started | |
 | 4. Positions and export | Track A export built (cells.geojson, species.json, parquet, manifest) | fixture tests |
@@ -299,6 +299,31 @@ Export: `cells.geojson` one feature per H3 r9 cell with a species index
 
 **Phase 1 acceptance: met.** A park's worth of real sightings is in DuckDB and
 exported in the shape the app consumes; the app builds against it.
+
+### Grand Teton and Great Smoky Mountains ingest (2026-09-05)
+
+Same pipeline, same rules, `--park` changed. Numbers from the ingest and
+export logs; the decision ledger holds each filter.
+
+| | Grand Teton (place 69099) | Great Smoky Mountains (place 72645) |
+|---|---|---|
+| iNaturalist research-grade Mammalia + Aves | 17,540 (548 obscured) | 11,825 (2,424 obscured) |
+| GBIF, wanted datasets only (iNat mirror and eBird never downloaded) | 328 mammal + 587 bird rows kept of 290,089 in the box | 12 mammal + 8,338 bird rows kept of 884,710 |
+| Cross-source duplicates marked | 0 | 8 |
+| Canonical sightings | 18,455 | 20,167 |
+| Cells (H3 r9; coarse r6 for sensitive species) | 2,743 holding 17,901 open-coordinate sightings | 1,998 holding 17,742 |
+| Species in the export | 257 | 237 |
+| Excluded by the suppression list | 0 rows | 0 rows |
+| Coarsened (list + auto rule) | 311 rows | 123 rows |
+| Displayable photographs (CC0/BY/BY-SA/BY-NC/BY-NC-SA) | 20,235 of 30,766 | 13,599 of 19,383 |
+| Landmarks / tour stops | 79 / 8 | 77 / 8 |
+
+The Smokies' elk are a reintroduced herd in Cataloochee: 469 records, 468 of
+them obscured by iNaturalist's taxon geoprivacy, so the species is counted
+and photographed but drawn in one coarse cell. Great Smoky's GBIF bird rows
+(8,338) come mostly from one wanted dataset; the road-bias and seasonal
+figures exist only for Yellowstone's Lamar Valley corridor because no other
+corridor's imagery has been pulled.
 
 ### Road and seasonal bias (Lamar Valley imagery vs Yellowstone sightings)
 

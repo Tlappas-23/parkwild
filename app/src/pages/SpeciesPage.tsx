@@ -1,16 +1,16 @@
 import { useMemo, useState } from "react";
 import { speciesPhotos } from "../photos";
-import { useStore } from "../store";
+import { speciesMatches, useStore } from "../store";
 import SpeciesDetail from "./SpeciesDetail";
 
 export default function SpeciesPage() {
-  const { species, selectedSpecies, selectSpecies, photosSpecies } = useStore();
+  const { species, selectedSpecies, selectSpecies, photosSpecies, parkName } = useStore();
   const [query, setQuery] = useState("");
   const [cls, setCls] = useState<"all" | "Mammalia" | "Aves">("all");
   const list = useMemo(() => {
     const q = query.trim().toLowerCase();
     return (species?.species ?? []).filter((s) => (cls === "all" || s.class === cls) &&
-      (!q || (s.common_name ?? "").toLowerCase().includes(q) || s.scientific_name.toLowerCase().includes(q)));
+      speciesMatches(s, q));
   }, [species, query, cls]);
   if (!species) return null;
   if (selectedSpecies) {
@@ -22,7 +22,7 @@ export default function SpeciesPage() {
       <div className="page-head">
         <div>
           <h1>Species</h1>
-          <p className="muted">{species.species.length} species recorded in Yellowstone, ordered by how often people have seen them.</p>
+          <p className="muted">{species.species.length} species recorded in {parkName}, ordered by how often people have seen them.</p>
         </div>
         <div className="page-tools">
           <input type="search" placeholder="Search" value={query} onChange={(e) => setQuery(e.target.value)} aria-label="Search species" />
