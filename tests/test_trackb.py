@@ -22,7 +22,9 @@ def test_detections_become_model_predicted_sightings(store, tmp_path):
     elk = by_id["mapillary_cv:img4:full:1"]
     assert elk[1] == "Mammalia" and "unidentified" in elk[2]                    # classifier 0.71 < 0.8: not named
     assert json.loads(elk[5])["chain_frames"] == 2
-    # idempotent
+    # idempotent, and stale derived rows do not survive a rerun
+    store.upsert_sightings([{"sighting_id": "mapillary_cv:stale:full:9", "source": "mapillary_cv", "source_id": "stale", "park": "yellowstone",
+                             "confidence_basis": "model_predicted", "coordinate_status": "missing", "raw_json": '{"corridor": "test"}'}])
     assert detections_to_sightings(store, "test", "yellowstone")["written"] == 2
     assert store.one("SELECT count(*) FROM sightings WHERE source = 'mapillary_cv'") == 2
 
