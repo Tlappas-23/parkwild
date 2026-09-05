@@ -197,3 +197,30 @@ def haversine_m(lon1: float, lat1: float, lon2: float, lat2: float) -> float:
     dlmb = math.radians(lon2 - lon1)
     a = math.sin(dphi / 2) ** 2 + math.cos(phi1) * math.cos(phi2) * math.sin(dlmb / 2) ** 2
     return 2 * EARTH_RADIUS_M * math.asin(math.sqrt(a))
+
+
+# Ray casting, the textbook even-odd rule. Holes are ignored on purpose: a
+# park boundary's holes are private inholdings, and a landmark in one is
+# still "in the park" for a tour.
+def point_in_ring(lon: float, lat: float, ring: list) -> bool:
+    inside = False
+    n = len(ring)
+    for i in range(n):
+        x1, y1 = ring[i][0], ring[i][1]
+        x2, y2 = ring[(i + 1) % n][0], ring[(i + 1) % n][1]
+        if (y1 > lat) != (y2 > lat):
+            x_at = x1 + (lat - y1) * (x2 - x1) / (y2 - y1)
+            if lon < x_at:
+                inside = not inside
+    return inside
+
+
+def point_in_geometry(lon: float, lat: float, geometry: dict) -> bool:
+    """GeoJSON Polygon or MultiPolygon; true if inside any outer ring."""
+    if geometry["type"] == "Polygon":
+        polys = [geometry["coordinates"]]
+    elif geometry["type"] == "MultiPolygon":
+        polys = geometry["coordinates"]
+    else:
+        raise ValueError(f"unsupported geometry {geometry['type']}")
+    return any(point_in_ring(lon, lat, poly[0]) for poly in polys)

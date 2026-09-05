@@ -37,7 +37,7 @@ from pathlib import Path
 
 import h3
 
-from .config import ROOT, Suppression, canonical_species, load_suppression, load_synonyms
+from .config import ROOT, Suppression, canonical_species, get_park, load_suppression, load_synonyms
 from .decisionlog import log_filter
 from .storage import Store
 
@@ -99,6 +99,54 @@ def _canonical_where(park_param: str = "?") -> str:
     return f"park = {park_param} AND duplicate_of IS NULL"
 
 
+
+# Common names. iNaturalist carries one curated name per taxon and a different
+# one per subspecies, which is why "American Elk" (the nelsoni subspecies
+# label) and "Wapiti" (the species) both arrive under Cervus canadensis once
+# subspecies collapse. GBIF vernaculars vary by dataset and can be junk
+# ("Canada Goose unknown" for the Cackling Goose). So the display name is the
+# one most iNaturalist rows used, and GBIF names count only when iNaturalist
+# never recorded the species. The first version took the first name seen per
+# file, so the map said "American Elk" while the species list said "Wapiti"
+# for the same animal, and the Yellow Warbler wore its "Mangrove Warbler"
+# subspecies label (E-024).
+def common_name_votes(store: Store, park: str) -> dict[str, dict[str, dict[str, int]]]:
+    """One vote table for the whole park, over every canonical row, open or
+    obscured, so cells.geojson and species.json cannot disagree. The first
+    pass voted inside each exporter, and the cells file, which only sees open
+    coordinates, named the Smokies' elk from its single open row (E-024)."""
+    rows = store.sql(
+        f"""
+        SELECT scientific_name, common_name, source, count(*)
+        FROM sightings WHERE {_canonical_where()} AND scientific_name IS NOT NULL
+        GROUP BY 1, 2, 3
+        """,
+        [park],
+    )
+    synonyms = load_synonyms()
+    votes: dict[str, dict[str, dict[str, int]]] = {}
+    for raw_sci, common, source, n in rows:
+        v = votes.setdefault(canonical_species(raw_sci, synonyms), {})
+        if common:
+            tier = v.setdefault("inaturalist" if source == "inaturalist" else "other", {})
+            tier[common] = tier.get(common, 0) + n
+    return votes
+
+
+def pick_common_name(votes: dict[str, dict[str, int]]) -> str | None:
+    for tier in ("inaturalist", "other"):
+        if votes.get(tier):
+            return max(votes[tier], key=lambda n: (votes[tier][n], n))
+    return None
+
+
+def other_common_names(votes: dict[str, dict[str, int]], chosen: str | None) -> list[str]:
+    """Every other name the records used, so a search for "elk" finds Wapiti."""
+    names = {n for tier in votes.values() for n in tier}
+    names.discard(chosen)
+    return sorted(names)
+
+
 def cells_geojson(store: Store, park: str, out_path: Path, *, res: int = H3_RES, rules: list[Suppression] | None = None) -> dict:
     """One feature per H3 cell, with a compact per-species list inside it.
 
@@ -123,13 +171,14 @@ def cells_geojson(store: Store, park: str, out_path: Path, *, res: int = H3_RES,
     log_filter("export.cells", "canonical rows with open coordinates and a taxon name", n_canonical, len(rows), park=park, h3_res=res)
 
     synonyms = load_synonyms()
+    names = common_name_votes(store, park)
     species_index: dict[str, int] = {}
-    species_meta: dict[str, tuple[str | None, str | None]] = {}
+    species_class: dict[str, str | None] = {}
     cells: dict[str, dict] = {}
     excluded: dict[str, int] = {}
     coarsened: dict[str, int] = {}
     merged: dict[str, str] = {}
-    for lon, lat, raw_sci, common, cls, basis, on in rows:
+    for lon, lat, raw_sci, _common, cls, basis, on in rows:
         sci = canonical_species(raw_sci, synonyms)
         if sci != raw_sci:
             merged[raw_sci] = sci
@@ -142,7 +191,7 @@ def cells_geojson(store: Store, park: str, out_path: Path, *, res: int = H3_RES,
             cell_res = rule.res or 6
             coarsened[sci] = coarsened.get(sci, 0) + 1
         idx = species_index.setdefault(sci, len(species_index))
-        species_meta.setdefault(sci, (common, cls))
+        species_class.setdefault(sci, cls)
         cell = h3.latlng_to_cell(lat, lon, cell_res)
         c = cells.setdefault(cell, {"res": cell_res, "count": 0, "hv": 0, "mp": 0, "y0": None, "y1": None, "sp": {}})
         e = c["sp"].setdefault(idx, [idx, 0, 0, 0, None, None])
@@ -178,7 +227,8 @@ def cells_geojson(store: Store, park: str, out_path: Path, *, res: int = H3_RES,
                len(rows), len(rows) - n_excluded, park=park, excluded=excluded, coarsened=coarsened)
     log_filter("export.cells.taxonomy", "subspecies collapsed to species; GBIF spellings mapped to iNaturalist (config/taxonomy.toml)",
                len(rows), len(rows), park=park, merged_names=merged)
-    index = [{"n": sci, "c": species_meta[sci][0], "k": species_meta[sci][1]} for sci, _ in sorted(species_index.items(), key=lambda kv: kv[1])]
+    index = [{"n": sci, "c": pick_common_name(names.get(sci, {})), "k": species_class[sci]}
+             for sci, _ in sorted(species_index.items(), key=lambda kv: kv[1])]
     fc = {"type": "FeatureCollection", "features": features, "park": park, "h3_res": res, "species_index": index,
           "entry": ["species_index", "count", "human_verified", "model_predicted", "first_year", "last_year"],
           "suppressed": {"excluded": excluded, "coarsened": coarsened}, "merged_names": merged}
@@ -205,6 +255,7 @@ def species_json(store: Store, park: str, out_path: Path, *, rules: list[Suppres
     models = load_models_index() if models is None else models
     auto = auto_sensitive_species(store, park)
     synonyms = load_synonyms()
+    names = common_name_votes(store, park)
     rows = store.sql(
         f"""
         SELECT scientific_name, common_name, taxon_class, taxon_id, coordinate_status, source, confidence_basis, observed_on
@@ -218,10 +269,10 @@ def species_json(store: Store, park: str, out_path: Path, *, rules: list[Suppres
     # the common name "unidentified large mammal (model)"; they are kept as their
     # own entry so the model badge counts are visible in the species list.
     agg: dict[str, dict] = {}
-    for raw_sci, common, cls, tid, status, source, basis, on in rows:
+    for raw_sci, _common, cls, tid, status, source, basis, on in rows:
         sci = canonical_species(raw_sci, synonyms)
         a = agg.setdefault(sci, {
-            "scientific_name": sci, "common_name": None, "class": cls, "taxon_id": None, "common_votes": {},
+            "scientific_name": sci, "common_name": None, "class": cls, "taxon_id": None,
             "sightings": 0, "open_coordinates": 0, "obscured_coordinates": 0,
             "sources": {"inaturalist": 0, "gbif": 0, "mapillary_cv": 0},
             "confidence_basis": {"human_verified": 0, "model_predicted": 0},
@@ -234,8 +285,6 @@ def species_json(store: Store, park: str, out_path: Path, *, rules: list[Suppres
             a["obscured_coordinates"] += 1
         a["sources"][source] = a["sources"].get(source, 0) + 1
         a["confidence_basis"][basis] = a["confidence_basis"].get(basis, 0) + 1
-        if common:
-            a["common_votes"][common] = a["common_votes"].get(common, 0) + 1
         if tid and source == "inaturalist" and raw_sci == sci:
             a["taxon_id"] = tid
         if raw_sci != sci:
@@ -248,12 +297,11 @@ def species_json(store: Store, park: str, out_path: Path, *, rules: list[Suppres
     species = []
     for sci, a in sorted(agg.items(), key=lambda kv: -kv[1]["sightings"]):
         rule = suppression_for(sci, rules, auto)
-        # The common name is the one the most records used, which favours the
-        # species-level iNaturalist name over a subspecies label.
-        common = max(a["common_votes"], key=a["common_votes"].get) if a["common_votes"] else None
+        common = pick_common_name(names.get(sci, {}))   # iNaturalist majority; GBIF only as a fallback
         species.append({
             "scientific_name": sci, "common_name": common, "class": a["class"], "taxon_id": a["taxon_id"],
             "aliases": sorted(a["aliases"]),
+            "other_names": other_common_names(names.get(sci, {}), common),
             "suppression": None if rule is None else {"action": rule.action, "res": rule.res, "why": rule.why},
             "sightings": a["sightings"], "open_coordinates": a["open_coordinates"], "obscured_coordinates": a["obscured_coordinates"],
             "sources": a["sources"], "confidence_basis": a["confidence_basis"],
@@ -309,6 +357,23 @@ def write_manifest(out_dir: Path, files: list[Path], extra: dict | None = None) 
     return path
 
 
+# PARK_FILES — DERIVED (every file the exporters and the landmarks command write)
+# Presence decides what the manifest covers: bias.json exists only after the
+# imagery track ran, landmarks.json and boundary.geojson only after
+# `track_a.py landmarks`.
+PARK_FILES = ("cells.geojson", "species.json", "sightings.parquet", "photos_species.json", "photos_cells.json",
+              "bias.json", "landmarks.json", "boundary.geojson")
+
+
+def write_park_manifest(out_dir: Path, park: str) -> Path:
+    """Hash every data file present so the app can refuse a swapped one. The
+    park's display name rides along so the app can list parks from the
+    manifests baked into it, without a second config file."""
+    p = get_park(park)
+    files = [out_dir / name for name in PARK_FILES if (out_dir / name).exists()]
+    return write_manifest(out_dir, files, {"park": park, "name": p.name, "state": p.state})
+
+
 def export_park(store: Store, park: str, out_dir: Path) -> dict:
     from .photos import export_photos  # local import: photos depends on this module's helpers
 
@@ -319,9 +384,5 @@ def export_park(store: Store, park: str, out_dir: Path) -> dict:
         "sightings": sightings_parquet(store, park, out_dir / "sightings.parquet"),
         "photos": export_photos(store, park, out_dir),
     }
-    files = [out_dir / "cells.geojson", out_dir / "species.json", out_dir / "sightings.parquet",
-             out_dir / "photos_species.json", out_dir / "photos_cells.json"]
-    if (out_dir / "bias.json").exists():   # written by `track_a.py bias --write`, optional
-        files.append(out_dir / "bias.json")
-    write_manifest(out_dir, files, {"park": park})
+    write_park_manifest(out_dir, park)
     return result

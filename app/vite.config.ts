@@ -32,9 +32,11 @@ export default defineConfig({
         cleanupOutdatedCaches: true,
         runtimeCaching: [
           {
-            urlPattern: ({ url }) => url.hostname === "tiles.openfreemap.org",
+            // vector tiles + fonts, USGS imagery, and the terrain DEM tiles: all immutable in practice
+            urlPattern: ({ url }) => ["tiles.openfreemap.org", "basemap.nationalmap.gov"].includes(url.hostname)
+              || (url.hostname === "s3.amazonaws.com" && url.pathname.startsWith("/elevation-tiles-prod/")),
             handler: "CacheFirst",
-            options: { cacheName: "basemap", expiration: { maxEntries: 400, maxAgeSeconds: 30 * 24 * 3600 } },
+            options: { cacheName: "basemap", expiration: { maxEntries: 900, maxAgeSeconds: 30 * 24 * 3600 }, cacheableResponse: { statuses: [0, 200] } },
           },
           {
             urlPattern: ({ url }) => url.pathname.includes("/models/"),

@@ -41,3 +41,24 @@ def test_export_photos_respects_licences_and_sensitivity(store, tmp_path):
     cell_species = {cells["species_index"][e[0]] for entries in cells["cells"].values() for e in entries}
     assert cell_species == {"Bison bison"}
     assert r["displayable"] == 3 and r["photos"] == 5
+
+
+def test_cell_strip_keeps_one_photo_per_species(store, tmp_path):
+    """E-024: the top three photographs of a busy cell were all bison, so a
+    map filtered to elk showed bison in every drawer. The strip is now the top
+    CELL_PHOTOS plus the best photograph of every other species in the cell."""
+    from parkwild.photos import CELL_PHOTOS
+    bison = _obs_with_photos()[0]
+    rows = []
+    for i in range(CELL_PHOTOS + 1):     # more faved bison than the strip holds
+        url = f"https://inaturalist-open-data.s3.amazonaws.com/photos/{9100 + i}/square.jpeg"
+        rows.append({**bison, "id": 9100 + i, "faves_count": 10 - i, "photos": [{"id": 9100 + i, "url": url, "license_code": "cc-by"}]})
+    rows.append({**bison, "id": 9200, "faves_count": 0, "taxon": {**bison["taxon"], "id": 7, "name": "Cervus canadensis", "preferred_common_name": "Wapiti"},
+                 "photos": [{"id": 9200, "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/9200/square.jpeg", "license_code": "cc-by"}]})
+    store.upsert_sightings([inaturalist.normalize(o, "yellowstone") for o in rows])
+    export_photos(store, "yellowstone", tmp_path, rules=[])
+    cells = json.loads((tmp_path / "photos_cells.json").read_text())
+    ((_cell, entries),) = cells["cells"].items()
+    species = [cells["species_index"][e[0]] for e in entries]
+    assert species[:CELL_PHOTOS] == ["Bison bison"] * CELL_PHOTOS       # v1 would have stopped here
+    assert species[CELL_PHOTOS:] == ["Cervus canadensis"] and entries[-1][1] == 9200

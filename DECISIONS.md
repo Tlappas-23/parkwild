@@ -251,6 +251,49 @@ every image by one component, PhotoCredit.
 
 ---
 
+## ADR-0016: The map is of the park: free relief, imagery, an outline and a guided tour
+
+**Context.** The owner's review (2026-09-05): "get the map better rendered
+so it looks like a real map… just of the parks… a virtual walk through with
+major landmarks and where animals are sited". The hard constraints still
+hold: zero cost, no key, never Google.
+**Decision.** Basemap OpenFreeMap "liberty" (OpenStreetMap, ODbL). Relief
+and 3D surface from the AWS Terrain Tiles bucket (Terrarium PNGs, open
+data). Satellite toggle from USGS The National Map imagery (public domain).
+The park outline is the iNaturalist place polygon the sightings were
+filtered by; everything outside it is washed out and the camera cannot
+leave a padded box around it. Landmarks are OpenStreetMap features with a
+Wikidata link (E-025); the tour is a curated, ordered stop list per park in
+config/parks.toml with Wikipedia's opening paragraph (CC BY-SA 4.0, linked)
+and the species recorded within 2.5 km of the stop (open-coordinate cells
+only; coarsened sensitive-species cells never attach to a landmark).
+**Rejected.** Google Maps or Street View (forbidden by the brief). Mapbox
+(key, paid tiers). Esri World Imagery without a key (terms unclear). USGS
+Topo raster as the base (labels blur and rotate when the map is pitched).
+NPS boundary shapefiles (a national download for three outlines).
+**Consequence.** Three more CSP hosts. The service worker caches the new
+tiles like the basemap. Landmarks and boundary files are integrity-hashed
+in the manifest like every other data file. Attribution for every source
+is on the map's attribution control and the About page.
+
+---
+
+## ADR-0017: Parks come from config; the app lists whatever was baked
+
+**Context.** config/parks.toml already described Grand Teton and Great
+Smoky Mountains; the app hardcoded Yellowstone.
+**Decision.** Every Track A command takes `--park`. The manifest carries the
+park's display name, so the app's park list is exactly the data folders
+compiled into the build, switched with a select and `?park=` in the URL.
+Suppression and the taxonomy map apply to every park; the auto-sensitive
+rule is computed per park.
+**Consequence.** Grand Teton and Great Smoky Mountains ingested 2026-09-05
+(numbers in RESULTS.md). The imagery track (Track B) and its bias figures
+exist only for Yellowstone's Lamar Valley until the other corridors are
+pulled.
+
+---
+
 ## Open decisions (owner's call; recorded here so nothing is decided by drift)
 
 | # | Decision | Default until decided | Where |

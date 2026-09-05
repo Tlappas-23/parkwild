@@ -12,6 +12,18 @@ state         = "WY"
 inat_place_id = 10211
 bbox          = [-111.1559859081, 44.1325839001, -109.8241801374, 45.108956716]
 corridors     = ["lamar_valley"]
+# Grand Loop, clockwise from the west entrance. Names must match OSM `name`
+# tags (see landmarks.json "missing_stops" after a run).
+tour = ["Old Faithful", "Grand Prismatic Spring", "West Thumb Geyser Basin", "Yellowstone Lake", "Hayden Valley",
+        "Lower Falls", "Mount Washburn", "Tower Fall", "Lamar Valley", "Mammoth Hot Springs", "Norris Geyser Basin"]
+[yellowstone.tour_fallback]
+"Hayden Valley"       = [-110.44, 44.66]
+"Lamar Valley"        = [-110.26, 44.905]
+"Lower Falls"         = [-110.4967, 44.7180]
+"Lower Falls@wiki"    = "Lower_Falls_of_the_Yellowstone_River"
+"Lamar Valley@wiki"   = "Lamar_Valley"
+"Norris Geyser Basin@wiki" = "Norris_Geyser_Basin"
+"Norris Geyser Basin" = [-110.703, 44.726]
 
 [grand_teton]
 name          = "Grand Teton National Park"
@@ -19,6 +31,17 @@ state         = "WY"
 inat_place_id = 69099
 bbox          = [-110.9484174894, 43.5379225963, -110.4227514174, 44.0840060908]
 corridors     = ["moose_wilson"]
+# South to north along the Teton Park Road and US-89.
+tour = ["Mormon Row", "Moose", "Jenny Lake", "Grand Teton", "Signal Mountain", "Oxbow Bend",
+        "Jackson Lake", "Colter Bay Village"]
+[grand_teton.tour_fallback]
+"Mormon Row"      = [-110.665, 43.657]
+"Mormon Row@wiki" = "Mormon_Row_Historic_District"
+"Signal Mountain" = [-110.612, 43.844]
+"Signal Mountain@wiki" = "Signal_Mountain_(Wyoming)"
+"Oxbow Bend"      = [-110.55, 43.87]
+"Oxbow Bend@wiki" = "Oxbow_Bend"
+"Colter Bay Village@wiki" = "Colter_Bay_Village,_Wyoming"
 
 [great_smoky]
 name          = "Great Smoky Mountains National Park"
@@ -26,3 +49,14 @@ state         = "TN"
 inat_place_id = 72645
 bbox          = [-84.0138923194, 35.4269005382, -82.9980412677, 35.841392749]
 corridors     = ["cades_cove"]
+# Tennessee side to North Carolina side over Newfound Gap Road.
+tour = ["Sugarlands Visitor Center", "Laurel Falls", "Cades Cove", "Chimney Tops", "Newfound Gap", "Kuwohi",
+        "Oconaluftee Visitor Center", "Cataloochee"]
+[great_smoky.tour_fallback]
+"Laurel Falls" = [-83.5966, 35.6733]
+"Laurel Falls@wiki" = "Laurel_Falls_(Tennessee)"
+"Cades Cove"  = [-83.82, 35.59]
+"Cataloochee" = [-83.09, 35.63]
+"Cataloochee@wiki" = "Cataloochee_(Great_Smoky_Mountains)"
+"Sugarlands Visitor Center@wiki" = "Sugarlands"
+"Oconaluftee Visitor Center@wiki" = "Oconaluftee_(Great_Smoky_Mountains)"

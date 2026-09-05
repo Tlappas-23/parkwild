@@ -155,3 +155,30 @@ def test_auto_sensitive_requires_a_majority(store):
         rows.append(inaturalist.normalize(o, "yellowstone"))
     store.upsert_sightings(rows)
     assert auto_sensitive_species(store, "yellowstone") == {"Lontra canadensis"}
+
+
+def test_common_name_is_the_inaturalist_majority_in_both_files(store, tmp_path):
+    """E-024: cells.geojson took the first name seen and species.json a plain
+    majority, so the map said "American Elk" while the list said "Wapiti".
+    Both now use the iNaturalist majority, GBIF names only when iNaturalist
+    has none, and the losing names stay searchable."""
+    _load(store)
+    obs = inat_observations()[0]
+    rows = []
+    for i, cn in enumerate(["American Elk", "Wapiti", "Wapiti", "Wapiti"]):
+        o = {**obs, "id": 7000 + i, "taxon": {**obs["taxon"], "id": 7, "name": "Cervus canadensis", "preferred_common_name": cn}}
+        rows.append(inaturalist.normalize(o, "yellowstone"))
+    base = gbif_occurrences()[0]
+    for i in range(5):    # a GBIF vernacular that would win on count alone
+        occ = {**base, "key": 8000 + i, "species": "Cervus canadensis", "vernacularName": "Elk unknown", "datasetKey": "d1"}
+        rows.append(gbif.normalize(occ, "yellowstone"))
+    rows.append(gbif.normalize({**base, "key": 8100, "species": "Alces alces", "vernacularName": "Moose", "datasetKey": "d1"}, "yellowstone"))
+    store.upsert_sightings(rows)
+    cells_geojson(store, "yellowstone", tmp_path / "c.geojson", rules=[])
+    species_json(store, "yellowstone", tmp_path / "s.json", rules=[])
+    cell_names = {e["n"]: e["c"] for e in json.loads((tmp_path / "c.geojson").read_text())["species_index"]}
+    sp = {s["scientific_name"]: s for s in json.loads((tmp_path / "s.json").read_text())["species"]}
+    assert cell_names["Cervus canadensis"] == "Wapiti" and sp["Cervus canadensis"]["common_name"] == "Wapiti"
+    assert sp["Cervus canadensis"]["other_names"] == ["American Elk", "Elk unknown"]
+    assert cell_names["Alces alces"] == "Moose" and sp["Alces alces"]["common_name"] == "Moose"     # GBIF-only fallback
+    assert all(cell_names[n] == sp[n]["common_name"] for n in cell_names)

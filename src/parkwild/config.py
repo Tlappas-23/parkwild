@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import os
 import tomllib
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 from .geo import BBox
@@ -114,6 +114,14 @@ class Park:
     inat_place_id: int
     bbox: BBox
     corridors: tuple[str, ...] = ()
+    # The virtual tour: stop names in visiting order, matched to OpenStreetMap
+    # features by parkwild.landmarks; tour_fallback gives a coordinate for a
+    # stop OSM has no named feature for (valleys, mostly).
+    tour: tuple[str, ...] = ()
+    tour_fallback: dict[str, tuple[float, float]] = field(default_factory=dict)
+    # "<stop>@wiki" = article title, for stops whose OSM feature has no wikipedia
+    # tag or whose bare name is a disambiguation page ("Lower Falls").
+    tour_wiki: dict[str, str] = field(default_factory=dict)
 
 
 def load_parks(path: Path = PARKS_TOML) -> dict[str, Park]:
@@ -129,6 +137,9 @@ def load_parks(path: Path = PARKS_TOML) -> dict[str, Park]:
             inat_place_id=int(section["inat_place_id"]),
             bbox=BBox.from_list(section["bbox"]),
             corridors=tuple(section.get("corridors", ())),
+            tour=tuple(section.get("tour", ())),
+            tour_fallback={k: (float(v[0]), float(v[1])) for k, v in section.get("tour_fallback", {}).items() if not k.endswith("@wiki")},
+            tour_wiki={k[:-5]: str(v) for k, v in section.get("tour_fallback", {}).items() if k.endswith("@wiki")},
         )
         for key, section in raw.items()
     }

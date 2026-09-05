@@ -124,9 +124,26 @@ def export_photos(store: Store, park: str, out_dir: Path, *, rules: list[Suppres
               for (faves, on, pid, ext, host, obs, lic, oid, cell) in best(entries, SPECIES_PHOTOS)]
         for sci, entries in by_species.items()
     }
+    # A cell's strip is its best few photographs overall plus the best one of
+    # every species photographed there, so filtering the map to elk and tapping
+    # a cell shows an elk from that cell rather than three bison (E-024). The
+    # first version kept the top CELL_PHOTOS only; it is kept below for the
+    # comparison test.
+    def cell_pick(entries: list[tuple]) -> list[tuple]:
+        top = cell_pick_v1(entries)
+        seen = {e[0] for e in top}
+        for e in best(entries, len(entries), key_faves=1):
+            if e[0] not in seen:
+                top.append(e)
+                seen.add(e[0])
+        return top
+
+    def cell_pick_v1(entries: list[tuple]) -> list[tuple]:
+        return best(entries, CELL_PHOTOS, key_faves=1)
+
     cells_out = {
         cell: [[idx, pid, ext, host, obs, lic, oid, on or None]
-               for (idx, faves, on, pid, ext, host, obs, lic, oid, _c) in best(entries, CELL_PHOTOS, key_faves=1)]
+               for (idx, faves, on, pid, ext, host, obs, lic, oid, _c) in cell_pick(entries)]
         for cell, entries in by_cell.items()
     }
     index = [sci for sci, _ in sorted(species_index.items(), key=lambda kv: kv[1])]
