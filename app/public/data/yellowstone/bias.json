@@ -1,0 +1,66 @@
+{
+ "road": {
+  "park": "yellowstone",
+  "corridor": "lamar_valley",
+  "h3_res": 9,
+  "ring": 1,
+  "n_sightings_in_bbox": 11402,
+  "n_covered": 8546,
+  "fraction_outside_coverage": 0.2504823715137695,
+  "by_class": {
+   "Mammalia": {
+    "n": 6706,
+    "covered": 5612,
+    "fraction_outside": 0.16313748881598567
+   },
+   "Aves": {
+    "n": 4696,
+    "covered": 2934,
+    "fraction_outside": 0.37521294718909715
+   }
+  },
+  "n_coverage_cells": 441
+ },
+ "seasonal": {
+  "park": "yellowstone",
+  "corridor": "lamar_valley",
+  "images_by_month": [
+   0,
+   0,
+   12,
+   0,
+   0,
+   23741,
+   311,
+   29,
+   1829,
+   1508,
+   0,
+   0
+  ],
+  "sightings_by_month": [
+   743,
+   841,
+   556,
+   1039,
+   8404,
+   17275,
+   12694,
+   8481,
+   6820,
+   2086,
+   304,
+   370
+  ],
+  "images_summer_share": 0.8779074006562159,
+  "sightings_summer_share": 0.644993541677151,
+  "months_with_no_imagery": [
+   1,
+   2,
+   4,
+   5,
+   11,
+   12
+  ]
+ }
+}

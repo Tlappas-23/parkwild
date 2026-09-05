@@ -54,12 +54,17 @@ def test_exports(store, tmp_path):
     out = tmp_path / "export"
     r = export_park(store, "yellowstone", out)
     fc = json.loads((out / "cells.geojson").read_text())
-    # open-coordinate canonical rows: bison 1001, raven 1003, raven 5004 => 3 features (obscured grizzly & wolf excluded)
-    assert r["cells"]["sightings_in_cells"] == 3 and len(fc["features"]) == 3
-    props = {(f["properties"]["species"], f["properties"]["count"]) for f in fc["features"]}
-    assert ("Bison bison", 1) in props and fc["h3_res"] == 9
-    ring = fc["features"][0]["geometry"]["coordinates"][0]
+    # open-coordinate canonical rows: bison 1001, raven 1003, raven 5004 (obscured grizzly & wolf excluded).
+    # bison and raven 1003 are 40 m apart, i.e. the same r9 cell => 2 cells.
+    assert r["cells"]["sightings_in_cells"] == 3 and r["cells"]["cells"] == 2 and len(fc["features"]) == 2
+    names = [e["n"] for e in fc["species_index"]]
+    assert set(names) == {"Bison bison", "Corvus corax"} and fc["h3_res"] == 9
+    shared = next(f for f in fc["features"] if f["properties"]["count"] == 2)
+    entries = {names[e[0]]: e for e in shared["properties"]["sp"]}
+    assert entries["Bison bison"][1] == 1 and entries["Bison bison"][2] == 1 and entries["Bison bison"][4] == 2023
+    ring = shared["geometry"]["coordinates"][0]
     assert len(ring) == 7 and -180 <= ring[0][0] <= 180 and -90 <= ring[0][1] <= 90   # lon, lat order
+    assert all(len(str(v).split(".")[-1]) <= 5 for pt in ring for v in pt)            # 5-decimal coordinates
     sp = json.loads((out / "species.json").read_text())
     by_name = {s["scientific_name"]: s for s in sp["species"]}
     assert by_name["Canis lupus"]["obscured_coordinates"] == 1 and by_name["Canis lupus"]["open_coordinates"] == 0
@@ -100,11 +105,53 @@ def test_export_applies_suppression(store, tmp_path):
              Suppression("Corvus corax", "raven", "coarsen", 6, "test")]
     r = cells_geojson(store, "yellowstone", tmp_path / "c.geojson", rules=rules)
     fc = json.loads((tmp_path / "c.geojson").read_text())
-    species = {f["properties"]["species"] for f in fc["features"]}
-    assert "Canis lupus" not in species and r["excluded"] == 1
-    ravens = [f for f in fc["features"] if f["properties"]["species"] == "Corvus corax"]
-    assert ravens and all(f["properties"]["coarsened"] and f["properties"]["res"] == 6 for f in ravens)
+    names = [e["n"] for e in fc["species_index"]]
+    assert "Canis lupus" not in names and r["excluded"] == 1
+    raven_idx = names.index("Corvus corax")
+    raven_cells = [f for f in fc["features"] if any(e[0] == raven_idx for e in f["properties"]["sp"])]
+    assert raven_cells and all(f["properties"]["coarsened"] and f["properties"]["res"] == 6 for f in raven_cells)
     assert fc["suppressed"]["excluded"] == {"Canis lupus": 1}
     species_json(store, "yellowstone", tmp_path / "s.json", rules=rules)
     sp = {s["scientific_name"]: s for s in json.loads((tmp_path / "s.json").read_text())["species"]}
     assert sp["Canis lupus"]["suppression"]["action"] == "exclude" and sp["Bison bison"]["suppression"] is None
+
+
+def test_canonical_species_collapses_subspecies_and_synonyms():
+    from parkwild.config import canonical_species, load_synonyms
+    syn = load_synonyms()
+    assert canonical_species("Bos bison bison", syn) == "Bison bison"
+    assert canonical_species("Bos bison", syn) == "Bison bison"
+    assert canonical_species("Cervus canadensis canadensis", syn) == "Cervus canadensis"
+    assert canonical_species("Cervus elaphus", syn) == "Cervus canadensis"
+    assert canonical_species("Ursus arctos horribilis", syn) == "Ursus arctos"
+    assert canonical_species("Corvus corax", syn) == "Corvus corax"
+    assert canonical_species(None, syn) is None
+
+
+def test_species_json_merges_names(store, tmp_path):
+    _load(store)
+    # A GBIF-spelled bison and a subspecies row should fold into the iNaturalist species.
+    from parkwild.gbif import normalize as gn
+    extra = gn({**gbif_occurrences()[0], "key": 9001, "species": "Bos bison", "datasetKey": "d1"}, "yellowstone")
+    extra2 = gn({**gbif_occurrences()[0], "key": 9002, "species": "Bos bison bison", "taxonRank": "SUBSPECIES", "datasetKey": "d1"}, "yellowstone")
+    store.upsert_sightings([extra, extra2])
+    species_json(store, "yellowstone", tmp_path / "s.json")
+    sp = {s["scientific_name"]: s for s in json.loads((tmp_path / "s.json").read_text())["species"]}
+    assert "Bos bison" not in sp and sp["Bison bison"]["sightings"] == 4
+    assert set(sp["Bison bison"]["aliases"]) == {"Bos bison", "Bos bison bison"}
+
+
+def test_auto_sensitive_requires_a_majority(store):
+    """E-019: one flagged observation among many must not coarsen a species."""
+    from parkwild.export import auto_sensitive_species
+    base = inat_observations()[0]
+    rows = []
+    for i in range(10):   # bison: one of ten flagged
+        o = {**base, "id": 2000 + i, "taxon_geoprivacy": "obscured" if i == 0 else None}
+        rows.append(inaturalist.normalize(o, "yellowstone"))
+    for i in range(4):    # otter: all flagged
+        o = {**base, "id": 3000 + i, "taxon_geoprivacy": "obscured",
+             "taxon": {"id": 9, "name": "Lontra canadensis", "preferred_common_name": "River Otter", "rank": "species", "iconic_taxon_name": "Mammalia"}}
+        rows.append(inaturalist.normalize(o, "yellowstone"))
+    store.upsert_sightings(rows)
+    assert auto_sensitive_species(store, "yellowstone") == {"Lontra canadensis"}

@@ -78,13 +78,26 @@ def test_phase0_numbers_and_markdown(store, tmp_path):
     assert p["n_indexed"] == 1 and p["n_predicted"] == 1 and p["images_with_animal"][0.2]["count"] == 1
 
 
+def test_report_refuses_to_mix_reviewers(store, tmp_path):
+    seed_phase0(store, tmp_path)
+    for who, verdict in (("me", "tp"), ("claude", "fp")):
+        store.upsert_reviews([{"image_id": "img1", "variant": "full", "det_idx": 0, "reviewer": who, "verdict": verdict,
+                               "true_species": "bison" if verdict == "tp" else "rock", "species_agree": "yes" if verdict == "tp" else None,
+                               "est_distance_m": None, "notes": None}])
+    import pytest
+    with pytest.raises(ValueError):
+        phase0_numbers(store, "test")
+    assert phase0_numbers(store, "test", reviewer="me")["review"]["tp"] == 1
+    assert phase0_numbers(store, "test", reviewer="claude")["review"]["fp"] == 1
+
+
 def test_update_results_md_is_idempotent(tmp_path):
     path = tmp_path / "RESULTS.md"
     path.write_text("# RESULTS\n\nhand-written intro\n")
-    update_results_md(path, "test:perspective", "first")
-    update_results_md(path, "test:perspective", "second")
+    update_results_md(path, "phase0:test:perspective", "first", heading="### T")
+    update_results_md(path, "phase0:test:perspective", "second")
     text = path.read_text()
-    assert "hand-written intro" in text
+    assert "hand-written intro" in text and "### T" in text
     assert text.count("<!-- phase0:test:perspective:start -->") == 1
     assert "second" in text and "first" not in text
 

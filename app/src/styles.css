@@ -24,7 +24,8 @@ main { flex: 1; display: flex; flex-direction: column; }
 .filters label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--muted); }
 .filters select, .filters input[type=range] { font: inherit; min-width: 220px; }
 .map-wrap { position: relative; flex: 1; min-height: 60vh; }
-.map { position: absolute; inset: 0; }
+/* two classes: MapLibre's own stylesheet sets .maplibregl-map { position: relative } and loads after ours */
+.map, .map.maplibregl-map { position: absolute; inset: 0; width: 100%; height: 100%; }
 .panel { position: absolute; top: 12px; left: 12px; width: min(340px, calc(100% - 24px)); max-height: calc(100% - 24px); overflow: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; box-shadow: 0 6px 24px rgba(0,0,0,0.08); }
 .panel-head { display: flex; justify-content: space-between; align-items: center; }
 .list { list-style: none; padding: 0; margin: 8px 0 0; }

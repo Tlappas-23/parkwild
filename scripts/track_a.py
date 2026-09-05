@@ -92,7 +92,7 @@ def cmd_bias(args):
     block = render_bias_markdown(road, season)
     print(block)
     if args.write:
-        update_results_md(RESULTS_MD, f"bias:{corridor.key}", block)
+        update_results_md(RESULTS_MD, f"bias:{corridor.key}", block, heading=f"### Bias: {corridor.key}")
         out = EXPORT_DIR / park.key / "bias.json"
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(json.dumps({"road": road, "seasonal": season}, indent=1, default=str))

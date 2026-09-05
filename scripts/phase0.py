@@ -270,7 +270,12 @@ def cmd_report(args: argparse.Namespace) -> None:
     """Import any filled review CSV, measure road length via Overpass, compute
     the Phase 0 numbers for one population, print them, optionally write them."""
     c = get_corridor(args.corridor)
-    review_csv = REVIEW_DIR / c.key / args.population / "review.csv"
+    # Per-reviewer files keep passes apart: review_<reviewer>.csv if it exists,
+    # else review.csv (the template, filled in by whoever runs with --reviewer me).
+    review_dir = REVIEW_DIR / c.key / args.population
+    review_csv = review_dir / f"review_{args.reviewer}.csv"
+    if not review_csv.exists():
+        review_csv = review_dir / "review.csv"
     road_km = trail_km = None
     if not args.no_overpass:
         try:
@@ -284,16 +289,17 @@ def cmd_report(args: argparse.Namespace) -> None:
             rows = load_review_csv(review_csv, reviewer=args.reviewer)
             store.upsert_reviews(rows)
             log.info("imported %d verdicts from %s", len(rows), review_csv)
-        numbers = phase0_numbers(store, c.key, population=args.population, det_threshold=args.threshold, road_km=road_km, trail_km=trail_km)
+        numbers = phase0_numbers(store, c.key, population=args.population, det_threshold=args.threshold, road_km=road_km, trail_km=trail_km,
+                                 reviewer=args.reviewer)
     block = render_phase0_markdown(numbers)
     print(block)
-    key = f"{c.key}:{args.population}"
+    key = f"phase0:{c.key}:{args.population}:{args.reviewer}"
     if args.json:
         out = DATA_DIR / f"phase0_{c.key}_{args.population}.json"
         out.write_text(dump_json(numbers))
         print(f"wrote {out}")
     if args.write:
-        update_results_md(RESULTS_MD, key, block)
+        update_results_md(RESULTS_MD, key, block, heading=f"### Phase 0 numbers: {c.key}, {args.population}, reviewer {args.reviewer}")
         print(f"updated {RESULTS_MD} block {key}")
 
 

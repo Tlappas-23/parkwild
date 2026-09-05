@@ -26,6 +26,7 @@ DB_PATH = DATA_DIR / "parkwild.duckdb"
 CORRIDORS_TOML = ROOT / "config" / "corridors.toml"
 PARKS_TOML = ROOT / "config" / "parks.toml"
 SUPPRESSION_TOML = ROOT / "config" / "suppression.toml"
+TAXONOMY_TOML = ROOT / "config" / "taxonomy.toml"
 EXPORT_DIR = DATA_DIR / "export"          # data/export/<park>/{cells.geojson,species.json,sightings.parquet,manifest.json}
 RESULTS_MD = ROOT / "RESULTS.md"
 
@@ -162,3 +163,19 @@ def load_suppression(path: Path = SUPPRESSION_TOML) -> list[Suppression]:
             raise ValueError(f"suppression {e['name']}: coarsen needs res")
         out.append(Suppression(e["name"], e.get("common", ""), e["action"], e.get("res"), e.get("why", "")))
     return out
+
+
+def load_synonyms(path: Path = TAXONOMY_TOML) -> dict[str, str]:
+    """GBIF-backbone -> iNaturalist spellings for the same animal (config/taxonomy.toml)."""
+    with open(path, "rb") as fh:
+        return dict(tomllib.load(fh).get("synonyms", {}))
+
+
+def canonical_species(name: str | None, synonyms: dict[str, str]) -> str | None:
+    """Collapse a subspecies to its species (first two words) and apply the
+    synonym table. 'Bos bison bison' -> 'Bos bison' -> 'Bison bison'."""
+    if not name:
+        return None
+    parts = name.split()
+    base = " ".join(parts[:2]) if len(parts) >= 3 and parts[0][:1].isupper() and parts[1].islower() else name
+    return synonyms.get(base, base)

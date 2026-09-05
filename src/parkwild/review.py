@@ -54,7 +54,7 @@ REVIEW_COLUMNS = [
     "top5", "source_url", "frame_file", "crop_file",
     # filled by me
     "verdict",          # tp | fp | unsure
-    "true_species",     # what it actually is (free text; blank if fp)
+    "true_species",     # what it actually is: the species for a tp; for a fp, the thing (rock, shrub, log, vehicle, person, shadow, sign)
     "species_agree",    # yes | rollup | no | na   (rollup = model gave a correct coarser taxon)
     "est_distance_m",   # rough range from camera to animal, metres
     "notes",

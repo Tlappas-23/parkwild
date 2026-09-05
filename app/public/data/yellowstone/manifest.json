@@ -1,0 +1,23 @@
+{
+  "built": "2026-09-05T19:12:12+00:00",
+  "git_commit": "51ac7ae4594201093ddec991750bf13327e71254",
+  "files": {
+    "cells.geojson": {
+      "sha256": "e9d1c70573cde9398b65a07f3ca0245a81a99929b1a54d8ef525d52fe4639d55",
+      "bytes": 2738070
+    },
+    "species.json": {
+      "sha256": "30abdf19125f415552ed936ed6a647bf2dadfb8590a875d56fa0482b47576701",
+      "bytes": 125149
+    },
+    "sightings.parquet": {
+      "sha256": "b3d80a345bb182adaa3058df5f4ce88aff7fdae3e29df6a6bac7ba731e4b98b1",
+      "bytes": 3488203
+    },
+    "bias.json": {
+      "sha256": "3f7f2a3130de777ee07cb73cd76840068c6c4c218b9e6b77447ce2a2de0f9fc4",
+      "bytes": 937
+    }
+  },
+  "park": "yellowstone"
+}

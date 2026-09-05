@@ -73,21 +73,27 @@ def ingest_inaturalist(store: Store, park: str, *, place_id: int | None, bbox: B
 
 def ingest_gbif(store: Store, park: str, bbox: BBox, *, classes: Iterable[str] = ("Mammalia", "Aves"),
                 max_records: int | None = None, skip_datasets: tuple[str, ...] = (gbif.INAT_DATASET_KEY,), batch: int = 500) -> dict:
-    """Pull GBIF occurrences for each class inside the park bbox, skipping the
-    iNaturalist mirror dataset (already ingested directly)."""
+    """Pull GBIF occurrences for each class inside the park bbox, querying only
+    the datasets that are wanted (the iNaturalist mirror and, by decision,
+    eBird are never downloaded; E-015)."""
     summary: dict = {}
     for cls in classes:
         class_key = gbif.CLASS_KEYS[cls]
+        all_datasets = gbif.count_by_dataset(bbox, class_key, facet_limit=gbif.FACET_LIMIT)
+        wanted = [(ds, n) for ds, n in all_datasets if ds not in skip_datasets]
+        skipped_by = {ds: n for ds, n in all_datasets if ds in skip_datasets}
+        n_skipped = sum(skipped_by.values())
         rows: list[dict] = []
-        n_raw = n_skipped = n_written = 0
+        n_raw = n_written = 0
         status_counts: dict[str, int] = {}
-        skipped_by: dict[str, int] = {}
-        for occ in gbif.iter_occurrences(bbox, class_key, max_records=max_records):
+        if not wanted:
+            log_filter("track_a.gbif", f"{cls}: no wanted datasets", n_skipped, 0, park=park, taxon_class=cls, skipped_by_dataset=skipped_by)
+            summary[cls] = {"fetched": 0, "skipped_mirror": n_skipped, "written": 0, "coordinate_status": {}}
+            continue
+        for occ in gbif.iter_occurrences(bbox, class_key, dataset_keys=[ds for ds, _ in wanted], max_records=max_records):
             n_raw += 1
             ds = occ.get("datasetKey")
-            if ds in skip_datasets:
-                n_skipped += 1
-                skipped_by[ds] = skipped_by.get(ds, 0) + 1
+            if ds in skip_datasets:   # belt and braces; the query should never return these
                 continue
             row = gbif.normalize(occ, park)
             status_counts[row["coordinate_status"]] = status_counts.get(row["coordinate_status"], 0) + 1
@@ -99,8 +105,9 @@ def ingest_gbif(store: Store, park: str, bbox: BBox, *, classes: Iterable[str] =
         if rows:
             check_lon_lat(rows)
             n_written += store.upsert_sightings(rows)
-        log_filter("track_a.gbif", f"{cls}: skip datasets already ingested directly ({', '.join(skip_datasets)})",
-                   n_raw, n_raw - n_skipped, park=park, taxon_class=cls, skipped_by_dataset=skipped_by, coordinate_status=status_counts)
+        log_filter("track_a.gbif", f"{cls}: skipped datasets never downloaded ({', '.join(skip_datasets)}); wanted datasets queried by key",
+                   n_raw + n_skipped, n_raw, park=park, taxon_class=cls, skipped_by_dataset=skipped_by,
+                   wanted_datasets=len(wanted), coordinate_status=status_counts)
         summary[cls] = {"fetched": n_raw, "skipped_mirror": n_skipped, "written": n_written, "coordinate_status": status_counts}
     return summary
 

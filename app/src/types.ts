@@ -3,19 +3,25 @@
 
 export type ConfidenceBasis = "human_verified" | "model_predicted";
 
+// One species entry inside a cell: [species_index, count, human_verified, model_predicted, first_year, last_year]
+export type SpeciesEntry = [number, number, number, number, number | null, number | null];
+
 export interface CellProps {
   cell: string;
-  species: string;
-  common_name: string | null;
-  class: string | null;
   res: number;
   coarsened: boolean;
   count: number;
-  human_verified: number;
-  model_predicted: number;
-  first: string | null;
-  last: string | null;
-  months: number[];
+  hv: number;
+  mp: number;
+  y0: number | null;
+  y1: number | null;
+  sp: SpeciesEntry[];
+}
+
+export interface SpeciesIndexEntry {
+  n: string;             // scientific name
+  c: string | null;      // common name
+  k: string | null;      // class
 }
 
 export interface CellFeature {
@@ -29,6 +35,8 @@ export interface CellsFile {
   features: CellFeature[];
   park: string;
   h3_res: number;
+  species_index: SpeciesIndexEntry[];
+  entry: string[];
   suppressed: { excluded: Record<string, number>; coarsened: Record<string, number> };
 }
 
@@ -37,6 +45,7 @@ export interface Species {
   common_name: string | null;
   class: string | null;
   taxon_id: string | null;
+  aliases: string[];
   suppression: { action: "exclude" | "coarsen"; res: number | null; why: string } | null;
   sightings: number;
   open_coordinates: number;

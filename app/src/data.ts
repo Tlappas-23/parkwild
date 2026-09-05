@@ -22,10 +22,16 @@ async function sha256Hex(buf: ArrayBuffer): Promise<string> {
 }
 
 async function fetchVerified<T>(park: string, name: string, manifest: Manifest | null): Promise<T> {
-  const res = await fetch(`/data/${park}/${name}`, { cache: "force-cache" });
+  // The manifest hash doubles as a cache key: a rebuild changes the URL, so a
+  // browser can never serve last build's file against this build's manifest.
+  // (The first version used cache: "force-cache" and tripped its own integrity
+  // check on the second build.)
+  const expectedHash = manifest?.files[name]?.sha256;
+  const url = `/data/${park}/${name}` + (expectedHash ? `?v=${expectedHash.slice(0, 16)}` : "");
+  const res = await fetch(url);
   if (!res.ok) throw new Error(`${name}: HTTP ${res.status}`);
   const buf = await res.arrayBuffer();
-  const expected = manifest?.files[name]?.sha256;
+  const expected = expectedHash;
   if (expected) {
     const actual = await sha256Hex(buf);
     if (actual !== expected) throw new Error(`${name} failed its integrity check (expected ${expected.slice(0, 12)}…, got ${actual.slice(0, 12)}…)`);

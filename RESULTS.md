@@ -90,22 +90,151 @@ excluded on purpose (see above).
 | 4 | Species-level agreement with my own eyes on the true positives | _not run_ | _not run_ |
 | 5 | Mapillary density in the corridor (images per km) and date range | 27,430 images over 59 km of road (OSM): **467 per road km**. Captured 2014-09 to 2024-08, but 87% are June 2024 panoramas from one contributor; the 3,690 perspective frames run 2014 to 2018 plus a few in 2024. |
 
+### Perspective frames: first read (reviewer: claude, 2026-09-05)
+
+Stratified review of 20 boxes (10 / 9 / 1 per band; the top band has one
+box in the whole population, so it cannot be judged). Verdicts are in
+`data/review/lamar_valley/perspective/review_claude.csv`; a second pass by
+the owner goes in `review.csv` under reviewer `me` and is reported separately.
+
+- **Hit rate:** 33 of 400 frames have an animal box at 0.2, 8.2% (95% CI 6 to 11%).
+- **Precision:** 42% (95% CI 23 to 64%, n=19). By band: 0.2 to 0.5 33% (95% CI 12 to 65%, n=9); 0.5 to 0.8 44% (95% CI 19 to 73%, n=9); 0.8+ 100% (95% CI 21 to 100%, n=1).
+- **What the false positives were:** 6 people (3 groups of hikers, 2 motorcyclists), 4 lone conifers on hillsides, 1 car, 1 patch of road. The ensemble labels all six people "human", so a filter on the ensemble label would remove them; the trees are the residual problem, and the highest-confidence false positive (0.737) is a tree.
+- **Range:** confirmed bison at 45 to 150 m. The two farthest (130 and 150 m) scored 0.20 and 0.26, at the threshold. Nothing beyond 150 m was detected at all; that is the practical range for a bison-sized animal in a ~3800 px frame.
+- **Species:** all 8 true positives are bison. The ensemble said "american bison" for 5 (62%), "vehicle" for 2 and "domestic cattle" for 1. The trivial baseline ("say bison") scores 8 of 8. In Lamar Valley the classifier adds nothing over the detector; that may not hold for a corridor with several species.
+- **Recall:** unmeasured.
+
+**Routing read (perspective):** hit rate clears the primary line (>= 5%);
+precision sits in the supplementary band (35 to 60%) with an interval that
+touches both neighbours because n is 19. Per the spec that is a stop-and-ask.
+
+### Sliced panoramas: first read (reviewer: claude, 2026-09-05)
+
+100 panoramas from the dominant 2024 contributor, 400 slices. Stratified
+review of 17 boxes (10 low band, 7 mid band, none above 0.8).
+
+- **Hit rate:** 54 of 100 panoramas (16% of slices) have a box at 0.2. **Artifact.** Seven of the seventeen sampled boxes, and every box in the 0.5 to 0.8 band, are the panorama camera's own mounting arm, a black curved bar present in every right-facing (yaw090) slice.
+- **Precision:** 2 of 16 judged, 12% (95% CI 3 to 36%). The other false positives: 3 rocks, 2 clouds, 1 lone tree, 1 car.
+- **True positives:** a bison running past parked cars at ~40 m (ensemble: vehicle) and a herd on pasture at ~250 m, about 8 px per animal (ensemble: blank). Both are bison.
+- **Read:** panoramas as processed are a negative result, and not because of resolution alone: the rig sits in a fixed place in the frame and a mask would remove the mid band's junk entirely. With the rig masked, the low band is rocks and clouds, and the model could not name either bison. Slicing did not extend range; nothing was found past ~250 m and that one is at the edge of a guess.
+- **Recall:** unmeasured.
+
 ### Routing decision
 
-_Pending detection. Track A proceeds regardless (BUILD_SPEC.md). The decision
-and the numbers behind it go to DECISIONS.md when made._
+_Proposed: **supplementary layer for perspective frames; panoramas excluded
+until the camera rig is masked and re-measured.** Pending owner confirmation
+(ADR-0013 draft). Track A proceeds regardless and already ships._
 
 ### Auto-generated numbers
 
-The block below is (re)written by `make report`. Hand-edit nothing inside the markers.
+The blocks below are (re)written by `make report POPULATION=...`. Hand-edit
+nothing inside the markers.
 
-<!-- phase0:lamar_valley:perspective:start -->
-_not yet run_
-<!-- phase0:lamar_valley:perspective:end -->
+#### Perspective frames, reviewer claude
 
-<!-- phase0:lamar_valley:pano:start -->
-_not yet run_
-<!-- phase0:lamar_valley:pano:end -->
+<!-- phase0:lamar_valley:perspective:claude:start -->
+_Population: **perspective**. Generated 2026-09-05 15:05 from `data/parkwild.duckdb`. Model versions: 4.0.3a. Recall: **unmeasured**._
+
+**Volume**
+
+| Indexed (this population) | Downloaded | Download failed | Run through SpeciesNet | Frames/slices scored | Model failures |
+|---|---|---|---|---|---|
+| 3,690 | 400 | 0 | 400 | 400 | 0 |
+
+**1. Images with any MegaDetector animal detection**
+
+| Threshold | Images | Fraction |
+|---|---|---|
+| >= 0.2 | 33 | 8.2% (95% CI 6 to 11%) |
+| >= 0.5 | 12 | 3.0% (95% CI 2 to 5%) |
+| >= 0.8 | 1 | 0.2% (95% CI 0 to 1%) |
+
+At >= 0.2: 43 animal boxes in 33 images form 25 frame-chains (same sequence, same label, consecutive frames within 60 s and 200 m), an estimated 34 distinct individuals; duplicate rate 20.9%.
+For context at >= 0.2: 20 images have a human box and 189 a vehicle box.
+
+Top ensemble labels on images with an animal box >= 0.2: unknown (15), vehicle (5), american bison (5), human (3), blank (2), animal (2), domestic cattle (1)
+
+**2. True positives on manual inspection** (20 boxes reviewed, stratified by confidence band, reviewer claude)
+
+- true positive: 8, false positive: 11, unsure: 1
+- precision (tp / (tp + fp)): 42.1% (95% CI 23 to 64%)
+- band 0.2-0.5: n=10, precision 33.3% (95% CI 12 to 65%)
+- band 0.5-0.8: n=9, precision 44.4% (95% CI 19 to 73%)
+- band 0.8-1.0: n=1, precision 100.0% (95% CI 21 to 100%)
+- recall: unmeasured (no exhaustive annotation exists; a number would be invented)
+
+**3. Distance of true positives from the camera** (n=8 with an estimate)
+
+- median 70 m, p90 136 m, farthest confirmed 150 m
+
+**4. Species agreement on true positives** (8 judged)
+
+- exact: 5, correct coarser taxon (rollup): 0, wrong: 3
+- trivial baseline (always say 'american bison'): 100.0% on n=8
+
+**5. Mapillary density in the corridor** (whole corridor, both populations)
+
+- 27,430 images in 55 sequences from 8 contributors; 23,740 panoramas
+- road inside bbox (OSM): n/a; trail: n/a; images per road km: n/a
+- captured between 2014-09-02 22:10:04 and 2024-08-15 22:04:02.856000
+- this population by year: 2014: 376, 2015: 513, 2016: 1,263, 2018: 1,508, 2019: 1, 2024: 29
+- this population by month: 3: 12, 6: 1, 7: 311, 8: 29, 9: 1,829, 10: 1,508
+- camera types: spherical: 23,740, perspective: 3,690
+
+<!-- phase0:lamar_valley:perspective:claude:end -->
+
+#### Sliced panoramas, reviewer claude
+
+<!-- phase0:lamar_valley:pano:claude:start -->
+_Population: **pano**. Generated 2026-09-05 15:08 from `data/parkwild.duckdb`. Model versions: 4.0.3a. Recall: **unmeasured**._
+
+**Volume**
+
+| Indexed (this population) | Downloaded | Download failed | Run through SpeciesNet | Frames/slices scored | Model failures |
+|---|---|---|---|---|---|
+| 23,740 | 100 | 0 | 100 | 400 | 0 |
+
+**1. Images with any MegaDetector animal detection**
+
+| Threshold | Images | Fraction |
+|---|---|---|
+| >= 0.2 | 54 | 54.0% (95% CI 44 to 63%) |
+| >= 0.5 | 8 | 8.0% (95% CI 4 to 15%) |
+| >= 0.8 | 0 | 0.0% (95% CI 0 to 4%) |
+
+At >= 0.2: 87 animal boxes in 54 images form 51 frame-chains (same sequence, same label, consecutive frames within 60 s and 200 m), an estimated 78 distinct individuals; duplicate rate 10.3%.
+For context at >= 0.2: 6 images have a human box and 95 a vehicle box.
+
+Top ensemble labels on images with an animal box >= 0.2: unknown (28), blank (26), animal (7), vehicle (3)
+
+**2. True positives on manual inspection** (17 boxes reviewed, stratified by confidence band, reviewer claude)
+
+- true positive: 2, false positive: 14, unsure: 1
+- precision (tp / (tp + fp)): 12.5% (95% CI 3 to 36%)
+- band 0.2-0.5: n=10, precision 22.2% (95% CI 6 to 55%)
+- band 0.5-0.8: n=7, precision 0.0% (95% CI 0 to 35%)
+- band 0.8-1.0: n=0, precision n/a
+- recall: unmeasured (no exhaustive annotation exists; a number would be invented)
+
+**3. Distance of true positives from the camera** (n=2 with an estimate)
+
+- median 145 m, p90 229 m, farthest confirmed 250 m
+
+**4. Species agreement on true positives** (2 judged)
+
+- exact: 0, correct coarser taxon (rollup): 0, wrong: 2
+- trivial baseline (always say 'american bison'): 100.0% on n=2
+
+**5. Mapillary density in the corridor** (whole corridor, both populations)
+
+- 27,430 images in 55 sequences from 8 contributors; 23,740 panoramas
+- road inside bbox (OSM): n/a; trail: n/a; images per road km: n/a
+- captured between 2014-09-02 22:10:04 and 2024-08-15 22:04:02.856000
+- this population by year: 2024: 23,740
+- this population by month: 6: 23,740
+- camera types: spherical: 23,740, perspective: 3,690
+
+<!-- phase0:lamar_valley:pano:claude:end -->
 
 ## Phase 1: Track A reference data
 
@@ -125,7 +254,51 @@ records would be nine tenths of the park's data and their coordinates are
 checklist locations, not bird locations. Bird counts below therefore
 understate what eBird knows.
 
-### Yellowstone ingest
+### Yellowstone ingest (2026-09-05)
 
-_In progress._
+| | |
+|---|---|
+| iNaturalist research-grade Mammalia + Aves | 51,643 observations (place 10211) |
+| GBIF, other datasets, Mammalia | 956 of 26,248 in the bbox (25,292 were the iNaturalist mirror, never downloaded) |
+| GBIF, other datasets, Aves | 7,206 of 445,426 (421,940 eBird and 16,280 mirror, never downloaded) |
+| Total | 59,805 sightings; 31,802 mammals, 28,003 birds |
+| Coordinates | 55,156 open, 4,649 obscured by the source (7.8%): counted, never mapped |
+| Cross-source duplicates | 0 marked. With the iNaturalist mirror excluded by dataset key, the remaining GBIF datasets are independent programmes. |
+| Suppression at export | 16 open-coordinate rows excluded (wolf, wolverine, lynx); the rest of those species were already obscured by iNaturalist |
 
+Export: `cells.geojson` one feature per H3 r9 cell with a species index
+(first version was 10.9 MB with geometry repeated per species, E-017),
+`species.json`, `sightings.parquet` (59,805 rows), `bias.json`, `manifest.json`.
+
+**Phase 1 acceptance: met.** A park's worth of real sightings is in DuckDB and
+exported in the shape the app consumes; the app builds against it.
+
+### Road and seasonal bias (Lamar Valley imagery vs Yellowstone sightings)
+
+Measured by `track_a.py bias`; block below is auto-generated.
+
+<!-- bias:lamar_valley:start -->
+**Road bias** (lamar_valley imagery vs yellowstone sightings inside the corridor bbox, H3 r9, ring 1)
+
+- 11,402 independent open-coordinate sightings in the bbox; 8,546 within imagery coverage
+- **25% fall outside coverage** and are invisible to the imagery method by construction
+- Aves: 4,696 sightings, 38% outside coverage
+- Mammalia: 6,706 sightings, 16% outside coverage
+
+**Seasonal bias**
+
+| | J | F | M | A | M | J | J | A | S | O | N | D |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| imagery | 0 | 0 | 12 | 0 | 0 | 23,741 | 311 | 29 | 1,829 | 1,508 | 0 | 0 |
+| sightings | 743 | 841 | 556 | 1,039 | 8,404 | 17,275 | 12,694 | 8,481 | 6,820 | 2,086 | 304 | 370 |
+
+- June to August share: imagery 88%, sightings 64%
+- months with no imagery at all: [1, 2, 4, 5, 11, 12]
+
+<!-- bias:lamar_valley:end -->
+
+**Reading:** a quarter of independent sightings inside the corridor are more
+than ~350 m from any camera position, and birds far more so than mammals
+(38% vs 16%). Imagery is 88% June, from one contributor; human sightings
+peak May to August but exist in every month. Any Track B layer inherits both
+biases and the About page says so with these numbers.

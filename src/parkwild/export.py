@@ -22,9 +22,9 @@ know where" is real information.
 FIRST ATTEMPT that failed: `COPY ... TO ?` with a bound parameter. DuckDB
 takes a literal path there; the park key is validated and interpolated.
 
-UNRESOLVED: one feature per (cell, species) repeats each hexagon's geometry
-once per species in it. Fine at Yellowstone scale; a vector-tile build would
-be the fix if a park ever has hundreds of species per cell.
+RESOLVED (E-017): the first cells.geojson repeated geometry per species and
+weighed 10.9 MB for Yellowstone. One feature per cell with a species index
+and five-decimal coordinates is the current shape; size is in the ledger.
 """
 from __future__ import annotations
 
@@ -37,7 +37,7 @@ from pathlib import Path
 
 import h3
 
-from .config import ROOT, Suppression, load_suppression
+from .config import ROOT, Suppression, canonical_species, load_suppression, load_synonyms
 from .decisionlog import log_filter
 from .storage import Store
 
@@ -60,15 +60,31 @@ def suppression_for(name: str | None, rules: list[Suppression], auto_sensitive: 
     return None
 
 
-def auto_sensitive_species(store: Store, park: str) -> set[str]:
-    """Species with any iNaturalist observation carrying taxon_geoprivacy."""
+# AUTO_SENSITIVE_SHARE — MEASURED (2026-09-05, Yellowstone iNaturalist rows)
+#
+# Share of a species' observations carrying taxon_geoprivacy:
+#     grizzly 99%   wolf 99%   bighorn 89%   river otter 100%   great grey owl 100%
+#     bison 0%      black bear 3%   coyote 2%   moose 0%   marmot 0%   starling 3%
+#
+# iNaturalist applies taxon geoprivacy per place, so a common species picks up
+# a few flagged observations from a county where it has a status. The first
+# rule ("any flagged observation") coarsened bison and starlings (E-019). A
+# majority rule separates the two groups with nothing in between.
+# REVISIT IF: a species lands between 20% and 80% in a new park.
+AUTO_SENSITIVE_SHARE = 0.5
+
+
+def auto_sensitive_species(store: Store, park: str, *, min_share: float = AUTO_SENSITIVE_SHARE) -> set[str]:
+    """Species whose iNaturalist observations are mostly taxon-obscured."""
     rows = store.sql(
         """
-        SELECT DISTINCT scientific_name FROM sightings
+        SELECT scientific_name,
+               avg(CASE WHEN json_extract_string(raw_json, '$.taxon_geoprivacy') IN ('obscured', 'private') THEN 1.0 ELSE 0.0 END) AS share
+        FROM sightings
         WHERE park = ? AND source = 'inaturalist' AND scientific_name IS NOT NULL
-          AND json_extract_string(raw_json, '$.taxon_geoprivacy') IN ('obscured', 'private')
+        GROUP BY scientific_name HAVING share >= ?
         """,
-        [park],
+        [park, min_share],
     )
     return {r[0] for r in rows}
 
@@ -84,6 +100,15 @@ def _canonical_where(park_param: str = "?") -> str:
 
 
 def cells_geojson(store: Store, park: str, out_path: Path, *, res: int = H3_RES, rules: list[Suppression] | None = None) -> dict:
+    """One feature per H3 cell, with a compact per-species list inside it.
+
+    FIRST VERSION (E-017) emitted one feature per (cell, species) and repeated
+    each hexagon's geometry once per species: 10.9 MB for Yellowstone, which
+    no phone loads in three seconds. Now geometry appears once per cell,
+    coordinates carry five decimals (about a metre), species names live in a
+    single index on the collection, and each species entry is a short array:
+    [species_index, count, human_verified, model_predicted, first_year, last_year].
+    """
     rules = load_suppression() if rules is None else rules
     auto = auto_sensitive_species(store, park)
     rows = store.sql(
@@ -97,11 +122,18 @@ def cells_geojson(store: Store, park: str, out_path: Path, *, res: int = H3_RES,
     n_canonical = store.one(f"SELECT count(*) FROM sightings WHERE {_canonical_where()}", [park])
     log_filter("export.cells", "canonical rows with open coordinates and a taxon name", n_canonical, len(rows), park=park, h3_res=res)
 
-    agg: dict[tuple[str, str], dict] = {}
+    synonyms = load_synonyms()
+    species_index: dict[str, int] = {}
+    species_meta: dict[str, tuple[str | None, str | None]] = {}
+    cells: dict[str, dict] = {}
     excluded: dict[str, int] = {}
     coarsened: dict[str, int] = {}
-    for lon, lat, sci, common, cls, basis, on in rows:
-        rule = suppression_for(sci, rules, auto)
+    merged: dict[str, str] = {}
+    for lon, lat, raw_sci, common, cls, basis, on in rows:
+        sci = canonical_species(raw_sci, synonyms)
+        if sci != raw_sci:
+            merged[raw_sci] = sci
+        rule = suppression_for(sci, rules, auto) or suppression_for(raw_sci, rules, auto)
         cell_res = res
         if rule is not None and rule.action == "exclude":
             excluded[sci] = excluded.get(sci, 0) + 1
@@ -109,81 +141,114 @@ def cells_geojson(store: Store, park: str, out_path: Path, *, res: int = H3_RES,
         if rule is not None and rule.action == "coarsen":
             cell_res = rule.res or 6
             coarsened[sci] = coarsened.get(sci, 0) + 1
+        idx = species_index.setdefault(sci, len(species_index))
+        species_meta.setdefault(sci, (common, cls))
         cell = h3.latlng_to_cell(lat, lon, cell_res)
-        key = (cell, sci)
-        a = agg.setdefault(key, {
-            "cell": cell, "species": sci, "common_name": common, "class": cls, "res": cell_res,
-            "coarsened": cell_res != res,
-            "count": 0, "human_verified": 0, "model_predicted": 0,
-            "first": None, "last": None, "months": [0] * 12,
+        c = cells.setdefault(cell, {"res": cell_res, "count": 0, "hv": 0, "mp": 0, "y0": None, "y1": None, "sp": {}})
+        e = c["sp"].setdefault(idx, [idx, 0, 0, 0, None, None])
+        year = int(str(on)[:4]) if on else None
+        for target in (c, e):
+            if isinstance(target, dict):
+                target["count"] += 1
+                target["hv" if basis == "human_verified" else "mp"] += 1
+                if year is not None:
+                    target["y0"] = year if target["y0"] is None or year < target["y0"] else target["y0"]
+                    target["y1"] = year if target["y1"] is None or year > target["y1"] else target["y1"]
+            else:
+                target[1] += 1
+                target[2 if basis == "human_verified" else 3] += 1
+                if year is not None:
+                    target[4] = year if target[4] is None or year < target[4] else target[4]
+                    target[5] = year if target[5] is None or year > target[5] else target[5]
+
+    features = []
+    for cell, c in cells.items():
+        boundary = h3.cell_to_boundary(cell)           # [(lat, lng), ...]
+        ring = [[round(lng, 5), round(lat, 5)] for lat, lng in boundary]
+        ring.append(ring[0])
+        sp = sorted(c["sp"].values(), key=lambda e: -e[1])
+        features.append({
+            "type": "Feature",
+            "geometry": {"type": "Polygon", "coordinates": [ring]},
+            "properties": {"cell": cell, "res": c["res"], "coarsened": c["res"] != res, "count": c["count"],
+                           "hv": c["hv"], "mp": c["mp"], "y0": c["y0"], "y1": c["y1"], "sp": sp},
         })
-        a["count"] += 1
-        a[basis] = a.get(basis, 0) + 1
+    n_excluded = sum(excluded.values())
+    log_filter("export.cells.suppression", "species suppression list + iNaturalist taxon_geoprivacy (config/suppression.toml)",
+               len(rows), len(rows) - n_excluded, park=park, excluded=excluded, coarsened=coarsened)
+    log_filter("export.cells.taxonomy", "subspecies collapsed to species; GBIF spellings mapped to iNaturalist (config/taxonomy.toml)",
+               len(rows), len(rows), park=park, merged_names=merged)
+    index = [{"n": sci, "c": species_meta[sci][0], "k": species_meta[sci][1]} for sci, _ in sorted(species_index.items(), key=lambda kv: kv[1])]
+    fc = {"type": "FeatureCollection", "features": features, "park": park, "h3_res": res, "species_index": index,
+          "entry": ["species_index", "count", "human_verified", "model_predicted", "first_year", "last_year"],
+          "suppressed": {"excluded": excluded, "coarsened": coarsened}, "merged_names": merged}
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(json.dumps(fc, separators=(",", ":")))
+    return {"features": len(features), "sightings_in_cells": len(rows) - n_excluded, "cells": len(cells),
+            "species": len(index), "excluded": n_excluded, "coarsened": sum(coarsened.values()), "bytes": out_path.stat().st_size}
+
+
+def species_json(store: Store, park: str, out_path: Path, *, rules: list[Suppression] | None = None) -> dict:
+    """Per-species metadata after name normalisation, so 'Bos bison', 'Bos
+    bison bison' and 'Bison bison' are one species with one count."""
+    rules = load_suppression() if rules is None else rules
+    auto = auto_sensitive_species(store, park)
+    synonyms = load_synonyms()
+    rows = store.sql(
+        f"""
+        SELECT scientific_name, common_name, taxon_class, taxon_id, coordinate_status, source, confidence_basis, observed_on
+        FROM sightings
+        WHERE {_canonical_where()} AND scientific_name IS NOT NULL AND taxon_rank IN ('species', 'subspecies')
+        """,
+        [park],
+    )
+    agg: dict[str, dict] = {}
+    for raw_sci, common, cls, tid, status, source, basis, on in rows:
+        sci = canonical_species(raw_sci, synonyms)
+        a = agg.setdefault(sci, {
+            "scientific_name": sci, "common_name": None, "class": cls, "taxon_id": None, "common_votes": {},
+            "sightings": 0, "open_coordinates": 0, "obscured_coordinates": 0,
+            "sources": {"inaturalist": 0, "gbif": 0, "mapillary_cv": 0},
+            "confidence_basis": {"human_verified": 0, "model_predicted": 0},
+            "first": None, "last": None, "months": [0] * 12, "aliases": set(),
+        })
+        a["sightings"] += 1
+        if status == "open":
+            a["open_coordinates"] += 1
+        elif status == "obscured":
+            a["obscured_coordinates"] += 1
+        a["sources"][source] = a["sources"].get(source, 0) + 1
+        a["confidence_basis"][basis] = a["confidence_basis"].get(basis, 0) + 1
+        if common:
+            a["common_votes"][common] = a["common_votes"].get(common, 0) + 1
+        if tid and source == "inaturalist" and raw_sci == sci:
+            a["taxon_id"] = tid
+        if raw_sci != sci:
+            a["aliases"].add(raw_sci)
         if on:
             d = str(on)
             a["first"] = d if a["first"] is None or d < a["first"] else a["first"]
             a["last"] = d if a["last"] is None or d > a["last"] else a["last"]
             a["months"][int(d[5:7]) - 1] += 1
-        if common and not a["common_name"]:
-            a["common_name"] = common
-
-    features = []
-    for a in agg.values():
-        boundary = h3.cell_to_boundary(a["cell"])           # [(lat, lng), ...]
-        ring = [[lng, lat] for lat, lng in boundary] + [[boundary[0][1], boundary[0][0]]]
-        features.append({"type": "Feature", "geometry": {"type": "Polygon", "coordinates": [ring]}, "properties": a})
-    n_excluded = sum(excluded.values())
-    log_filter("export.cells.suppression", "species suppression list + iNaturalist taxon_geoprivacy (config/suppression.toml)",
-               len(rows), len(rows) - n_excluded, park=park, excluded=excluded, coarsened=coarsened)
-    fc = {"type": "FeatureCollection", "features": features, "park": park, "h3_res": res,
-          "suppressed": {"excluded": excluded, "coarsened": coarsened}}
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    out_path.write_text(json.dumps(fc, separators=(",", ":")))
-    return {"features": len(features), "sightings_in_cells": len(rows) - n_excluded, "cells": len({k[0] for k in agg}),
-            "excluded": n_excluded, "coarsened": sum(coarsened.values())}
-
-
-def species_json(store: Store, park: str, out_path: Path, *, rules: list[Suppression] | None = None) -> dict:
-    rules = load_suppression() if rules is None else rules
-    auto = auto_sensitive_species(store, park)
-    rows = store.sql(
-        f"""
-        SELECT scientific_name, any_value(common_name), any_value(taxon_class), any_value(taxon_id),
-               count(*) AS n,
-               sum(CASE WHEN coordinate_status = 'open' THEN 1 ELSE 0 END),
-               sum(CASE WHEN coordinate_status = 'obscured' THEN 1 ELSE 0 END),
-               sum(CASE WHEN source = 'inaturalist' THEN 1 ELSE 0 END),
-               sum(CASE WHEN source = 'gbif' THEN 1 ELSE 0 END),
-               sum(CASE WHEN source = 'mapillary_cv' THEN 1 ELSE 0 END),
-               sum(CASE WHEN confidence_basis = 'human_verified' THEN 1 ELSE 0 END),
-               sum(CASE WHEN confidence_basis = 'model_predicted' THEN 1 ELSE 0 END),
-               min(observed_on), max(observed_on),
-               list(month(observed_on))
-        FROM sightings
-        WHERE {_canonical_where()} AND scientific_name IS NOT NULL AND taxon_rank IN ('species', 'subspecies')
-        GROUP BY scientific_name ORDER BY n DESC
-        """,
-        [park],
-    )
     species = []
-    for sci, common, cls, tid, n, n_open, n_obs, n_inat, n_gbif, n_cv, n_hv, n_mp, first, last, months in rows:
-        hist = [0] * 12
-        for m in months or []:
-            if m:
-                hist[int(m) - 1] += 1
+    for sci, a in sorted(agg.items(), key=lambda kv: -kv[1]["sightings"]):
         rule = suppression_for(sci, rules, auto)
+        # The common name is the one the most records used, which favours the
+        # species-level iNaturalist name over a subspecies label.
+        common = max(a["common_votes"], key=a["common_votes"].get) if a["common_votes"] else None
         species.append({
-            "scientific_name": sci, "common_name": common, "class": cls, "taxon_id": tid,
+            "scientific_name": sci, "common_name": common, "class": a["class"], "taxon_id": a["taxon_id"],
+            "aliases": sorted(a["aliases"]),
             "suppression": None if rule is None else {"action": rule.action, "res": rule.res, "why": rule.why},
-            "sightings": n, "open_coordinates": n_open, "obscured_coordinates": n_obs,
-            "sources": {"inaturalist": n_inat, "gbif": n_gbif, "mapillary_cv": n_cv},
-            "confidence_basis": {"human_verified": n_hv, "model_predicted": n_mp},
-            "first": str(first) if first else None, "last": str(last) if last else None,
-            "months": hist,
+            "sightings": a["sightings"], "open_coordinates": a["open_coordinates"], "obscured_coordinates": a["obscured_coordinates"],
+            "sources": a["sources"], "confidence_basis": a["confidence_basis"],
+            "first": a["first"], "last": a["last"], "months": a["months"],
             "model": None,   # 3D asset reference, Phase 6
         })
     payload = {"park": park, "generated": datetime.now(UTC).isoformat(timespec="seconds"), "species": species,
-               "notes": {"recall": "unmeasured", "obscured": "coordinates fuzzed by the source for sensitive taxa; counted, never mapped"}}
+               "notes": {"recall": "unmeasured",
+                         "obscured": "coordinates fuzzed by the source for sensitive taxa; counted, never mapped",
+                         "names": "subspecies collapsed to species; GBIF backbone spellings mapped to iNaturalist's (config/taxonomy.toml)"}}
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(json.dumps(payload, separators=(",", ":")))
     return {"species": len(species)}

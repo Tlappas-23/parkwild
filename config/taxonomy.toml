@@ -1,0 +1,10 @@
+# Name normalisation applied at export time only; DuckDB rows keep the source's
+# spelling. Two rules run before this table: subspecies collapse to species
+# (first two words of a three-word name), and GBIF's backbone spellings are
+# mapped to iNaturalist's where they differ for the same animal. Each entry
+# says why, because "these are the same species" is a claim, not a fact.
+
+[synonyms]
+"Bos bison" = "Bison bison"                 # GBIF backbone places bison in Bos; iNaturalist uses Bison. Same animal.
+"Cervus elaphus" = "Cervus canadensis"      # North American elk was split from red deer; older GBIF records keep C. elaphus.
+"Antigone canadensis" = "Antigone canadensis"  # kept: sandhill crane is spelled the same in both; entry documents that it was checked

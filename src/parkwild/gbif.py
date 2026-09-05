@@ -17,6 +17,14 @@ the generalisation flags; anything coarser than 1 km is 'obscured' and stays
 off the map. Offset paging is capped at 100,000 by GBIF, so a query that big
 is split by year automatically.
 
+FIRST INGEST (E-015) filtered the skipped datasets *after* fetching. It
+downloaded 25,000 mirrored mammal records to discard them, and would have
+paged through all 445,000 bird records at GBIF's deep-offset speed of about
+one page a minute: a day of requests for 7,000 rows. Killed. CURRENT: list
+the datasets present via the datasetKey facet, drop the skipped keys, and
+query each wanted dataset by key (repeated `datasetKey=` parameters are an
+OR). Offsets stay small, so pages stay fast.
+
 CONSIDERED, NOT DONE: the GBIF download API (asynchronous, needs an account,
 no offset cap). Not needed while eBird is out.
 
@@ -93,6 +101,12 @@ def _get(path: str, params: dict, *, session: requests.Session | None = None, re
     raise GBIFError(f"gave up on {path} after {retries} retries")
 
 
+# FACET_LIMIT — ASSUMED
+# The Yellowstone bbox had 8 mammal and about 20 bird datasets; 200 leaves
+# room for a park with a long tail of small publishers.
+FACET_LIMIT = 200
+
+
 def _base_params(bbox: BBox, class_key: int, **extra) -> dict:
     return {
         "decimalLatitude": f"{bbox.min_lat},{bbox.max_lat}",
@@ -105,14 +119,21 @@ def _base_params(bbox: BBox, class_key: int, **extra) -> dict:
     }
 
 
+def wanted_datasets(bbox: BBox, class_key: int, skip: tuple[str, ...]) -> list[tuple[str, int]]:
+    """(datasetKey, count) for every dataset in the bbox except the skipped
+    ones. The facet is one request; each wanted dataset is then queried by
+    key so no skipped record is ever downloaded."""
+    return [(ds, n) for ds, n in count_by_dataset(bbox, class_key, facet_limit=FACET_LIMIT) if ds not in skip]
+
+
 def count(bbox: BBox, class_key: int, **extra) -> int:
     return int(_get("/occurrence/search", {**_base_params(bbox, class_key, **extra), "limit": 0})["count"])
 
 
-def count_by_dataset(bbox: BBox, class_key: int, **extra) -> list[tuple[str, int]]:
+def count_by_dataset(bbox: BBox, class_key: int, *, facet_limit: int = 20, **extra) -> list[tuple[str, int]]:
     """Facet on datasetKey so the iNaturalist / eBird share is visible before
     ingesting anything."""
-    data = _get("/occurrence/search", {**_base_params(bbox, class_key, **extra), "limit": 0, "facet": "datasetKey", "facetLimit": 20})
+    data = _get("/occurrence/search", {**_base_params(bbox, class_key, **extra), "limit": 0, "facet": "datasetKey", "facetLimit": facet_limit})
     facets = data.get("facets", [])
     if not facets:
         return []
@@ -124,14 +145,18 @@ def iter_occurrences(
     class_key: int,
     *,
     year: str | None = None,
+    dataset_keys: list[str] | None = None,
     max_records: int | None = None,
     session: requests.Session | None = None,
     _depth: int = 0,
 ) -> Iterator[dict]:
-    """Yield raw occurrences. If a query would exceed the offset cap it is split
-    by year (then by half-ranges of years) until each piece fits."""
+    """Yield raw occurrences, optionally restricted to `dataset_keys`. If a
+    query would exceed the offset cap it is split by year (then by
+    half-ranges of years) until each piece fits."""
     session = session or requests.Session()
-    extra = {"year": year} if year else {}
+    extra: dict = {"year": year} if year else {}
+    if dataset_keys:
+        extra["datasetKey"] = list(dataset_keys)
     total = count(bbox, class_key, **extra)
     if total > OFFSET_CAP:
         lo, hi = _year_bounds(year)
@@ -140,7 +165,8 @@ def iter_occurrences(
         else:
             mid = (lo + hi) // 2
             for sub in (f"{lo},{mid}", f"{mid + 1},{hi}"):
-                yield from iter_occurrences(bbox, class_key, year=sub, max_records=max_records, session=session, _depth=_depth + 1)
+                yield from iter_occurrences(bbox, class_key, year=sub, dataset_keys=dataset_keys, max_records=max_records,
+                                            session=session, _depth=_depth + 1)
             return
     offset = 0
     n = 0

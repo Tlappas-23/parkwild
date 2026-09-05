@@ -84,6 +84,44 @@ Format: date, what, number, kept?, why, where it lives.
 - **Kept:** CPU, deterministic = True. No error bar needed for backend nondeterminism.
 - **Where:** reports/determinism.json.
 
+### E-014: first SpeciesNet pass over 400 Lamar perspective frames (CPU, v4.0.3a, country USA, admin1 WY)
+- **What:** whole-frame inference on the pinned 400-frame sample (reports/samples/lamar_valley_perspective_download.json).
+- **Number (pre-review, from the raw JSON):** frames with an animal box >= 0.1: 67 (16.8%); >= 0.2: 33 (8.2%); >= 0.5: 12 (3.0%); >= 0.8: 1 (0.2%). 43 animal boxes >= 0.2: 28 in 0.2 to 0.5, 14 in 0.5 to 0.8, 1 at 0.8+. Median box height 2.2% of the frame (about 60 px), p90 24.6%. Vehicle boxes in 189 frames (47%), human in 20. Zero model failures.
+- **Ensemble labels on the 33 frames:** "unknown" 15, vehicle 5, american bison 5, human 3, animal 2, blank 2, domestic cattle 1.
+- **Read:** the hit rate at 0.2 clears the spec's 5% line for a primary source; whether the boxes are animals is what the stratified review decides. The high band has one box, so the review cannot say anything about precision above 0.8 on this population. "domestic cattle" in Lamar Valley is almost certainly a bison the classifier could not separate at 60 px.
+- **Kept:** as the perspective baseline. Timing: about 10 minutes on CPU for 400 originals.
+- **Where:** data/predictions/lamar_valley_perspective.json; `runs` table once parsed.
+
+### E-015: GBIF ingest, filter-after-fetch
+- **What:** first Yellowstone GBIF ingest fetched every record in the bbox and dropped the skipped datasets client-side.
+- **Number:** 26,248 mammal records downloaded to keep 956; GBIF deep paging ran at about one 300-row page per minute past offset ~10,000. Aves would have been 445,426 records for ~7,200 kept, roughly a day. Killed at mammals 24,000/26,248 after 85 minutes.
+- **Kept:** no. Query wanted datasets by key (facet minus skip list, repeated `datasetKey=`); offsets stay small and pages stay fast.
+- **Where:** `gbif.wanted_datasets`, `sightings.ingest_gbif`.
+
+### E-016: SpeciesNet resume refused after a path-form change
+- **What:** `phase0.py detect` re-invoked SpeciesNet on the 400 frames whose JSON already existed (from the direct CPU run), expecting the documented resume.
+- **Number:** exit 1, "Filepath from loaded predictions is missing from the set of instances"; zero re-inference, results parsed anyway.
+- **Why:** the direct run passed `data/images/lamar_valley`, the CLI passed the absolute path; resume compares strings.
+- **Kept:** fix. All paths repo-relative with cwd=ROOT. The run row for the perspective population carries exit_code 1 for this reason; its predictions are the direct CPU run's.
+
+### E-017: cells.geojson size
+- **What:** first export emitted one feature per (cell, species) with a 12-month histogram each.
+- **Number:** 17,653 features over 5,241 cells, 10.9 MB raw, 2.0 MB gzipped. Too slow for the 3-second phone budget.
+- **Kept:** no. One feature per cell, species index on the collection, array entries, five-decimal coordinates: 2.16 MB raw, 365 KB gzipped, same information minus per-cell months (species.json keeps months per species).
+
+### E-018: SpeciesNet on sliced panoramas (100 panoramas, 400 slices, CPU)
+- **What:** the second Phase 0 population (ADR-0006): 90-degree horizon windows at yaw 0/90/180/270.
+- **Number:** 64 of 400 slices with an animal box >= 0.2 (16%); 54 of 100 panoramas (54%). Stratified review of 17 boxes (10 low band, 7 mid, none above 0.8): 2 true positives, 14 false positives, 1 unsure. Precision 2/16 = 12% (95% CI 3 to 36%).
+- **What the false positives were:** 7 the camera's own mounting arm (a black curved bar in every yaw090 slice from this contributor, and every box in the 0.5 to 0.8 band), 3 rocks, 2 clouds, 1 lone tree, 1 car. The two true positives: a bison running past parked cars at ~40 m (ensemble said vehicle) and a distant herd at ~250 m, about 8 px each (ensemble said blank).
+- **Read:** the 54% "hit rate" is an artifact of the rig; strip the yaw090 rig region (or that contributor) and the population is closer to the perspective one. Q-2 (slices vs whole) stands unanswered; the rig must be masked first or the comparison measures the rig.
+- **Kept:** as a documented negative result for panoramas as processed. Fix is cheap (mask a fixed region per contributor) and goes in Phase 2 only if Track B is routed anywhere.
+
+### E-019: the "anything iNaturalist obscures" rule, first version
+- **What:** coarsen any species with at least one taxon-obscured iNaturalist observation in the park.
+- **Number:** 16,371 sightings coarsened, including bison (2 flagged of 7,822), black bear (72 of 2,210), coyote, marmot, mountain bluebird, moose and European starling. The species page showed "sensitive species" on a third of the grid.
+- **Kept:** no. Majority rule (share >= 0.5): grizzly 99%, wolf 99%, bighorn 89%, river otter 100%, great grey owl 100% stay coarsened; everything under 5% is mapped normally. Nothing sits between 13% and 85%.
+- **Also found:** GBIF and iNaturalist spell the same animal differently (Bos bison / Bison bison; Cervus elaphus / canadensis) and subspecies rows split counts. Names are normalised at export (config/taxonomy.toml); bison is one species with one count.
+
 ## Open questions with a planned experiment
 
 - **Q-1 SpeciesNet determinism.** Answered (E-013).

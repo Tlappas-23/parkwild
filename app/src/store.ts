@@ -53,8 +53,8 @@ export const useStore = create<State>((set, get) => ({
       // Default the year scrubber to the data's real span.
       let lo = 2100, hi = 1900;
       for (const f of cells.features) {
-        if (f.properties.first) lo = Math.min(lo, +f.properties.first.slice(0, 4));
-        if (f.properties.last) hi = Math.max(hi, +f.properties.last.slice(0, 4));
+        if (f.properties.y0 !== null) lo = Math.min(lo, f.properties.y0);
+        if (f.properties.y1 !== null) hi = Math.max(hi, f.properties.y1);
       }
       set({ cells, species, bias, manifest, error: null, yearRange: lo <= hi ? [lo, hi] : [1900, 2100] });
     } catch (e) {
@@ -63,17 +63,30 @@ export const useStore = create<State>((set, get) => ({
   },
 }));
 
-// A cell feature is shown if it matches the species filter and its date span
-// overlaps the year range. Cells carry a span, not individual dates, so the
-// overlap test is the honest one: the cell *may* have sightings in range.
+// A cell is shown if its date span overlaps the year range and, with a species
+// filter, if it holds that species; the feature's count/hv/mp are then swapped
+// for that species' own numbers so opacity and the detail panel reflect the
+// filter. Cells carry spans, not dates, so overlap is the honest test: the
+// cell *may* have sightings in range.
 export function filteredFeatures(cells: CellsFile | null, speciesFilter: string | null, yearRange: [number, number]): CellFeature[] {
   if (!cells) return [];
   const [lo, hi] = yearRange;
-  return cells.features.filter((f) => {
+  const idx = speciesFilter ? cells.species_index.findIndex((e) => e.n === speciesFilter) : -1;
+  if (speciesFilter && idx < 0) return [];
+  const out: CellFeature[] = [];
+  for (const f of cells.features) {
     const p = f.properties;
-    if (speciesFilter && p.species !== speciesFilter) return false;
-    const first = p.first ? +p.first.slice(0, 4) : lo;
-    const last = p.last ? +p.last.slice(0, 4) : hi;
-    return last >= lo && first <= hi;
-  });
+    if (idx >= 0) {
+      const e = p.sp.find((x) => x[0] === idx);
+      if (!e) continue;
+      const first = e[4] ?? lo, last = e[5] ?? hi;
+      if (last < lo || first > hi) continue;
+      out.push({ ...f, properties: { ...p, count: e[1], hv: e[2], mp: e[3], y0: e[4], y1: e[5], sp: [e] } });
+    } else {
+      const first = p.y0 ?? lo, last = p.y1 ?? hi;
+      if (last < lo || first > hi) continue;
+      out.push(f);
+    }
+  }
+  return out;
 }

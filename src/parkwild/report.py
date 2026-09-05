@@ -178,14 +178,18 @@ def phase0_numbers(
     det_threshold: float = 0.2,
     road_km: float | None = None,
     trail_km: float | None = None,
+    reviewer: str | None = None,
 ) -> dict:
+    """`reviewer` selects whose verdicts feed numbers 2 to 4. Two reviewers can
+    each hold a full pass (the table is keyed by reviewer); mixing them would
+    double count, so None means "all rows" only when one reviewer exists."""
     if population not in VARIANT_FILTER:
         raise ValueError(f"population must be one of {list(VARIANT_FILTER)}")
     vf = VARIANT_FILTER[population]
     pf = POPULATION_FILTER[population]
     n: dict = {
         "corridor": corridor, "population": population, "det_threshold": det_threshold,
-        "road_km": road_km, "trail_km": trail_km, "recall": "unmeasured",
+        "road_km": road_km, "trail_km": trail_km, "recall": "unmeasured", "reviewer": reviewer,
     }
 
     # ---- volume ---------------------------------------------------------------
@@ -238,12 +242,16 @@ def phase0_numbers(
     n["clusters"] = cluster_detections(store, corridor, population=population, min_conf=det_threshold)
 
     # ---- numbers 2-4: manual review ------------------------------------------
+    reviewer_sql = "" if reviewer is None else "AND m.reviewer = ?"
     rev = store.sql(
         f"""SELECT m.verdict, m.species_agree, m.est_distance_m, d.conf FROM manual_review m
            JOIN detections_raw d USING (image_id, variant, det_idx)
-           JOIN images i USING (image_id) WHERE i.corridor = ? AND m.{vf}""",
-        [corridor],
+           JOIN images i USING (image_id) WHERE i.corridor = ? AND m.{vf} {reviewer_sql}""",
+        [corridor] + ([reviewer] if reviewer is not None else []),
     )
+    reviewers = [r[0] for r in store.sql("SELECT DISTINCT reviewer FROM manual_review m JOIN images i USING (image_id) WHERE i.corridor = ?", [corridor])]
+    if reviewer is None and len(reviewers) > 1:
+        raise ValueError(f"{len(reviewers)} reviewers present ({', '.join(reviewers)}); pass reviewer= to avoid double counting")
     verdicts = [r[0] for r in rev]
     tp = sum(v == "tp" for v in verdicts)
     fp = sum(v == "fp" for v in verdicts)
@@ -276,7 +284,7 @@ def phase0_numbers(
         "exact": sum(a == "yes" for a in agree),
         "rollup": sum(a == "rollup" for a in agree),
         "wrong": sum(a == "no" for a in agree),
-        "baseline": majority_baseline(store, corridor, population),
+        "baseline": majority_baseline(store, corridor, population, reviewer=reviewer),
     }
 
     # ---- number 5: density and dates (whole corridor, then this population) --
@@ -300,14 +308,15 @@ def phase0_numbers(
     return n
 
 
-def majority_baseline(store: Store, corridor: str, population: str) -> dict:
+def majority_baseline(store: Store, corridor: str, population: str, *, reviewer: str | None = None) -> dict:
     """The trivial model: label every true positive with the most common
     reviewed species. If SpeciesNet's exact-agreement rate barely beats this,
     that is the headline, not the model's number."""
+    reviewer_sql = "" if reviewer is None else "AND m.reviewer = ?"
     rows = store.sql(
         f"""SELECT lower(trim(m.true_species)) FROM manual_review m JOIN images i USING (image_id)
-           WHERE i.corridor = ? AND m.verdict = 'tp' AND m.true_species IS NOT NULL AND m.{VARIANT_FILTER[population]}""",
-        [corridor],
+           WHERE i.corridor = ? AND m.verdict = 'tp' AND m.true_species IS NOT NULL AND m.{VARIANT_FILTER[population]} {reviewer_sql}""",
+        [corridor] + ([reviewer] if reviewer is not None else []),
     )
     names = [r[0] for r in rows if r[0]]
     if not names:
@@ -371,7 +380,8 @@ def render_phase0_markdown(n: dict) -> str:
         f"Top ensemble labels on images with an animal box >= {t}: "
         + (", ".join(f"{lbl} ({cnt})" for lbl, cnt in n["ensemble_labels"]) or "none"),
         "",
-        f"**2. True positives on manual inspection** ({r['n_reviewed']} boxes reviewed, stratified by confidence band)",
+        f"**2. True positives on manual inspection** ({r['n_reviewed']} boxes reviewed, stratified by confidence band"
+        f"{', reviewer ' + n['reviewer'] if n.get('reviewer') else ''})",
         "",
         f"- true positive: {r['tp']}, false positive: {r['fp']}, unsure: {r['unsure']}",
         f"- precision (tp / (tp + fp)): {_pct(r['precision'])}{_ci(r['precision_ci'])}",
@@ -406,18 +416,21 @@ def render_phase0_markdown(n: dict) -> str:
     return "\n".join(lines)
 
 
-def update_results_md(path: Path, key: str, block: str) -> None:
-    """Replace the auto-generated block for `key` (e.g. 'lamar_valley:perspective')
-    between HTML-comment markers, or append a new section if the markers aren't
-    there yet. Everything outside the markers is hand-written and left alone."""
-    start, end = f"<!-- phase0:{key}:start -->", f"<!-- phase0:{key}:end -->"
+def update_results_md(path: Path, key: str, block: str, *, heading: str | None = None) -> None:
+    """Replace the auto-generated block between `<!-- {key}:start -->` and
+    `<!-- {key}:end -->`, or append a new section under `heading` if the
+    markers aren't there yet. Everything outside the markers is hand-written
+    and left alone. Keys carry their own prefix ("phase0:...", "bias:...");
+    an earlier version hardcoded "phase0:" and appended duplicate sections
+    when a caller passed a bias key."""
+    start, end = f"<!-- {key}:start -->", f"<!-- {key}:end -->"
     text = path.read_text() if path.exists() else "# RESULTS\n"
     replacement = f"{start}\n{block}\n{end}"
     pattern = re.compile(re.escape(start) + r".*?" + re.escape(end), re.DOTALL)
     if pattern.search(text):
         text = pattern.sub(lambda _: replacement, text)
     else:
-        text = text.rstrip("\n") + f"\n\n### Phase 0 numbers: {key}\n\n{replacement}\n"
+        text = text.rstrip("\n") + f"\n\n{heading or '### ' + key}\n\n{replacement}\n"
     path.write_text(text)
 
 

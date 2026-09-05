@@ -7,6 +7,15 @@ from parkwild.contracts import ContractError
 from parkwild.speciesnet_runner import build_command, display_name, parse_predictions, split_label, split_stem
 
 
+def test_build_command_uses_repo_relative_paths():
+    """E-016: SpeciesNet resumes only if the folder string matches the one in the
+    JSON. Paths inside the repo are always passed relative to the repo root."""
+    from parkwild.speciesnet_runner import ROOT
+    cmd = build_command(ROOT / "data" / "images" / "x", ROOT / "data" / "predictions" / "x.json", python="py")
+    assert cmd[cmd.index("--folders") + 1] == "data/images/x"
+    assert cmd[cmd.index("--predictions_json") + 1] == "data/predictions/x.json"
+
+
 def test_build_command_flags(tmp_path):
     cmd = build_command(tmp_path / "imgs", tmp_path / "out.json", country="USA", admin1_region="WY", batch_size=4, python="py")
     assert cmd[:3] == ["py", "-m", "speciesnet.scripts.run_model"]

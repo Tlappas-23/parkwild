@@ -32,8 +32,8 @@ export default function MapPage() {
   const years = useMemo(() => {
     let lo = 2100, hi = 1900;
     for (const f of cells?.features ?? []) {
-      if (f.properties.first) lo = Math.min(lo, +f.properties.first.slice(0, 4));
-      if (f.properties.last) hi = Math.max(hi, +f.properties.last.slice(0, 4));
+      if (f.properties.y0 !== null) lo = Math.min(lo, f.properties.y0);
+      if (f.properties.y1 !== null) hi = Math.max(hi, f.properties.y1);
     }
     return lo <= hi ? [lo, hi] : [1900, 2100];
   }, [cells]);
@@ -57,7 +57,7 @@ export default function MapPage() {
         type: "fill",
         source: "cells",
         paint: {
-          "fill-color": ["case", [">", ["get", "model_predicted"], 0], "#b86e00", "#2a78d6"],
+          "fill-color": ["case", [">", ["get", "mp"], 0], "#b86e00", "#2a78d6"],
           // Opacity on a log scale: 1 sighting is faint, 1000 is solid-ish, and
           // the jump from 1 to 10 reads the same as 10 to 100.
           "fill-opacity": ["interpolate", ["linear"], ["log10", ["max", 1, ["get", "count"]]], 0, 0.12, 1, 0.3, 2, 0.5, 3, 0.65],
@@ -113,7 +113,7 @@ export default function MapPage() {
           <input type="range" min={years[0]} max={years[1]} value={yearRange[1]} aria-label="End year"
             onChange={(e) => setYearRange([yearRange[0], Math.max(+e.target.value, yearRange[0])])} />
         </label>
-        <span className="muted small">{features.length.toLocaleString()} cell-species shown</span>
+        <span className="muted small">{features.length.toLocaleString()} cells shown</span>
       </div>
       <div className="map-wrap">
         <div ref={container} className="map" role="region" aria-label="Map of aggregated sightings" />

@@ -33,6 +33,17 @@ from .contracts import check_bbox_normalized
 
 log = logging.getLogger(__name__)
 
+ROOT = Path(__file__).resolve().parents[2]
+
+
+def _rel(path: Path) -> str:
+    """Repo-relative form of a path (or the path unchanged if outside the repo)."""
+    try:
+        return str(Path(path).resolve().relative_to(ROOT))
+    except ValueError:
+        return str(path)
+
+
 # CPU_WRAPPER — DERIVED (repo-relative path to scripts/speciesnet_cpu.py, the MPS-hiding wrapper)
 CPU_WRAPPER = Path(__file__).resolve().parents[2] / "scripts" / "speciesnet_cpu.py"
 
@@ -89,10 +100,14 @@ def build_command(
     and so I can print it for a manual run on Kaggle. `force_cpu` routes
     through scripts/speciesnet_cpu.py, which hides MPS from torch (E-012)."""
     entry = [str(CPU_WRAPPER)] if force_cpu else ["-m", "speciesnet.scripts.run_model"]
+    # Paths relative to the repo root, always. SpeciesNet's resume compares the
+    # filepaths stored in predictions_json with the instances it is given as
+    # literal strings; an absolute folder on one run and a relative one on the
+    # next made it refuse to resume (E-016). run() sets cwd=ROOT to match.
     cmd = [
         python, *entry,
-        "--folders", str(image_dir),
-        "--predictions_json", str(predictions_json),
+        "--folders", _rel(image_dir),
+        "--predictions_json", _rel(predictions_json),
         "--country", country,          # ISO 3166-1 alpha-3; geofence drops species absent from the USA
         "--batch_size", str(batch_size),
         "--bypass_prompts",            # never block a batch job on a y/n question
@@ -115,7 +130,7 @@ def run_speciesnet(image_dir: Path, predictions_json: Path, **kwargs) -> int:
     predictions_json.parent.mkdir(parents=True, exist_ok=True)
     cmd = build_command(image_dir, predictions_json, **kwargs)
     log.info("running: %s", " ".join(cmd))
-    return subprocess.run(cmd).returncode
+    return subprocess.run(cmd, cwd=ROOT).returncode
 
 
 # ---- output parsing ----------------------------------------------------------

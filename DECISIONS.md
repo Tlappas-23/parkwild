@@ -167,6 +167,37 @@ project's problem to fix, and the cost is minutes per corridor, not hours.
 of ten minutes. Revisit when torch or speciesnet changes version; the
 determinism script is the test.
 
+## ADR-0013 (DRAFT, awaiting owner): Phase 0 routing for Track B, perspective population
+
+**Context.** Lamar Valley, 400 perspective frames, SpeciesNet 4.0.3a on CPU,
+stratified review of 20 boxes by one reviewer. Hit rate 8.2% (CI 6 to 11%).
+Precision 42% (95% CI 23 to 64%, n=19); by band 0.2 to 0.5 33% (95% CI 12 to 65%, n=9), 0.5 to 0.8 44% (95% CI 19 to 73%, n=9). All true
+positives bison at 45 to 150 m; nothing found beyond 150 m. Six of eleven
+false positives are people the ensemble correctly labels "human"; four are
+lone conifers. Trivial baseline for species (always "bison") beats the
+classifier, 8/8 vs 5/8.
+**Panorama population (E-018).** 100 panoramas, 17 boxes reviewed: precision
+2/16 (12%, CI 3 to 36%); seven false positives are the camera's own
+mounting arm in the yaw090 window, every box in the mid band. Negative
+result as processed; the rig is maskable.
+**Decision (proposed).** Track B becomes a supplementary layer built on
+perspective frames only: crawl only best-coverage corridors, surface as
+model-predicted and visually distinct, filter ensemble label "human" /
+"vehicle" out of the animal layer, treat species labels as no better than
+"large mammal" until a multi-species corridor says otherwise, and keep
+panoramas out until the rig region is masked and the population re-read.
+**Why not primary.** The precision point estimate is below 60% and the top
+band that a UI would threshold at has one box in 400 frames.
+**Why not negative.** Real bison are found at 8% of frames with confirmed
+range to 150 m, and the false positives have shapes (people, lone trees) that
+cheap filters address.
+**Consequence.** Phase 2 scoped to corridors with Lamar-like coverage;
+panorama population still to be read; a second reviewer's pass changes the
+interval, not the band, unless it disagrees on more than three boxes.
+**Status.** Draft. The interval straddles the primary and negative bands, so
+the spec's stop-and-ask applies. Confirm, or ask for the panorama numbers
+first.
+
 ---
 
 ## Open decisions (owner's call; recorded here so nothing is decided by drift)

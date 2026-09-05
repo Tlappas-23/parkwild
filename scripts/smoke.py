@@ -63,7 +63,8 @@ def main() -> None:
             check(d["marked_duplicate"] == 1, "cross-source dedupe marks the mirrored bison")
             out = tmp / "export"
             r = export_park(store, "yellowstone", out)
-            check(r["cells"]["features"] == 3 and r["species"]["species"] >= 3, "cells.geojson and species.json baked")
+            check(r["cells"]["features"] == 2 and r["cells"]["sightings_in_cells"] == 3 and r["species"]["species"] >= 3,
+                  "cells.geojson and species.json baked")
             manifest = json.loads((out / "manifest.json").read_text())
             for name, meta in manifest["files"].items():
                 digest = hashlib.sha256((out / name).read_bytes()).hexdigest()
