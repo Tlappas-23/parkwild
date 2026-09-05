@@ -139,6 +139,11 @@ Format: date, what, number, kept?, why, where it lives.
 - **Read:** the 400-frame sample's 8.2% at 0.2 was slightly high; the corridor runs at 7.2%. The layer is thin, as a supplementary layer should be, and each row carries the image ID for anyone to check.
 - **Kept:** yes; it is what the map shows in the model colour. A first version left a stale cattle row behind on rerun; derived rows are now cleared per corridor before rewriting.
 
+### E-023: integrity error on a visitor's browser after a deploy
+- **What:** the owner opened the live site after two deploys in quick succession and saw "species.json failed its integrity check".
+- **Why:** the service worker had precached the previous build's app shell (with the previous manifest compiled in); the data request carried a new `?v=` parameter that the precache did not match, so it went to the server and got the newer file. Old shell, new data.
+- **Kept:** the precache now ignores the `v` parameter, so a cached shell is served its own cached data; and an integrity failure first updates the service worker, clears caches and reloads once, showing the error only if the mismatch survives that. Outdated caches are cleaned on activate.
+
 ## Open questions with a planned experiment
 
 - **Q-1 SpeciesNet determinism.** Answered (E-013).
