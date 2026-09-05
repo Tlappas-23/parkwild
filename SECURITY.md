@@ -19,20 +19,21 @@ it; see the last section.
 
 ## Source control
 
-- Repo is private until launch. Only the owner's account has write access.
+- Repo is public (decision O-7, 2026-09-05): that is what makes server-side branch protection free. Only the owner's account has write access; nothing secret is in it, and history was checked for the token before the flip.
 - 2FA on the GitHub account (Settings > Password and authentication).
 - Server-side protection of `main` (status checks required, no force-push, no
   deletion) is applied with `make protect REPO=owner/name`. **GitHub does not
   offer branch protection or rulesets on a free private repository** (checked
   2026-09-05: HTTP 403 "Upgrade to GitHub Pro or make this repository public").
-  Until the repo is public or paid, the stand-in is the local `pre-push` hook
-  installed by `make hooks`: it refuses non-fast-forward pushes to `main` and
-  refuses any push when lint, tests, smoke or the secret scan fail. This
-  protects against the owner's own mistakes; a second collaborator would need
-  the server-side rules. Decision O-7 in DECISIONS.md.
+  Applied on 2026-09-05 once the repo went public. The local `pre-push` hook
+  (`make hooks`) stays as a second layer: it refuses non-fast-forward pushes
+  to `main` and any push when lint, tests, smoke or the secret scan fail.
 - `.github/CODEOWNERS` names the owner for every path.
 - Commit signing is recommended, not required: `git config commit.gpgsign true`
   with an SSH or GPG key registered on GitHub.
+
+Landing changes: `scripts/ship.sh "title"` branches, pushes, opens a PR and
+arms auto-merge; the `test` check must pass first. `make ship TITLE=...`.
 
 ## Secrets
 

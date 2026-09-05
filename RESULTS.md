@@ -121,9 +121,9 @@ review of 17 boxes (10 low band, 7 mid band, none above 0.8).
 
 ### Routing decision
 
-_Proposed: **supplementary layer for perspective frames; panoramas excluded
-until the camera rig is masked and re-measured.** Pending owner confirmation
-(ADR-0013 draft). Track A proceeds regardless and already ships._
+**Supplementary layer for perspective frames; panoramas excluded until the
+camera rig is masked and re-measured.** Confirmed by the owner 2026-09-05
+(ADR-0013). Phase 2 runs at that scope on Lamar Valley.
 
 ### Auto-generated numbers
 
