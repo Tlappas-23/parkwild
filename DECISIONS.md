@@ -224,6 +224,31 @@ with their own badge; species.json carries the Mammalia bucket; the About
 page states the 42% Phase 0 precision. All thresholds are tagged in the
 module with the counts behind them and move only with a bigger review.
 
+## ADR-0015: Photographs are the evidence, under strict licence rules
+
+**Context.** The owner's review of the first live app: aggregated hexagons
+and monogram tiles show neither the animal nor proof of the place. Every
+iNaturalist record's raw JSON is stored, and 89,238 photographs come with
+per-photo licences.
+**Decision.** Show iNaturalist photographs as the species card art, the
+species hero and gallery, and a "seen here" strip in the cell panel, only
+under CC0, CC BY, CC BY-SA, CC BY-NC and CC BY-NC-SA (62,222 of 89,238),
+always with the observer's name, the licence and a link to the observation,
+hotlinked from iNaturalist's CDN. No-derivatives and all-rights-reserved
+photographs are not shown at all. Sensitive-species rules match the cells:
+excluded species get no cell photos, coarsened species attach to the coarse
+cell, obscured coordinates attach to no cell. Model-predicted sightings link
+to their Mapillary image by ID and show no thumbnail (ShareAlike caution in
+the spec).
+**Rejected.** Mirroring photographs into the repository (would make the repo
+the publisher). Showing ND photographs at reduced size (a resized copy is
+arguably a derivative). Rendering 3D thumbnails for cards (needs the models
+first; photographs are better evidence anyway).
+**Consequence.** photos_species.json (176 KB) loads with the app;
+photos_cells.json (768 KB, 220 KB gzipped) loads on the first cell tap.
+The CSP allows the two iNaturalist image hosts. Credit is printed beside
+every image by one component, PhotoCredit.
+
 ---
 
 ## Open decisions (owner's call; recorded here so nothing is decided by drift)

@@ -72,7 +72,7 @@ def test_exports(store, tmp_path):
     assert sp["notes"]["recall"] == "unmeasured"
     assert r["sightings"]["rows"] == 5
     manifest = json.loads((out / "manifest.json").read_text())
-    assert set(manifest["files"]) == {"cells.geojson", "species.json", "sightings.parquet"}
+    assert set(manifest["files"]) == {"cells.geojson", "species.json", "sightings.parquet", "photos_species.json", "photos_cells.json"}
     assert all(len(v["sha256"]) == 64 for v in manifest["files"].values())
 
 

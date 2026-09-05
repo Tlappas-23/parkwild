@@ -1,5 +1,5 @@
-// Shapes of the static files the pipeline bakes (parkwild/export.py). The app
-// depends on these, never on the pipeline or the database.
+// Shapes of the static files the pipeline bakes (parkwild/export.py,
+// parkwild/photos.py). The app depends on these, never on the pipeline.
 
 export type ConfidenceBasis = "human_verified" | "model_predicted";
 
@@ -18,11 +18,7 @@ export interface CellProps {
   sp: SpeciesEntry[];
 }
 
-export interface SpeciesIndexEntry {
-  n: string;             // scientific name
-  c: string | null;      // common name
-  k: string | null;      // class
-}
+export interface SpeciesIndexEntry { n: string; c: string | null; k: string | null; }
 
 export interface CellFeature {
   type: "Feature";
@@ -55,14 +51,14 @@ export interface Species {
   first: string | null;
   last: string | null;
   months: number[];
-  model: string | null;
+  model: { url: string; title: string; author: string; license: string; credit: string; source: string } | null;
 }
 
 export interface SpeciesFile {
   park: string;
   generated: string;
   species: Species[];
-  notes: { recall: string; obscured: string };
+  notes: { recall: string; obscured: string; names?: string };
 }
 
 export interface Manifest {
@@ -74,19 +70,20 @@ export interface Manifest {
 
 export interface BiasFile {
   road: {
-    corridor: string;
-    n_sightings_in_bbox: number;
-    n_covered: number;
-    fraction_outside_coverage: number | null;
-    by_class: Record<string, { n: number; covered: number; fraction_outside: number | null }>;
-    ring: number;
-    h3_res: number;
+    corridor: string; n_sightings_in_bbox: number; n_covered: number; fraction_outside_coverage: number | null;
+    by_class: Record<string, { n: number; covered: number; fraction_outside: number | null }>; ring: number; h3_res: number;
   };
   seasonal: {
-    images_by_month: number[];
-    sightings_by_month: number[];
-    images_summer_share: number | null;
-    sightings_summer_share: number | null;
+    images_by_month: number[]; sightings_by_month: number[]; images_summer_share: number | null; sightings_summer_share: number | null;
     months_with_no_imagery: number[];
   };
 }
+
+// A photograph: id, extension, host index, observer, licence label, observation id, date, cell (species file only)
+export interface SpeciesPhoto { i: number; e: string; h: number; o: string; l: string; obs: number; d: string | null; c: string | null; }
+export type CellPhotoEntry = [number, number, string, number, string, string, number, string | null];
+
+export interface PhotosSpeciesFile { park: string; photo_hosts: string[]; species: Record<string, SpeciesPhoto[]>; licence_rule: string; }
+export interface PhotosCellsFile { park: string; photo_hosts: string[]; species_index: string[]; cells: Record<string, CellPhotoEntry[]>; licence_rule: string; }
+
+export type PhotoSize = "square" | "small" | "medium" | "large";
