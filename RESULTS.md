@@ -12,7 +12,7 @@ Phases follow BUILD_SPEC.md (three tracks; Phase 0 routes, it does not gate).
 |---|---|---|
 | 0. Feasibility (routing) | **steps 1 to 3 done for perspective frames; panorama slicing built; detection pending** | live coverage, index, 400-frame download, Overpass; offline tests + smoke |
 | 1. Track A reference data | **built; Yellowstone ingest in progress** | live iNaturalist place lookup and GBIF counts; fixture tests |
-| 2. Track B at scale | **in progress at supplementary scope**: all 3,690 Lamar perspective frames downloading, CPU inference next, then `track_b.py sightings` | ADR-0013/0014 |
+| 2. Track B at scale | **done at supplementary scope**: 3,690 Lamar frames scored on CPU, 31 model-predicted sightings in the schema and on the map | ADR-0013/0014, run rows in `runs` |
 | 3. Dedup, validation, bias | cluster counting built for Phase 0; rest not started | |
 | 4. Positions and export | Track A export built (cells.geojson, species.json, parquet, manifest) | fixture tests |
 | 5. Application | **skeleton live-tested locally**: map, species, detail, about on real data; deploys to GitHub Pages on merge | screenshots 2026-09-05 |
@@ -241,11 +241,27 @@ Top ensemble labels on images with an animal box >= 0.2: unknown (28), blank (26
 Scope from ADR-0013: Lamar Valley perspective frames only, all 3,690 of
 them; detector confidence >= 0.5; ensemble labels human / vehicle / blank
 dropped; one sighting per frame-chain; species named only at classifier
->= 0.8, otherwise "unidentified large mammal (model)"; camera position with
-150 m as the stated accuracy (ADR-0014). Panoramas out until the rig is
-masked.
+>= 0.8, otherwise "unidentified large mammal (model)"; domestic species the
+classifier reaches for fold into unidentified inside a park; camera position
+with 150 m as the stated accuracy (ADR-0014). Panoramas out until the rig
+is masked.
 
-_Numbers land here when the full-corridor inference finishes._
+### Full corridor (2026-09-05, 3,690 perspective frames, CPU)
+
+| | Frames | Share |
+|---|---|---|
+| Scored | 3,690 | |
+| Animal box >= 0.2 | 266 | 7.2% (CI 6.4 to 8.1%) |
+| Animal box >= 0.5 | 102 | 2.8% (CI 2.3 to 3.3%) |
+
+3,510 animal boxes -> 110 kept by the filters -> **31 model-predicted
+sightings** in the `sightings` table: Mammalia 28, Bison bison 3.
+They appear on the map in the model colour with their own badge, placed at
+the camera with 150 m stated accuracy; each links to its Mapillary image by
+ID. Run: lamar_valley:perspective:20260905T154043, backend cpu, 3,690 files, exit 0.
+
+Expected precision of this layer from Phase 0: about two thirds at 0.5 after
+the human filter, on a very small review sample. Recall: unmeasured.
 
 ## Phase 1: Track A reference data
 

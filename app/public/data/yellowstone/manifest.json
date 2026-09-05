@@ -1,18 +1,26 @@
 {
-  "built": "2026-09-05T20:47:48+00:00",
-  "git_commit": "6c3e3ae7fc4fb6be391162fbdfef8118691e00eb",
+  "built": "2026-09-05T20:51:46+00:00",
+  "git_commit": "c1850235e67de5d59411a782ab0c60070f54f0f7",
   "files": {
     "cells.geojson": {
-      "sha256": "55b4397609a9367f064808a595c26ad66b8becee8192f2e7d0dab6ab4766f84b",
-      "bytes": 2738770
+      "sha256": "339c5d2c567ad27e075126b22f4d5083a0be0d46ce62a2f7053b791de29cbe58",
+      "bytes": 2738692
     },
     "species.json": {
-      "sha256": "d1f70016dafda8a7ad4f878f70d250fdcd9f18c343d250583613888cfe4e10be",
-      "bytes": 125544
+      "sha256": "139b223a77c33bd3685c94fc8382b9b8e4234d1b5723f87d5c3b49ddd7a39e20",
+      "bytes": 125149
     },
     "sightings.parquet": {
-      "sha256": "2dd452e8b98c7ec11374308cfa1c64354d335a5268b8f1b44e458dee2e8c1244",
-      "bytes": 3496795
+      "sha256": "db0b5535341570b26cecc76fae45f83b805d2ea9da7a734e5c3dbc0fe9ba0135",
+      "bytes": 3501755
+    },
+    "photos_species.json": {
+      "sha256": "7c30ffd9f2aca66af75e9580398f4497b1be43c841d2899ddb45b78d7918e7ff",
+      "bytes": 175566
+    },
+    "photos_cells.json": {
+      "sha256": "ab10e1ae8944e4654de577743255c1851ecc8ae4a0d87211190de20ed9cf951e",
+      "bytes": 767802
     },
     "bias.json": {
       "sha256": "3f7f2a3130de777ee07cb73cd76840068c6c4c218b9e6b77447ce2a2de0f9fc4",

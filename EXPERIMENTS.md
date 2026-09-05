@@ -133,6 +133,12 @@ Format: date, what, number, kept?, why, where it lives.
 - **Also learned:** the browser extension's tab is a background tab (`document.visibilityState === "hidden"`), so the map's animation-frame loop is throttled and screenshots of the WebGL canvas come out grey even though the app is fine; image checks via script (`img.complete && naturalWidth > 0`) are the reliable test there.
 - **Kept:** photographs everywhere (ADR-0015), OpenFreeMap positron basemap, CSP with both image hosts, a ResizeObserver on the map container, data URLs keyed by manifest hash, `preserveDrawingBuffer` for captures.
 
+### E-022: full Lamar Valley perspective corridor
+- **What:** all 3,690 perspective frames through SpeciesNet on CPU (about 55 minutes), then ADR-0014's filters.
+- **Number:** 266 frames (7.2%) with an animal box at 0.2, 102 (2.8%) at 0.5; 3,510 animal boxes -> 110 after confidence and label filters -> 31 frame-chains -> 31 sightings: 3 named bison, 28 unidentified large mammals (two confident "domestic cattle" calls folded in; no cattle in Yellowstone).
+- **Read:** the 400-frame sample's 8.2% at 0.2 was slightly high; the corridor runs at 7.2%. The layer is thin, as a supplementary layer should be, and each row carries the image ID for anyone to check.
+- **Kept:** yes; it is what the map shows in the model colour. A first version left a stale cattle row behind on rerun; derived rows are now cleared per corridor before rewriting.
+
 ## Open questions with a planned experiment
 
 - **Q-1 SpeciesNet determinism.** Answered (E-013).
