@@ -192,6 +192,13 @@ def detections_to_sightings(
                 "range_m_assumed": RANGE_M, "position": "camera; bearing stored for Phase 4 projection",
             }, separators=(",", ":"), default=str),
         })
+    # Derived rows, not raw output: clear this corridor's previous model-predicted
+    # sightings first, so a rule change never leaves a stale row behind (a
+    # "domestic cattle" row outlived the NOT_WILD rule on the first rerun).
+    store.con.execute(
+        "DELETE FROM sightings WHERE source = 'mapillary_cv' AND park = ? AND json_extract_string(raw_json, '$.corridor') = ?",
+        [park, corridor],
+    )
     n_written = store.upsert_sightings(sightings)
     named = sum(1 for s in sightings if s["taxon_rank"] == "species")
     return {"boxes": n_boxes, "kept_boxes": len(kept), "chains": len(chains), "written": n_written, "named_species": named}
