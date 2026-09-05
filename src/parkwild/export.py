@@ -294,13 +294,17 @@ def write_manifest(out_dir: Path, files: list[Path], extra: dict | None = None) 
 
 
 def export_park(store: Store, park: str, out_dir: Path) -> dict:
+    from .photos import export_photos  # local import: photos depends on this module's helpers
+
     out_dir.mkdir(parents=True, exist_ok=True)
     result = {
         "cells": cells_geojson(store, park, out_dir / "cells.geojson"),
         "species": species_json(store, park, out_dir / "species.json"),
         "sightings": sightings_parquet(store, park, out_dir / "sightings.parquet"),
+        "photos": export_photos(store, park, out_dir),
     }
-    files = [out_dir / "cells.geojson", out_dir / "species.json", out_dir / "sightings.parquet"]
+    files = [out_dir / "cells.geojson", out_dir / "species.json", out_dir / "sightings.parquet",
+             out_dir / "photos_species.json", out_dir / "photos_cells.json"]
     if (out_dir / "bias.json").exists():   # written by `track_a.py bias --write`, optional
         files.append(out_dir / "bias.json")
     write_manifest(out_dir, files, {"park": park})

@@ -5,7 +5,7 @@
 // (import.meta.glob below), so a file swapped on the CDN after the build fails
 // the hash check and is refused. In development, with no baked manifest, the
 // check is skipped and a warning is logged instead of blocking work.
-import type { BiasFile, CellsFile, Manifest, SpeciesFile } from "./types";
+import type { BiasFile, CellsFile, Manifest, PhotosCellsFile, PhotosSpeciesFile, SpeciesFile } from "./types";
 
 const baked = import.meta.glob<Manifest>("../public/data/*/manifest.json", { eager: true, import: "default" });
 
@@ -21,17 +21,14 @@ async function sha256Hex(buf: ArrayBuffer): Promise<string> {
   return Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-async function fetchVerified<T>(park: string, name: string, manifest: Manifest | null): Promise<T> {
+export async function fetchVerified<T>(park: string, name: string, manifest: Manifest | null): Promise<T> {
   // The manifest hash doubles as a cache key: a rebuild changes the URL, so a
   // browser can never serve last build's file against this build's manifest.
-  // (The first version used cache: "force-cache" and tripped its own integrity
-  // check on the second build.)
-  const expectedHash = manifest?.files[name]?.sha256;
-  const url = `${import.meta.env.BASE_URL}data/${park}/${name}` + (expectedHash ? `?v=${expectedHash.slice(0, 16)}` : "");
+  const expected = manifest?.files[name]?.sha256;
+  const url = `${import.meta.env.BASE_URL}data/${park}/${name}` + (expected ? `?v=${expected.slice(0, 16)}` : "");
   const res = await fetch(url);
   if (!res.ok) throw new Error(`${name}: HTTP ${res.status}`);
   const buf = await res.arrayBuffer();
-  const expected = expectedHash;
   if (expected) {
     const actual = await sha256Hex(buf);
     if (actual !== expected) throw new Error(`${name} failed its integrity check (expected ${expected.slice(0, 12)}…, got ${actual.slice(0, 12)}…)`);
@@ -41,13 +38,18 @@ async function fetchVerified<T>(park: string, name: string, manifest: Manifest |
   return JSON.parse(new TextDecoder().decode(buf)) as T;
 }
 
-export async function loadPark(park: string): Promise<{ cells: CellsFile; species: SpeciesFile; bias: BiasFile | null; manifest: Manifest | null }> {
+export async function loadPark(park: string) {
   const manifest = bakedManifest(park);
-  const [cells, species, bias] = await Promise.all([
+  const [cells, species, bias, photosSpecies] = await Promise.all([
     fetchVerified<CellsFile>(park, "cells.geojson", manifest),
     fetchVerified<SpeciesFile>(park, "species.json", manifest),
-    // bias.json exists only once the imagery track has been measured; its absence is not an error.
     fetchVerified<BiasFile>(park, "bias.json", manifest).catch(() => null),
+    fetchVerified<PhotosSpeciesFile>(park, "photos_species.json", manifest).catch(() => null),
   ]);
-  return { cells, species, bias, manifest };
+  return { cells, species, bias, photosSpecies, manifest };
+}
+
+// The per-cell photo file is a megabyte; it is fetched the first time a cell is opened.
+export function loadCellPhotos(park: string, manifest: Manifest | null) {
+  return fetchVerified<PhotosCellsFile>(park, "photos_cells.json", manifest);
 }

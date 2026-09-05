@@ -159,7 +159,9 @@ any data file whose hash does not match.
 ## The app
 
 `app/` is React + Vite + MapLibre + React Three Fiber + Zustand, static files
-only. `make app` installs, builds and enforces the JS budget (entry chunk
+only. Photographs from iNaturalist observations are the evidence layer
+(ADR-0015): card art and hero per species, a "seen here" strip per cell,
+each credited to its observer with its licence and a link. `make app` installs, builds and enforces the JS budget (entry chunk
 under 200 KB gzipped; the map and 3D libraries are lazy chunks with their own
 caps). Pages: map of H3 cells with species and year filters and a cell detail
 panel; species grid and detail with month histogram and a lazy 3D viewer;

@@ -127,6 +127,12 @@ Format: date, what, number, kept?, why, where it lives.
 - **Number:** dozens of entries with corridor "test" or n_in under 20 among the real ones; found when a stash conflict showed bias and review entries timestamped at a test run.
 - **Kept:** no. Path resolves at call time from PARKWILD_DECISION_LOG; conftest and smoke.py set it to a temp file; the ledger was scrubbed of entries with corridor "test" or fixture-sized inputs.
 
+### E-021: what the first live app got wrong, and the screenshot trap
+- **What:** owner review of the deployed app.
+- **Findings:** no photographs, monogram tiles, a busy basemap; the CSP meta tag blocked iNaturalist's image hosts once photos were added; MapLibre's container had zero height under its own stylesheet; a stale service-worker cache tripped the integrity check after a rebuild.
+- **Also learned:** the browser extension's tab is a background tab (`document.visibilityState === "hidden"`), so the map's animation-frame loop is throttled and screenshots of the WebGL canvas come out grey even though the app is fine; image checks via script (`img.complete && naturalWidth > 0`) are the reliable test there.
+- **Kept:** photographs everywhere (ADR-0015), OpenFreeMap positron basemap, CSP with both image hosts, a ResizeObserver on the map container, data URLs keyed by manifest hash, `preserveDrawingBuffer` for captures.
+
 ## Open questions with a planned experiment
 
 - **Q-1 SpeciesNet determinism.** Answered (E-013).
