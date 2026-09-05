@@ -4,8 +4,11 @@
 # and (2) any push when lint, tests, the smoke test or the secret scan fail.
 # Installed by `make hooks`.
 set -e
-PY=".venv/bin/python"; [ -x "$PY" ] || PY="python3"
-RUFF=".venv/bin/ruff";  [ -x "$RUFF" ] || RUFF="ruff"
+# The venv lives in the main checkout; a `git worktree` has its own root, so
+# resolve it from the worktree list rather than the current directory.
+MAIN=$(git worktree list --porcelain | head -1 | sed 's/^worktree //')
+PY="$MAIN/.venv/bin/python"; [ -x "$PY" ] || PY="python3"
+RUFF="$MAIN/.venv/bin/ruff";  [ -x "$RUFF" ] || RUFF="ruff"
 remote="$1"
 zero=0000000000000000000000000000000000000000
 while read local_ref local_sha remote_ref remote_sha; do
