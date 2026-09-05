@@ -209,10 +209,14 @@ def species_json(store: Store, park: str, out_path: Path, *, rules: list[Suppres
         f"""
         SELECT scientific_name, common_name, taxon_class, taxon_id, coordinate_status, source, confidence_basis, observed_on
         FROM sightings
-        WHERE {_canonical_where()} AND scientific_name IS NOT NULL AND taxon_rank IN ('species', 'subspecies')
+        WHERE {_canonical_where()} AND scientific_name IS NOT NULL
+          AND (taxon_rank IN ('species', 'subspecies') OR source = 'mapillary_cv')
         """,
         [park],
     )
+    # Model-predicted rows that could not be named carry the class "Mammalia" with
+    # the common name "unidentified large mammal (model)"; they are kept as their
+    # own entry so the model badge counts are visible in the species list.
     agg: dict[str, dict] = {}
     for raw_sci, common, cls, tid, status, source, basis, on in rows:
         sci = canonical_species(raw_sci, synonyms)

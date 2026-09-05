@@ -1,14 +1,14 @@
 {
-  "built": "2026-09-05T20:51:46+00:00",
-  "git_commit": "c1850235e67de5d59411a782ab0c60070f54f0f7",
+  "built": "2026-09-05T20:57:27+00:00",
+  "git_commit": "1ec9abb3a81fb7d9118f792e7e448220c21b610f",
   "files": {
     "cells.geojson": {
       "sha256": "339c5d2c567ad27e075126b22f4d5083a0be0d46ce62a2f7053b791de29cbe58",
       "bytes": 2738692
     },
     "species.json": {
-      "sha256": "139b223a77c33bd3685c94fc8382b9b8e4234d1b5723f87d5c3b49ddd7a39e20",
-      "bytes": 125149
+      "sha256": "19446acc1359ba5302eece7a898930827b8bed7064cd5f16f72a55e42966de44",
+      "bytes": 125565
     },
     "sightings.parquet": {
       "sha256": "db0b5535341570b26cecc76fae45f83b805d2ea9da7a734e5c3dbc0fe9ba0135",
