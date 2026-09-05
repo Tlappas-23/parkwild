@@ -4,22 +4,11 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import { filteredFeatures, useStore } from "../store";
 import CellDetail from "./CellDetail";
 
-// OSM raster tiles: free, attribution required (shown by the control). Traffic
-// stays within OSM's tile usage policy for a small app; Protomaps is the
-// documented alternative if that ever changes.
-const STYLE: maplibregl.StyleSpecification = {
-  version: 8,
-  sources: {
-    osm: {
-      type: "raster",
-      tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
-      tileSize: 256,
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      maxzoom: 19,
-    },
-  },
-  layers: [{ id: "osm", type: "raster", source: "osm" }],
-};
+// Basemap: OpenFreeMap's "positron" vector style. Free, no key, no signup,
+// OpenStreetMap data, and muted enough that the cells are the only colour on
+// the page. The first version used raw OSM raster tiles, which fought the
+// cells for attention (green park fills, dense labels).
+const STYLE = "https://tiles.openfreemap.org/styles/positron";
 
 const YELLOWSTONE_CENTER: [number, number] = [-110.5, 44.6];
 
@@ -51,25 +40,35 @@ export default function MapPage() {
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
     map.on("load", () => {
       map.addSource("cells", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
-      // Soft, low-opacity fills on purpose: a cell is a probability, not a point.
+      const color: maplibregl.ExpressionSpecification = ["case", [">", ["get", "mp"], 0], "#b86e00", "#2a78d6"];
+      // Opacity on a log scale: 1 sighting is faint, 1000 is solid-ish, and
+      // the jump from 1 to 10 reads the same as 10 to 100.
+      const opacity = (scale: number): maplibregl.ExpressionSpecification =>
+        ["interpolate", ["linear"], ["log10", ["max", 1, ["get", "count"]]], 0, 0.1 * scale, 1, 0.28 * scale, 2, 0.45 * scale, 3, 0.6 * scale];
+      // Coarse cells (sensitive species, ~3 km) sit underneath and fainter, so
+      // a grizzly cell does not swamp the fine cells it covers.
+      map.addLayer({
+        id: "cells-coarse",
+        type: "fill",
+        source: "cells",
+        filter: ["==", ["get", "coarsened"], true],
+        paint: { "fill-color": color, "fill-opacity": opacity(0.45), "fill-outline-color": "rgba(42,120,214,0.35)" },
+      });
       map.addLayer({
         id: "cells-fill",
         type: "fill",
         source: "cells",
-        paint: {
-          "fill-color": ["case", [">", ["get", "mp"], 0], "#b86e00", "#2a78d6"],
-          // Opacity on a log scale: 1 sighting is faint, 1000 is solid-ish, and
-          // the jump from 1 to 10 reads the same as 10 to 100.
-          "fill-opacity": ["interpolate", ["linear"], ["log10", ["max", 1, ["get", "count"]]], 0, 0.12, 1, 0.3, 2, 0.5, 3, 0.65],
-          "fill-outline-color": "rgba(255,255,255,0.35)",
-        },
+        filter: ["!=", ["get", "coarsened"], true],
+        paint: { "fill-color": color, "fill-opacity": opacity(1), "fill-outline-color": "rgba(255,255,255,0.45)" },
       });
-      map.on("click", "cells-fill", (e) => {
-        const f = e.features?.[0];
-        if (f) selectCell(String(f.properties.cell));
-      });
-      map.on("mouseenter", "cells-fill", () => (map.getCanvas().style.cursor = "pointer"));
-      map.on("mouseleave", "cells-fill", () => (map.getCanvas().style.cursor = ""));
+      for (const layer of ["cells-fill", "cells-coarse"]) {
+        map.on("click", layer, (e) => {
+          const f = e.features?.[0];
+          if (f) selectCell(String(f.properties.cell));
+        });
+        map.on("mouseenter", layer, () => (map.getCanvas().style.cursor = "pointer"));
+        map.on("mouseleave", layer, () => (map.getCanvas().style.cursor = ""));
+      }
       mapRef.current = map;
       // Push whatever is already filtered.
       (map.getSource("cells") as maplibregl.GeoJSONSource).setData({ type: "FeatureCollection", features });

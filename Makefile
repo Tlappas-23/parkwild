@@ -13,7 +13,7 @@ PARK ?= yellowstone
 TRACKA := $(BIN)/python scripts/track_a.py
 PHASE0   := $(BIN)/python scripts/phase0.py
 
-.PHONY: setup setup-ml test lint secrets hooks protect coverage pull download slice detect sample report notebook track-a export bias smoke app app-data
+.PHONY: setup setup-ml test lint secrets hooks protect ship coverage pull download slice detect sample report notebook track-a track-b export bias smoke app app-data
 
 $(BIN)/python:
 	$(PY) -m venv $(VENV)
@@ -37,6 +37,10 @@ lint:
 	$(BIN)/ruff check src tests scripts
 	$(BIN)/python scripts/provenance_report.py --strict
 
+## Track B -> sightings (after detect): make track-b
+track-b:
+	$(BIN)/python scripts/track_b.py sightings --corridor $(CORRIDOR) --park $(PARK) --population $(POPULATION)
+
 ## the app: install, build, enforce the JS budget
 app:
 	cd app && npm install --no-audit --no-fund && npm run build && npm run budget
@@ -53,6 +57,10 @@ secrets:
 hooks:
 	git config core.hooksPath .githooks
 	@echo "pre-commit secret scan installed"
+
+## land the working tree on main via PR + CI (main refuses direct pushes)
+ship:
+	scripts/ship.sh "$(TITLE)" $(BODY)
 
 ## lock main on GitHub: make protect REPO=owner/name
 protect:

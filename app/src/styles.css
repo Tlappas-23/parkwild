@@ -38,7 +38,11 @@ main { flex: 1; display: flex; flex-direction: column; }
 .swatch.human { background: var(--accent); } .swatch.model { background: var(--model); }
 .species-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; padding: 24px; }
 .card { text-align: left; border: 1px solid var(--line); border-radius: 14px; padding: 16px; background: var(--panel); margin: 0; }
-.card-art { font-size: 40px; line-height: 1; margin-bottom: 10px; }
+/* Typographic tile until rendered model thumbnails exist: a monogram on a soft
+   tint, one hue per class. Emoji were the first version and read as a toy. */
+.card-art { width: 56px; height: 56px; border-radius: 16px; display: grid; place-items: center; font-weight: 700; font-size: 18px; letter-spacing: -0.02em; margin-bottom: 12px; }
+.card-art.mammalia { background: color-mix(in oklab, var(--accent) 14%, var(--panel)); color: var(--accent); }
+.card-art.aves { background: color-mix(in oklab, #1baf7a 14%, var(--panel)); color: #158a60; }
 .card-title { font-weight: 600; letter-spacing: -0.01em; }
 .note { color: var(--model); }
 .detail, .prose { max-width: 760px; margin: 0 auto; padding: 24px; }

@@ -4,6 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="color-scheme" content="light dark" />
+    <!-- GitHub Pages cannot set response headers; this carries the CSP instead
+         (frame-ancestors is header-only and is dropped here). -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: blob: https://tiles.openfreemap.org; connect-src 'self' https://tiles.openfreemap.org; font-src 'self' https://tiles.openfreemap.org; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; base-uri 'self'; form-action 'none'" />
+    <link rel="icon" href="./icon.svg" type="image/svg+xml" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <meta name="theme-color" content="#fcfcfb" />
     <title>parkwild</title>
     <meta name="description" content="Where and when animals have been seen in Yellowstone, from public observations. Aggregated, attributed, honest about uncertainty." />
   </head>

@@ -27,7 +27,7 @@ async function fetchVerified<T>(park: string, name: string, manifest: Manifest |
   // (The first version used cache: "force-cache" and tripped its own integrity
   // check on the second build.)
   const expectedHash = manifest?.files[name]?.sha256;
-  const url = `/data/${park}/${name}` + (expectedHash ? `?v=${expectedHash.slice(0, 16)}` : "");
+  const url = `${import.meta.env.BASE_URL}data/${park}/${name}` + (expectedHash ? `?v=${expectedHash.slice(0, 16)}` : "");
   const res = await fetch(url);
   if (!res.ok) throw new Error(`${name}: HTTP ${res.status}`);
   const buf = await res.arrayBuffer();

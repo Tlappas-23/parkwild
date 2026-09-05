@@ -12,7 +12,9 @@ export default function SpeciesPage() {
     <div className="species-grid" role="list">
       {species.species.map((s) => (
         <button key={s.scientific_name} role="listitem" className="card" onClick={() => selectSpecies(s.scientific_name)}>
-          <div className="card-art" aria-hidden="true">{s.class === "Aves" ? "🐦" : "🦌"}</div>
+          <div className={"card-art " + (s.class === "Aves" ? "aves" : "mammalia")} aria-hidden="true">
+            {(s.common_name ?? s.scientific_name).split(/\s+/).slice(0, 2).map((w) => w[0]).join("").toUpperCase()}
+          </div>
           <div className="card-title">{s.common_name ?? s.scientific_name}</div>
           <div className="muted small">
             <em>{s.scientific_name}</em> · {s.sightings.toLocaleString()} sightings

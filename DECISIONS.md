@@ -167,7 +167,7 @@ project's problem to fix, and the cost is minutes per corridor, not hours.
 of ten minutes. Revisit when torch or speciesnet changes version; the
 determinism script is the test.
 
-## ADR-0013 (DRAFT, awaiting owner): Phase 0 routing for Track B, perspective population
+## ADR-0013: Phase 0 routing for Track B: supplementary layer (confirmed by owner 2026-09-05)
 
 **Context.** Lamar Valley, 400 perspective frames, SpeciesNet 4.0.3a on CPU,
 stratified review of 20 boxes by one reviewer. Hit rate 8.2% (CI 6 to 11%).
@@ -194,9 +194,35 @@ cheap filters address.
 **Consequence.** Phase 2 scoped to corridors with Lamar-like coverage;
 panorama population still to be read; a second reviewer's pass changes the
 interval, not the band, unless it disagrees on more than three boxes.
-**Status.** Draft. The interval straddles the primary and negative bands, so
-the spec's stop-and-ask applies. Confirm, or ask for the panorama numbers
-first.
+**Status.** Confirmed by the owner on 2026-09-05 after both populations were
+read. Phase 2 proceeds at supplementary scope: Lamar Valley perspective
+frames in full, human/vehicle ensemble labels filtered out of the animal
+layer, species shown as "unidentified large mammal (model)" unless the
+classifier is confident, positions at the camera with the measured 150 m
+range as the stated uncertainty, panoramas excluded until the rig is masked.
+
+## ADR-0014: How Track B enters the sightings table at supplementary scope
+
+**Context.** ADR-0013 routed Track B as a supplementary layer. The raw
+tables hold one row per box with a camera position; the app needs one row
+per sighting in the shared schema, visibly model-predicted.
+**Decision.** `parkwild/trackb.py`: animal boxes at detector confidence >=
+0.5 whose ensemble label is not human, vehicle or blank; consecutive frames
+in a sequence within 60 s and 200 m collapse to one sighting (the strongest
+box); position is the camera position with 150 m, the farthest confirmed
+detection, as the stated accuracy; the species is named only when the
+classifier scores >= 0.8, otherwise "unidentified large mammal (model)";
+Mapillary image ID, contributor, licence and page URL on every row; the
+compass bearing is stored for Phase 4 projection.
+**Rejected.** Placing points along the bearing now: no range estimate exists
+yet (Phase 4). Trusting species labels: the trivial baseline beat the
+classifier in Phase 0. Keeping "vehicle"-labelled boxes: two reviewed bison
+were labelled vehicle, but so were real vehicles; without a larger review
+the filter stays and the loss is recorded.
+**Consequence.** The map shows model-predicted cells in a distinct colour
+with their own badge; species.json carries the Mammalia bucket; the About
+page states the 42% Phase 0 precision. All thresholds are tagged in the
+module with the counts behind them and move only with a bigger review.
 
 ---
 
@@ -210,4 +236,4 @@ first.
 | O-4 | Ingest eBird (421,940 Yellowstone records) | **decided: skip** (2026-09-05); revisit only for checklists with GPS tracks | ADR-0011 |
 | O-5 | Quaternius pack license: CC0 (pack page) vs QAL v1.0 (site license page) | **decided: QAL, credit anyway** (2026-09-05); license archived + hashed | docs/3d-assets.md |
 | O-6 | Start the app skeleton (React + Vite + MapLibre + R3F; `npm install` is several hundred MB) | **decided: yes** (2026-09-05) | BUILD_SPEC.md Phase 5 |
-| O-7 | Repo visibility: GitHub only protects `main` server-side on public or paid repos. Make it public (protection on, code visible, no secrets in it) or stay private with the local pre-push guard only | private + local guard | SECURITY.md |
+| O-7 | Repo visibility: GitHub only protects `main` server-side on public or paid repos. Make it public (protection on, code visible, no secrets in it) or stay private with the local pre-push guard only | **decided: public** (2026-09-05); `main` protected server-side, local guard kept | SECURITY.md |
