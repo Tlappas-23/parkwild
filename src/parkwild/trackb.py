@@ -74,6 +74,15 @@ RANGE_M = 150.0
 UNIDENTIFIED_NAME = "Mammalia"
 UNIDENTIFIED_COMMON = "unidentified large mammal (model)"
 
+# NOT_WILD — ASSUMED
+# Domestic species the classifier knows well and reaches for when a wild
+# animal is dark and distant. Inside a national park a confident "domestic
+# cattle" is a bison the model could not resolve, not a cow; the full Lamar
+# run produced two such calls at >= 0.8. These fold into "unidentified"
+# rather than being renamed to bison, because the model did not say bison.
+# REVISIT IF: a corridor with grazing allotments or working stock is added.
+NOT_WILD = {"Bos taurus", "Canis familiaris", "Felis catus", "Equus caballus", "Ovis aries", "Capra hircus", "Sus scrofa"}
+
 
 def _species_from_label(label: str | None, score: float | None) -> tuple[str, str | None, str | None]:
     """(scientific_name, common_name, rank) for a sighting row."""
@@ -81,6 +90,8 @@ def _species_from_label(label: str | None, score: float | None) -> tuple[str, st
     if "raw" not in parts and parts["species"] and (score or 0) >= SPECIES_MIN_SCORE:
         genus, species = parts["genus"], parts["species"]
         sci = f"{genus.capitalize()} {species}"
+        if sci in NOT_WILD:
+            return UNIDENTIFIED_NAME, UNIDENTIFIED_COMMON, "class"
         return sci, parts["common_name"] or None, "species"
     return UNIDENTIFIED_NAME, UNIDENTIFIED_COMMON, "class"
 
@@ -193,8 +204,7 @@ def detections_to_sightings(
             }, separators=(",", ":"), default=str),
         })
     # Derived rows, not raw output: clear this corridor's previous model-predicted
-    # sightings first, so a rule change never leaves a stale row behind (a
-    # "domestic cattle" row outlived the NOT_WILD rule on the first rerun).
+    # sightings first, so a rule change never leaves a stale row behind.
     store.con.execute(
         "DELETE FROM sightings WHERE source = 'mapillary_cv' AND park = ? AND json_extract_string(raw_json, '$.corridor') = ?",
         [park, corridor],
