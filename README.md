@@ -12,9 +12,12 @@ Phase 0 routes instead of gating, and the app ships on reference data whatever
 detection turns out to be worth. Choices are logged in [DECISIONS.md](DECISIONS.md);
 the security model is in [SECURITY.md](SECURITY.md).
 
-**Status (2026-09-05):** Phase 0 steps 1 to 3 are done live (coverage, index,
-400-frame download); detection waits on the ML install decision. Track A
-(iNaturalist + GBIF) is built and being run for Yellowstone. See RESULTS.md.
+**Status (2026-09-05):** Phase 0 read on both populations and routed:
+Track B is a supplementary layer (ADR-0013). Phase 1 done: 59,805 Yellowstone
+sightings exported. Phase 2 running at supplementary scope on Lamar Valley.
+The app renders the real export and deploys to GitHub Pages from `main`:
+https://tlappas-23.github.io/parkwild/ (first deploy on the next merge).
+See RESULTS.md for numbers, DECISIONS.md for why.
 
 ## Hard constraints
 
