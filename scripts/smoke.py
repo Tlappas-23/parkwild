@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import sys
 import tempfile
 import time
@@ -18,6 +19,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
+os.environ.setdefault("PARKWILD_DECISION_LOG", os.path.join(tempfile.gettempdir(), "parkwild-smoke-decision_log.jsonl"))
 sys.path.insert(0, str(ROOT / "tests"))
 
 from conftest import gbif_occurrences, inat_observations, seed_phase0  # noqa: E402

@@ -2,10 +2,16 @@
 from __future__ import annotations
 
 import json
+import os
+import tempfile
 from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
+
+# Keep test runs out of the real decision ledger (E-020). Set before parkwild
+# is imported anywhere; decisionlog.default_log_path reads it at call time.
+os.environ["PARKWILD_DECISION_LOG"] = os.path.join(tempfile.mkdtemp(prefix="parkwild-tests-"), "decision_log.jsonl")
 
 from parkwild.storage import Store
 
