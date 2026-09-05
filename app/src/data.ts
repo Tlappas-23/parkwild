@@ -5,7 +5,7 @@
 // (import.meta.glob below), so a file swapped on the CDN after the build fails
 // the hash check and is refused. In development, with no baked manifest, the
 // check is skipped and a warning is logged instead of blocking work.
-import type { CellsFile, Manifest, SpeciesFile } from "./types";
+import type { BiasFile, CellsFile, Manifest, SpeciesFile } from "./types";
 
 const baked = import.meta.glob<Manifest>("../public/data/*/manifest.json", { eager: true, import: "default" });
 
@@ -35,11 +35,13 @@ async function fetchVerified<T>(park: string, name: string, manifest: Manifest |
   return JSON.parse(new TextDecoder().decode(buf)) as T;
 }
 
-export async function loadPark(park: string): Promise<{ cells: CellsFile; species: SpeciesFile; manifest: Manifest | null }> {
+export async function loadPark(park: string): Promise<{ cells: CellsFile; species: SpeciesFile; bias: BiasFile | null; manifest: Manifest | null }> {
   const manifest = bakedManifest(park);
-  const [cells, species] = await Promise.all([
+  const [cells, species, bias] = await Promise.all([
     fetchVerified<CellsFile>(park, "cells.geojson", manifest),
     fetchVerified<SpeciesFile>(park, "species.json", manifest),
+    // bias.json exists only once the imagery track has been measured; its absence is not an error.
+    fetchVerified<BiasFile>(park, "bias.json", manifest).catch(() => null),
   ]);
-  return { cells, species, manifest };
+  return { cells, species, bias, manifest };
 }

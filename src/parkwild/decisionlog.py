@@ -50,3 +50,17 @@ def print_decision_summary() -> None:
     print("decision summary:")
     for e in _THIS_RUN:
         print(f"  {e['stage']:<28} {e['n_in']:>9,} -> {e['n_out']:>9,}  ({e['n_dropped']:,} dropped)  {e['rule']}")
+
+
+SAMPLES_DIR = REPORTS_DIR / "samples"
+
+
+def record_sample(name: str, ids: list, **params) -> Path:
+    """Pin a sample to disk: the seed and parameters that produced it and the
+    exact ids chosen. A number that cannot be regenerated from this file is
+    not a result. Overwrites: the file describes the current sample."""
+    SAMPLES_DIR.mkdir(parents=True, exist_ok=True)
+    path = SAMPLES_DIR / f"{name}.json"
+    record = {"recorded": datetime.now(UTC).isoformat(timespec="seconds"), "n": len(ids), **params, "ids": ids}
+    path.write_text(json.dumps(record, indent=1, default=str))
+    return path

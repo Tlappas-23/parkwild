@@ -32,6 +32,7 @@ import requests
 from PIL import Image
 from tqdm import tqdm
 
+from .decisionlog import record_sample
 from .mapillary import MapillaryClient
 from .storage import Store
 
@@ -164,6 +165,8 @@ def download_images(
         corridor, limit=limit, max_per_sequence=max_per_sequence, population=population
     )
     log.info("%d %s images to download for %s (size=%s)", len(rows), population, corridor, size)
+    record_sample(f"{corridor}_{population}_download", [r["image_id"] for r in rows],
+                  seed="phase0", limit=limit, max_per_sequence=max_per_sequence, size=size)
 
     session = requests.Session()
     ok = failed = 0

@@ -4,7 +4,7 @@ import { useStore } from "../store";
 // and the bias figures in plain language. Numbers come from the pipeline's
 // exports where they exist; where they do not yet, the page says so.
 export default function AboutPage() {
-  const { species, manifest, cells } = useStore();
+  const { species, manifest, cells, bias } = useStore();
   const excluded = Object.keys(cells?.suppressed.excluded ?? {});
   const coarsened = Object.keys(cells?.suppressed.coarsened ?? {});
   return (
@@ -40,7 +40,22 @@ export default function AboutPage() {
       </p>
 
       <h3>Road bias and seasonal bias</h3>
-      <p className="muted">Measured figures are published here once the imagery track has run; until then the qualitative statements above stand.</p>
+      {bias ? (
+        <>
+          <p>
+            Of {bias.road.n_sightings_in_bbox.toLocaleString()} independent sightings inside the {bias.road.corridor.replace("_", " ")} corridor,{" "}
+            <strong>{Math.round(100 * (bias.road.fraction_outside_coverage ?? 0))}% fall outside street-level imagery coverage</strong>{" "}
+            (more than about {bias.road.ring === 1 ? "350" : "170"} m from any camera position). The imagery method cannot see those by construction.
+          </p>
+          <p>
+            Imagery captures are {Math.round(100 * (bias.seasonal.images_summer_share ?? 0))}% June to August; human sightings are{" "}
+            {Math.round(100 * (bias.seasonal.sightings_summer_share ?? 0))}%.
+            {bias.seasonal.months_with_no_imagery.length > 0 && <> Months with no imagery at all: {bias.seasonal.months_with_no_imagery.join(", ")}.</>}
+          </p>
+        </>
+      ) : (
+        <p className="muted">Measured figures are published here once the imagery track has run; until then the qualitative statements above stand.</p>
+      )}
 
       <h3>Sources and licenses</h3>
       <ul>

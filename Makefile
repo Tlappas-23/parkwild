@@ -8,6 +8,7 @@ VENV     := .venv
 BIN      := $(VENV)/bin
 CORRIDOR ?= lamar_valley
 POPULATION ?= perspective
+BACKEND ?= cpu
 PARK ?= yellowstone
 TRACKA := $(BIN)/python scripts/track_a.py
 PHASE0   := $(BIN)/python scripts/phase0.py
@@ -71,7 +72,7 @@ slice:
 	$(PHASE0) slice --corridor $(CORRIDOR)
 
 detect:
-	$(PHASE0) detect --corridor $(CORRIDOR) --population $(POPULATION)
+	$(PHASE0) detect --corridor $(CORRIDOR) --population $(POPULATION) --backend $(BACKEND)
 
 sample:
 	$(PHASE0) sample --corridor $(CORRIDOR) --population $(POPULATION) --n 30

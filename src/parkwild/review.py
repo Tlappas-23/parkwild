@@ -32,6 +32,7 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageOps
 
+from .decisionlog import log_filter
 from .pano import slice_path_for
 from .speciesnet_runner import ANIMAL_CATEGORY, display_name
 from .storage import VARIANT_FILTER, Store
@@ -145,6 +146,9 @@ def pick_sample(
     short = {b: q for b, q in quota.items() if q > 0}
     if short:
         log.warning("bands short of their quota (not back-filled): %s", short)
+    log_filter("review.sample", f"stratified: {per_band} per band over {len(BANDS)} bands, one box per frame, seed {seed}",
+               len(candidates), len(sample), corridor=corridor, population=population, min_conf=min_conf,
+               by_band={b: sum(1 for x in sample if x["band"] == b) for b, _ in ((band_of(lo), None) for lo, _ in BANDS)}, short=short)
     return sample
 
 

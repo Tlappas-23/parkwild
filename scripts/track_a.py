@@ -93,7 +93,10 @@ def cmd_bias(args):
     print(block)
     if args.write:
         update_results_md(RESULTS_MD, f"bias:{corridor.key}", block)
-        print(f"updated {RESULTS_MD}")
+        out = EXPORT_DIR / park.key / "bias.json"
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(json.dumps({"road": road, "seasonal": season}, indent=1, default=str))
+        print(f"updated {RESULTS_MD}; wrote {out} (re-run `export` to refresh the manifest)")
 
 
 def cmd_all(args):

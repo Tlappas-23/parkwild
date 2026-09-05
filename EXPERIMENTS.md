@@ -71,9 +71,22 @@ Format: date, what, number, kept?, why, where it lives.
 - **Number:** identical labels and detection confidences to three decimals on all three. Labels were "blank" and "no cv result"; the meaning of the latter is an open question in speciesnet_runner.py.
 - **Kept:** MPS provisionally; the 20-frame check (Q-1) decides.
 
+### E-012: SpeciesNet backend on the M2 Pro (decision 1's condition)
+- **What:** 20 perspective frames, same command, three backends/modes.
+- **Number:** MPS batch 8: segfault (exit 139) at "Classifier preprocess 10/20" inside speciesnet/multiprocessing.py. MPS batch 1: abort (exit 134), same place. MPS `--run_mode multi_process`: hung past 10 minutes, killed. CPU batch 8: exit 0, 20 predictions.
+- **Kept:** CPU is the backend. `phase0.py detect --backend cpu` is the default and `runs.backend` records it. MPS stays reachable via `--backend auto` for a future torch/speciesnet version.
+- **Why it matters:** decision 1 predicted "silently wrong output rather than failing"; what happened was loud failure, which is the better outcome. The three-frame agreement (E-011) says MPS arithmetic was fine when it ran.
+- **Where:** ADR-0012; reports/determinism.json holds the CPU run-to-run comparison.
+
+### E-013: CPU run-to-run determinism, 20 frames
+- **What:** the same 20 perspective frames scored twice on CPU (`scripts/determinism_check.py`), plus one MPS attempt with a 15-minute cap.
+- **Number:** CPU run 1 vs run 2: byte-identical JSON = True, label mismatches 0, box-count mismatches 0, max score diff 0.0, max box diff 0.0. Timing 29.5 s and 29.6 s. MPS: failed: speciesnet failed (mps, exit -6).
+- **Kept:** CPU, deterministic = True. No error bar needed for backend nondeterminism.
+- **Where:** reports/determinism.json.
+
 ## Open questions with a planned experiment
 
-- **Q-1 SpeciesNet determinism on MPS.** Run 20 images twice; predictions must be byte-identical. If not, force CPU and record the backend in `runs`. (Decision 1 condition.)
+- **Q-1 SpeciesNet determinism.** Answered (E-013).
 - **Q-2 Panorama slices vs whole panoramas.** Ablation: same 100 panoramas whole and sliced; compare animal-box rate and review precision.
 - **Q-3 Country filter on/off.** Same frames with and without `--country USA`; count label changes.
 - **Q-4 Mapillary's own `animal--ground-animal` tags as a pre-filter.** Fetch with `pull --with-mapillary-detections`; overlap with MegaDetector boxes >= 0.2.

@@ -1,0 +1,47 @@
+{
+  "images": [
+    "1005361611062043.jpg",
+    "1007544989981193.jpg",
+    "1023326861408409.jpg",
+    "1023327171822984.jpg",
+    "1036030556924741.jpg",
+    "1046595020373626.jpg",
+    "1047223956110022.jpg",
+    "1065632648297549.jpg",
+    "1073839499811466.jpg",
+    "1076031789555838.jpg",
+    "1077931193853956.jpg",
+    "1080339995790998.jpg",
+    "1083066818870033.jpg",
+    "1098459970634473.jpg",
+    "1129212027544340.jpg",
+    "113812717431945.jpg",
+    "1169287806852486.jpg",
+    "1179121602526125.jpg",
+    "1179591016669925.jpg",
+    "120078483426813.jpg"
+  ],
+  "seconds": {
+    "cpu_run1": 29.5,
+    "cpu_run2": 29.6
+  },
+  "cpu_run1_vs_run2": {
+    "byte_identical_json": true,
+    "n": 20,
+    "label_mismatch": [],
+    "box_count_mismatch": [],
+    "max_score_diff": 0.0,
+    "max_box_diff": 0.0,
+    "identical_within_tol": true
+  },
+  "mps": {
+    "attempted": true,
+    "ok": false,
+    "error": "speciesnet failed (mps, exit -6)"
+  },
+  "verdict": {
+    "cpu_deterministic": true,
+    "mps_usable": false,
+    "backend_to_use": "cpu"
+  }
+}

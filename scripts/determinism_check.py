@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 """
 Decision 1's condition: before trusting any number from SpeciesNet on this
-machine, run the same 20 images twice on MPS and once on CPU.
+machine, run the same 20 images twice and confirm the output is identical.
 
-  MPS run 1 vs MPS run 2  -> must be identical. If not, the backend is
-                             nondeterministic and every downstream number
-                             needs an error bar.
-  MPS vs CPU              -> should agree on labels and boxes to a few decimals.
-                             Silent disagreement means MPS is producing wrong
-                             output rather than failing, and CPU is the backend.
+FIRST VERSION ran MPS twice and CPU once. MPS segfaults past a handful of
+frames (E-012), so the backend is CPU and this script now measures:
+
+  CPU run 1 vs CPU run 2  -> must be identical. If not, every downstream
+                             number needs an error bar.
+  MPS (attempted)         -> recorded as ok / crashed, never required.
 
 Writes reports/determinism.json and prints a verdict. Runs standalone, no DB.
 """
@@ -34,10 +34,14 @@ def run(image_dir: Path, out: Path, *, cpu: bool) -> float:
     cmd += ["--folders", str(image_dir), "--predictions_json", str(out), "--country", "USA", "--admin1_region", "WY",
             "--batch_size", "8", "--bypass_prompts"]
     t0 = time.time()
-    proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+    # MPS is known to hang in some modes (E-012); never wait more than 15 minutes for it.
+    try:
+        proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True, timeout=900)
+    except subprocess.TimeoutExpired:
+        raise SystemExit(f"speciesnet timed out ({'cpu' if cpu else 'mps'})") from None
     if proc.returncode != 0:
         print(proc.stdout[-2000:], proc.stderr[-4000:], file=sys.stderr)
-        raise SystemExit(f"speciesnet failed ({'cpu' if cpu else 'mps'})")
+        raise SystemExit(f"speciesnet failed ({'cpu' if cpu else 'mps'}, exit {proc.returncode})")
     return time.time() - t0
 
 
@@ -79,23 +83,28 @@ def main() -> None:
     # scan produced a crash-shaped log with zero predictions (E-010).
     for f in files:
         shutil.copy2(f, work / "images" / f.name)
-    t_mps1 = run(work / "images", work / "mps1.json", cpu=False)
-    t_mps2 = run(work / "images", work / "mps2.json", cpu=False)
-    t_cpu = run(work / "images", work / "cpu.json", cpu=True)
-    mps1, mps2, cpu = load(work / "mps1.json"), load(work / "mps2.json"), load(work / "cpu.json")
-    byte_identical = (work / "mps1.json").read_bytes() == (work / "mps2.json").read_bytes()
+    t_cpu1 = run(work / "images", work / "cpu1.json", cpu=True)
+    t_cpu2 = run(work / "images", work / "cpu2.json", cpu=True)
+    cpu1, cpu2 = load(work / "cpu1.json"), load(work / "cpu2.json")
+    byte_identical = (work / "cpu1.json").read_bytes() == (work / "cpu2.json").read_bytes()
+    mps_status: dict = {"attempted": True}
+    try:
+        t_mps = run(work / "images", work / "mps.json", cpu=False)
+        mps = load(work / "mps.json")
+        mps_status.update(ok=True, seconds=round(t_mps, 1), vs_cpu=compare(cpu1, mps, tol=1e-3))
+    except SystemExit as exc:
+        mps_status.update(ok=False, error=str(exc))
     report = {
         "images": [f.name for f in files],
-        "seconds": {"mps_run1": round(t_mps1, 1), "mps_run2": round(t_mps2, 1), "cpu": round(t_cpu, 1)},
-        "mps_run1_vs_run2": {"byte_identical_json": byte_identical, **compare(mps1, mps2, tol=0.0)},
-        "mps_vs_cpu": compare(mps1, cpu, tol=1e-3),
+        "seconds": {"cpu_run1": round(t_cpu1, 1), "cpu_run2": round(t_cpu2, 1)},
+        "cpu_run1_vs_run2": {"byte_identical_json": byte_identical, **compare(cpu1, cpu2, tol=0.0)},
+        "mps": mps_status,
     }
-    mps_deterministic = report["mps_run1_vs_run2"]["identical_within_tol"]
-    mps_agrees_cpu = report["mps_vs_cpu"]["identical_within_tol"]
+    cpu_deterministic = report["cpu_run1_vs_run2"]["identical_within_tol"]
     report["verdict"] = {
-        "mps_deterministic": mps_deterministic,
-        "mps_agrees_with_cpu": mps_agrees_cpu,
-        "backend_to_use": "mps" if (mps_deterministic and mps_agrees_cpu) else "cpu",
+        "cpu_deterministic": cpu_deterministic,
+        "mps_usable": bool(mps_status.get("ok")) and bool(mps_status.get("vs_cpu", {}).get("identical_within_tol")),
+        "backend_to_use": "cpu",
     }
     out = ROOT / "reports" / "determinism.json"
     out.write_text(json.dumps(report, indent=2))

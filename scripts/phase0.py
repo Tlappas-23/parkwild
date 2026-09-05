@@ -39,7 +39,7 @@ from parkwild.config import (  # noqa: E402
     mapillary_token,
 )
 from parkwild.contracts import check_lon_lat, check_ms_epoch  # noqa: E402
-from parkwild.decisionlog import log_filter, print_decision_summary  # noqa: E402
+from parkwild.decisionlog import log_filter, print_decision_summary, record_sample  # noqa: E402
 from parkwild.download import download_images  # noqa: E402
 from parkwild.geo import DEFAULT_TILE_DEG  # noqa: E402
 from parkwild.mapillary import (  # noqa: E402
@@ -192,8 +192,8 @@ def cmd_slice(args: argparse.Namespace) -> None:
 
 def cmd_detect(args: argparse.Namespace) -> None:
     """Run the SpeciesNet ensemble over one population's image folder, record
-    the run, then parse its JSON into the append-only raw tables. --parse-only
-    skips the model (for JSON produced elsewhere, e.g. on Kaggle)."""
+    the run (backend included), then parse its JSON into the append-only raw
+    tables. --backend external skips the model for JSON produced elsewhere."""
     c = get_corridor(args.corridor)
     image_dir = detect_dir_for(c.key, args.population)
     predictions_json = PREDICTIONS_DIR / f"{c.key}_{args.population}.json"
@@ -201,15 +201,21 @@ def cmd_detect(args: argparse.Namespace) -> None:
     run_id = f"{c.key}:{args.population}:{datetime.now():%Y%m%dT%H%M%S}"
     started = _utcnow()
     exit_code = None
-    env = {"speciesnet_version": "external", "backend": "kaggle" if args.parse_only else "unknown"}
-    if not args.parse_only:
+    # Backend is recorded per run (build spec, Phase 2). 'cpu' is the measured
+    # default on this machine: MPS segfaults in SpeciesNet's classifier
+    # preprocessing past a handful of frames (E-012). 'external' means the JSON
+    # was produced elsewhere (Kaggle) and is only parsed here.
+    env = {"speciesnet_version": "external", "backend": "external"}
+    if args.backend != "external":
         if not files:
             sys.exit(f"no images in {image_dir}; run `download` (and `slice` for panoramas) first")
         env = speciesnet_env_info(args.python)
+        if args.backend == "cpu":
+            env["backend"] = "cpu"
         exit_code = run_speciesnet(
             image_dir, predictions_json, country="USA",
             admin1_region=None if args.no_admin1 else c.state,
-            batch_size=args.batch_size, python=args.python,
+            batch_size=args.batch_size, python=args.python, force_cpu=(args.backend == "cpu"),
         )
     if not predictions_json.exists():
         sys.exit(f"{predictions_json} not found")
@@ -222,7 +228,7 @@ def cmd_detect(args: argparse.Namespace) -> None:
             "image_dir": str(image_dir), "predictions_json": str(predictions_json), "n_files": len(files),
             "country": "USA", "admin1_region": None if args.no_admin1 else c.state, "batch_size": args.batch_size,
             "exit_code": exit_code, "started_at": started, "finished_at": _utcnow(),
-            "notes": "parse-only" if args.parse_only else None,
+            "notes": "parsed external JSON" if args.backend == "external" else None,
         })
         new_p = store.append_predictions(preds)
         new_d = store.append_detections(dets)
@@ -248,6 +254,8 @@ def cmd_sample(args: argparse.Namespace) -> None:
             return
         render_review_images(store, sample, out_dir, min_conf=args.min_conf)
         write_review_template(sample, out_dir / "review.csv")
+    record_sample(f"{c.key}_{args.population}_review", [f"{x['image_id']}:{x['variant']}:{x['det_idx']}" for x in sample],
+                  seed=args.seed, n=args.n, min_conf=args.min_conf)
     bands = {}
     for s in sample:
         bands[s["band"]] = bands.get(s["band"], 0) + 1
@@ -333,7 +341,8 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--batch-size", type=int, default=8)
     p.add_argument("--python", default=sys.executable, help="interpreter that has speciesnet installed")
     p.add_argument("--no-admin1", action="store_true", help="geofence to USA only, not the corridor's state")
-    p.add_argument("--parse-only", action="store_true", help="skip inference; just load an existing predictions JSON")
+    p.add_argument("--backend", choices=["cpu", "auto", "external"], default="cpu",
+                   help="cpu (measured default, E-012) | auto (let torch pick; MPS crashes here) | external (parse a JSON made elsewhere)")
     p.set_defaults(func=cmd_detect)
 
     p = sub.add_parser("sample", help="build the manual review gallery and CSV")

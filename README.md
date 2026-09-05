@@ -127,7 +127,7 @@ Run in order. Every step is idempotent and resumable.
 | 2 | `make pull CORRIDOR=lamar_valley` | Tiles the bbox, walks every tile, stores one row per image. Tiles that hit the 2000 cap get quartered. Progress per tile, so a rerun resumes. | `images`, `tiles` tables |
 | 3 | `make download CORRIDOR=...` | Picks 400 perspective frames spread across sequences (max 20 each), downloads the original resolution, verifies each file. `--population pano --limit 100` does the same for panoramas. | `data/images/<corridor>/`, `data/images/<corridor>_pano/`, `downloads` table |
 | 3b | `make slice CORRIDOR=...` | Cuts each downloaded panorama into four 90-degree horizon windows. Fixes framing, not resolution. | `data/images/<corridor>_pano_slices/` |
-| 4 | `make detect CORRIDOR=... POPULATION=perspective\|pano` | Runs the full SpeciesNet ensemble with `--country USA --admin1_region <state>`, records the run, parses the JSON into the append-only raw tables. | `data/predictions/<corridor>_<population>.json`, `runs`, `predictions_raw`, `detections_raw` |
+| 4 | `make detect CORRIDOR=... POPULATION=perspective\|pano` | Runs the full SpeciesNet ensemble with `--country USA --admin1_region <state>` on CPU (MPS segfaults here, E-012), records the run and its backend, parses the JSON into the append-only raw tables. | `data/predictions/<corridor>_<population>.json`, `runs`, `predictions_raw`, `detections_raw` |
 | 5 | `make sample CORRIDOR=... POPULATION=...` | Stratified sample of 30 animal boxes across three confidence bands, one per frame, drawn and cropped, plus `review.csv`. | `data/review/<corridor>/<population>/` |
 | 6 | fill `review.csv` (or use the notebook) | `verdict` tp/fp/unsure, `true_species`, `species_agree` yes/rollup/no/na, `est_distance_m`. | |
 | 7 | `make report CORRIDOR=... POPULATION=...` | Imports the verdicts, asks Overpass for road km, computes the numbers with Wilson intervals and cluster counts, writes them into `RESULTS.md`. Recall is printed as unmeasured. | `RESULTS.md`, `data/phase0_<corridor>_<population>.json` |
@@ -144,10 +144,24 @@ make track-a PARK=yellowstone          # ingest iNaturalist + GBIF, dedupe, expo
 ```
 
 Outputs land in `data/export/<park>/`: `cells.geojson` (H3 resolution 9, one
-feature per cell and species, open coordinates only), `species.json` (counts,
-seasonality, obscured share, source mix), `sightings.parquet` (full canonical
-records with attribution) and `manifest.json` (SHA-256 per file, git commit).
-Every filter writes a line to `reports/decision_log.jsonl`.
+feature per cell and species, open coordinates only, sensitive species
+excluded or coarsened per `config/suppression.toml`), `species.json` (counts,
+seasonality, obscured share, source mix, suppression treatment),
+`sightings.parquet` (full canonical records with attribution) and
+`manifest.json` (SHA-256 per file, git commit). `make bias` adds the road and
+seasonal bias block to RESULTS.md. `make app-data` copies the exports into
+`app/public/data/<park>/`, where the app compiles the manifest in and refuses
+any data file whose hash does not match.
+
+## The app
+
+`app/` is React + Vite + MapLibre + React Three Fiber + Zustand, static files
+only. `make app` installs, builds and enforces the JS budget (entry chunk
+under 200 KB gzipped; the map and 3D libraries are lazy chunks with their own
+caps). Pages: map of H3 cells with species and year filters and a cell detail
+panel; species grid and detail with month histogram and a lazy 3D viewer;
+About with methods, limitations, suppression and licensing. Deploy target is
+Cloudflare Pages with `app/public/_headers` for CSP.
 
 Rough cost on this machine: steps 1 to 3 are a few minutes of API calls and
 about 1 to 2 GB of JPEGs. Step 4 is the slow one: MegaDetector on 400 original
@@ -211,6 +225,21 @@ One optional addition, not a substitution: `phase0.py pull --with-mapillary-dete
 also stores Mapillary's own segmentation labels (`detections.value`, e.g.
 `animal--ground-animal`). It is a free, in-domain pre-filter worth measuring
 against MegaDetector, and it costs one extra field in the query.
+
+## How the code is written (the narrative standard)
+
+Every module opens with what problem it solves, what was tried first, why
+that failed, what it does now, and what is unresolved. Every constant carries
+a provenance tag (`MEASURED`, `DERIVED`, `BORROWED`, `ASSUMED`, `ARBITRARY`)
+and says what would change it; `scripts/provenance_report.py --strict` runs
+in CI and fails on an untagged one. Replaced methods stay in the code as
+`_v1` with a docstring giving the evidence and a test that reproduces the
+comparison (`is_capped_v1`, `images_pending_download_v1`,
+`cluster_detections_v1`, `pick_sample_uniform_v1`). Every filter logs rows
+in and out to `reports/decision_log.jsonl`, and every script ends with a
+decision summary. Samples are pinned in `reports/samples/*.json` with their
+seeds. `EXPERIMENTS.md` is the ledger, failures included; `DECISIONS.md` the
+ADRs; `docs/data-cards/` one page per source.
 
 ## Data model (DuckDB)
 

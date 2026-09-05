@@ -62,3 +62,22 @@ export interface Manifest {
   park: string;
   files: Record<string, { sha256: string; bytes: number }>;
 }
+
+export interface BiasFile {
+  road: {
+    corridor: string;
+    n_sightings_in_bbox: number;
+    n_covered: number;
+    fraction_outside_coverage: number | null;
+    by_class: Record<string, { n: number; covered: number; fraction_outside: number | null }>;
+    ring: number;
+    h3_res: number;
+  };
+  seasonal: {
+    images_by_month: number[];
+    sightings_by_month: number[];
+    images_summer_share: number | null;
+    sightings_summer_share: number | null;
+    months_with_no_imagery: number[];
+  };
+}

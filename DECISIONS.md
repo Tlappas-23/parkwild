@@ -151,6 +151,22 @@ non-iNaturalist records are real and cheap.
 decision is made; species.json and the About page must say so. Logged in
 reports/decision_log.jsonl by the ingest.
 
+## ADR-0012: SpeciesNet runs on CPU on this machine
+
+**Context.** Decision 1 chose a local install and required a determinism
+check with a CPU fallback on any misbehaviour. Measured (E-012): MPS
+segfaulted at 20 frames (batch 8) and aborted (batch 1) inside SpeciesNet's
+classifier preprocessing, and hung in multi-process mode; CPU completed.
+On the three frames where MPS did run, it matched CPU exactly.
+**Decision.** CPU is the default backend (`--backend cpu`, via
+scripts/speciesnet_cpu.py which hides MPS from torch). Every run records its
+backend in the `runs` table.
+**Rejected.** Debugging the MPS crash inside torch/speciesnet: not this
+project's problem to fix, and the cost is minutes per corridor, not hours.
+**Consequence.** Inference on 400 originals is roughly half an hour instead
+of ten minutes. Revisit when torch or speciesnet changes version; the
+determinism script is the test.
+
 ---
 
 ## Open decisions (owner's call; recorded here so nothing is decided by drift)

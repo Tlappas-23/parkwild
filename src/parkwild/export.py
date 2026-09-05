@@ -235,5 +235,8 @@ def export_park(store: Store, park: str, out_dir: Path) -> dict:
         "species": species_json(store, park, out_dir / "species.json"),
         "sightings": sightings_parquet(store, park, out_dir / "sightings.parquet"),
     }
-    write_manifest(out_dir, [out_dir / "cells.geojson", out_dir / "species.json", out_dir / "sightings.parquet"], {"park": park})
+    files = [out_dir / "cells.geojson", out_dir / "species.json", out_dir / "sightings.parquet"]
+    if (out_dir / "bias.json").exists():   # written by `track_a.py bias --write`, optional
+        files.append(out_dir / "bias.json")
+    write_manifest(out_dir, files, {"park": park})
     return result

@@ -10,15 +10,16 @@ the tests, and it would lose SpeciesNet's own resume-from-JSON behaviour.
 
 CURRENT: shell out to `python -m speciesnet.scripts.run_model` (flags checked
 against run_model.py in 5.0.5), parse the JSON into rows, contract-check
-that boxes are normalised. Backend: MPS on Apple silicon. First determinism
-attempt looked like a segfault; it was symlinked inputs (E-010). On real
-files MPS and CPU agreed exactly on three frames; the 20-frame check is in
-reports/determinism.json. `scripts/speciesnet_cpu.py` forces CPU if MPS ever
-misbehaves, and `runs.backend` records which one ran.
+that boxes are normalised. Backend: **CPU**, by measurement (E-012). MPS
+agreed with CPU exactly on three frames, then segfaulted at 20 frames in the
+classifier preprocessing at batch 8 and aborted at batch 1; multi-process
+mode hung. `scripts/speciesnet_cpu.py` hides MPS from torch and
+`runs.backend` records what ran. Cost: CPU inference on 400 originals is on
+the order of half an hour instead of ten minutes.
 
-UNRESOLVED: the ensemble label "no cv result" appeared on two of three test
-frames that *did* have detections. Meaning to be confirmed from the ensemble
-source before it is interpreted; treated as "no species" for now.
+RESOLVED: the ensemble label "no cv result" is SpeciesNet's UNKNOWN constant
+(constants.py), the fallback when neither classifier nor detector clears
+its threshold. Displayed as "unknown"; its detections are still stored.
 """
 from __future__ import annotations
 
@@ -31,6 +32,9 @@ from pathlib import Path
 from .contracts import check_bbox_normalized
 
 log = logging.getLogger(__name__)
+
+# CPU_WRAPPER — DERIVED (repo-relative path to scripts/speciesnet_cpu.py, the MPS-hiding wrapper)
+CPU_WRAPPER = Path(__file__).resolve().parents[2] / "scripts" / "speciesnet_cpu.py"
 
 # ANIMAL_CATEGORY / HUMAN_CATEGORY / VEHICLE_CATEGORY — BORROWED
 # (speciesnet/constants.py, Detection enum: "1" animal, "2" human, "3" vehicle)
@@ -79,11 +83,14 @@ def build_command(
     batch_size: int = 8,
     python: str = sys.executable,
     extra_args: tuple[str, ...] = (),
+    force_cpu: bool = False,
 ) -> list[str]:
     """The exact CLI invocation. Kept separate from run() so tests can check it
-    and so I can print it for a manual run on Kaggle."""
+    and so I can print it for a manual run on Kaggle. `force_cpu` routes
+    through scripts/speciesnet_cpu.py, which hides MPS from torch (E-012)."""
+    entry = [str(CPU_WRAPPER)] if force_cpu else ["-m", "speciesnet.scripts.run_model"]
     cmd = [
-        python, "-m", "speciesnet.scripts.run_model",
+        python, *entry,
         "--folders", str(image_dir),
         "--predictions_json", str(predictions_json),
         "--country", country,          # ISO 3166-1 alpha-3; geofence drops species absent from the USA
@@ -126,6 +133,8 @@ def split_label(label: str | None) -> dict[str, str]:
     parts = label.split(";")
     if len(parts) != len(LABEL_PARTS):
         return {"raw": label}
+    if parts[1] == "no cv result":   # SpeciesNet's UNKNOWN sentinel wears the 7-part shape
+        return {"raw": "unknown"}
     return dict(zip(LABEL_PARTS, parts))
 
 

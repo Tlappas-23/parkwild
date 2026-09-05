@@ -15,6 +15,8 @@ def test_build_command_flags(tmp_path):
     assert cmd[cmd.index("--country") + 1] == "USA"
     assert cmd[cmd.index("--admin1_region") + 1] == "WY"
     assert "--admin1_region" not in build_command(tmp_path, tmp_path / "o.json")
+    cpu = build_command(tmp_path, tmp_path / "o.json", python="py", force_cpu=True)
+    assert cpu[1].endswith("scripts/speciesnet_cpu.py") and "-m" not in cpu[:2]
 
 
 def test_split_label_and_display_name():
