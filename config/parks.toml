@@ -1,0 +1,28 @@
+# Parks for Track A (reference sightings) and, later, the app.
+#
+# inat_place_id and bbox come from iNaturalist's place records, looked up live
+# on 2026-09-05 with `track_a.py places --query "<name>"`. The bbox is the
+# park's bounding rectangle, so it includes some land outside the boundary;
+# Phase 1 filters by place_id on iNaturalist (exact boundary) and by bbox on
+# GBIF (which has no place filter). `corridors` links to config/corridors.toml.
+
+[yellowstone]
+name          = "Yellowstone National Park"
+state         = "WY"
+inat_place_id = 10211
+bbox          = [-111.1559859081, 44.1325839001, -109.8241801374, 45.108956716]
+corridors     = ["lamar_valley"]
+
+[grand_teton]
+name          = "Grand Teton National Park"
+state         = "WY"
+inat_place_id = 69099
+bbox          = [-110.9484174894, 43.5379225963, -110.4227514174, 44.0840060908]
+corridors     = ["moose_wilson"]
+
+[great_smoky]
+name          = "Great Smoky Mountains National Park"
+state         = "TN"
+inat_place_id = 72645
+bbox          = [-84.0138923194, 35.4269005382, -82.9980412677, 35.841392749]
+corridors     = ["cades_cove"]

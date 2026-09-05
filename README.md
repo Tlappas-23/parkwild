@@ -7,11 +7,14 @@ queryable DuckDB dataset plus a map. Side project; zero budget; honest numbers.
 The full brief is in [PROJECT_BRIEF.md](PROJECT_BRIEF.md). Accuracy numbers, good
 or bad, go in [RESULTS.md](RESULTS.md).
 
-**Status (2026-09-05):** Phase 0 code is written and unit-tested offline. It has
-not been run against Mapillary yet. Two things are needed first:
+The build now follows [BUILD_SPEC.md](BUILD_SPEC.md): three decoupled tracks,
+Phase 0 routes instead of gating, and the app ships on reference data whatever
+detection turns out to be worth. Choices are logged in [DECISIONS.md](DECISIONS.md);
+the security model is in [SECURITY.md](SECURITY.md).
 
-1. a Mapillary client token in `.env` (free registration, no card);
-2. an OK to run `make setup-ml`, which installs PyTorch + SpeciesNet (several GB).
+**Status (2026-09-05):** Phase 0 steps 1 to 3 are done live (coverage, index,
+400-frame download); detection waits on the ML install decision. Track A
+(iNaturalist + GBIF) is built and being run for Yellowstone. See RESULTS.md.
 
 ## Hard constraints
 
@@ -41,6 +44,17 @@ not been run against Mapillary yet. Two things are needed first:
 Nothing in the stack was substituted. See "Verified against live docs" below
 for the two API details that shaped the crawler.
 
+## Tracks
+
+| Track | What | Where |
+|---|---|---|
+| A: reference data | iNaturalist + GBIF sightings, deduplicated, exported as H3 cells | `scripts/track_a.py`, `parkwild/{inaturalist,gbif,sightings,export}.py` |
+| B: detection | Mapillary crawl, SpeciesNet, Phase 0 numbers per population | `scripts/phase0.py`, `parkwild/{mapillary,download,pano,speciesnet_runner,review,report}.py` |
+| C: app | React + MapLibre + R3F, static files, no backend | `app/` (Phase 5, not started) |
+
+Both A and B write the same `sightings` schema with `source` and
+`confidence_basis`; the app reads only that.
+
 ## Layout
 
 ```
@@ -48,8 +62,13 @@ for the two API details that shaped the crawler.
 ├── PROJECT_BRIEF.md          the brief, verbatim
 ├── RESULTS.md                the numbers ledger (auto-blocks + hand-written verdicts)
 ├── README.md                 this file
+├── BUILD_SPEC.md             the full build spec (supersedes the brief)
+├── DECISIONS.md              ADRs + the open-decisions table
+├── SECURITY.md               threat model and controls
 ├── docs/
-│   └── finetuning-decision.md   when (and when not) to fine-tune, and how to test it
+│   ├── finetuning-decision.md   when (and when not) to fine-tune, and how to test it
+│   └── 3d-assets.md             Phase 6 sourcing sheet: species, candidates, license status
+├── config/parks.toml         parks: iNaturalist place id, bbox, corridors
 ├── config/
 │   └── corridors.toml        candidate corridors: bbox, state, notes
 ├── src/parkwild/             the library (pure batch code, no agents)
@@ -62,7 +81,18 @@ for the two API details that shaped the crawler.
 │   ├── speciesnet_runner.py  run SpeciesNet as a subprocess, parse its JSON
 │   ├── review.py             manual-inspection gallery + CSV
 │   └── report.py             the five Phase 0 numbers -> RESULTS.md
-├── scripts/phase0.py         CLI: coverage | pull | download | detect | sample | report
+│   ├── pano.py               equirectangular -> 4 horizon windows (fixes framing, not resolution)
+│   ├── inaturalist.py        iNat API v1 client + normaliser (obscured coords flagged, never recovered)
+│   ├── gbif.py               GBIF occurrence client + normaliser (iNat mirror skipped by dataset key)
+│   ├── sightings.py          Track A ingest orchestration + cross-source dedupe
+│   ├── export.py             cells.geojson (H3 r9), species.json, sightings.parquet, manifest.json
+│   ├── contracts.py          stage-boundary assertions (lon/lat, bbox, epoch units, conservation)
+│   └── decisionlog.py        reports/decision_log.jsonl writer
+├── scripts/phase0.py         Track B CLI: coverage | pull | download | slice | detect | sample | report
+├── scripts/track_a.py        Track A CLI: places | ingest | dedupe | export | summary | all
+├── scripts/smoke.py          end-to-end on fixtures, no network (CI, < 5 min)
+├── scripts/check_secrets.py  pre-commit + CI secret scan
+├── scripts/github_protect.sh branch protection for main via gh api
 ├── notebooks/phase0_inspection.ipynb   narrative walkthrough of the manual review
 ├── tests/                    offline tests (in-memory DuckDB, fake API client)
 ├── data/                     gitignored: images, DuckDB file, model JSON, review galleries
@@ -76,9 +106,11 @@ for the two API details that shaped the crawler.
 
 ```bash
 make setup            # .venv from Anaconda's Python 3.12, light deps, editable install, Jupyter kernel
+make hooks            # pre-commit secret scan for this clone
 cp .env.example .env  # paste MAPILLARY_TOKEN from https://www.mapillary.com/dashboard/developers
-make test             # offline tests; no token or model needed
+make test lint smoke  # offline; no token or model needed
 make setup-ml         # PyTorch + SpeciesNet. Several GB. Only when ready.
+make track-a PARK=yellowstone   # iNaturalist + GBIF -> DuckDB -> data/export/yellowstone/
 ```
 
 Why Anaconda's 3.12 and not Homebrew's 3.14: SpeciesNet declares
@@ -93,13 +125,29 @@ Run in order. Every step is idempotent and resumable.
 |---|---|---|---|
 | 1 | `make coverage` | Counts images, sequences and date range in each candidate corridor using the cheapest fields. Picks nothing; tells me where the imagery is. | `data/coverage_<date>.json` |
 | 2 | `make pull CORRIDOR=lamar_valley` | Tiles the bbox, walks every tile, stores one row per image. Tiles that hit the 2000 cap get quartered. Progress per tile, so a rerun resumes. | `images`, `tiles` tables |
-| 3 | `make download CORRIDOR=...` | Picks 400 images spread across sequences (max 20 each, panoramas excluded), downloads the original resolution, verifies each file. | `data/images/<corridor>/*.jpg`, `downloads` table |
-| 4 | `make detect CORRIDOR=...` | Runs the full SpeciesNet ensemble with `--country USA --admin1_region <state>`, then parses the JSON into `predictions_raw` / `detections_raw`. | `data/predictions/<corridor>.json` + tables |
-| 5 | `make sample CORRIDOR=...` | Picks 30 animal boxes at random (one per frame), draws them, writes `review.csv`. | `data/review/<corridor>/` |
+| 3 | `make download CORRIDOR=...` | Picks 400 perspective frames spread across sequences (max 20 each), downloads the original resolution, verifies each file. `--population pano --limit 100` does the same for panoramas. | `data/images/<corridor>/`, `data/images/<corridor>_pano/`, `downloads` table |
+| 3b | `make slice CORRIDOR=...` | Cuts each downloaded panorama into four 90-degree horizon windows. Fixes framing, not resolution. | `data/images/<corridor>_pano_slices/` |
+| 4 | `make detect CORRIDOR=... POPULATION=perspective\|pano` | Runs the full SpeciesNet ensemble with `--country USA --admin1_region <state>`, records the run, parses the JSON into the append-only raw tables. | `data/predictions/<corridor>_<population>.json`, `runs`, `predictions_raw`, `detections_raw` |
+| 5 | `make sample CORRIDOR=... POPULATION=...` | Stratified sample of 30 animal boxes across three confidence bands, one per frame, drawn and cropped, plus `review.csv`. | `data/review/<corridor>/<population>/` |
 | 6 | fill `review.csv` (or use the notebook) | `verdict` tp/fp/unsure, `true_species`, `species_agree` yes/rollup/no/na, `est_distance_m`. | |
-| 7 | `make report CORRIDOR=...` | Imports the verdicts, asks Overpass for road km, computes the five numbers, writes them into `RESULTS.md`. | `RESULTS.md`, `data/phase0_<corridor>.json` |
+| 7 | `make report CORRIDOR=... POPULATION=...` | Imports the verdicts, asks Overpass for road km, computes the numbers with Wilson intervals and cluster counts, writes them into `RESULTS.md`. Recall is printed as unmeasured. | `RESULTS.md`, `data/phase0_<corridor>_<population>.json` |
 
-Then stop, write the decision in `RESULTS.md`, and wait.
+Then route per BUILD_SPEC.md and record the routing in `DECISIONS.md`. Track A
+and the app do not wait for this.
+
+## Track A runbook
+
+```bash
+make track-a PARK=yellowstone          # ingest iNaturalist + GBIF, dedupe, export, summary
+.venv/bin/python scripts/track_a.py ingest --park yellowstone --gbif-counts-only   # what GBIF holds, by dataset
+.venv/bin/python scripts/track_a.py ingest --park yellowstone --include-ebird      # only after ADR-0011 is decided
+```
+
+Outputs land in `data/export/<park>/`: `cells.geojson` (H3 resolution 9, one
+feature per cell and species, open coordinates only), `species.json` (counts,
+seasonality, obscured share, source mix), `sightings.parquet` (full canonical
+records with attribution) and `manifest.json` (SHA-256 per file, git commit).
+Every filter writes a line to `reports/decision_log.jsonl`.
 
 Rough cost on this machine: steps 1 to 3 are a few minutes of API calls and
 about 1 to 2 GB of JPEGs. Step 4 is the slow one: MegaDetector on 400 original
@@ -124,6 +172,18 @@ Mapillary Graph API, from the developer documentation page:
   thumb_1024_url, thumb_2048_url, thumb_original_url`.
 - Auth: `Authorization: OAuth <token>` header. Search rate limit 10,000/min
   per app; the client sleeps 150 ms between calls anyway and backs off on 429.
+
+Two behaviours that are **not** in the docs, measured on 2026-09-05:
+
+- **The 2000 cap is fuzzy.** Lamar Valley tiles that returned 1879 to 1973
+  rows were truncated (their quarters summed to 2500 to 3400), while tiles at
+  1849 and below were complete. The crawler treats any tile returning 1500 or
+  more rows as capped and splits it.
+- **Dense tiles return HTTP 500**, not a truncated list. Two 0.05 deg tiles in
+  Cades Cove errored at any `limit`, and their quarters answered normally. The
+  crawler treats a repeated 5xx on a splittable tile as "too heavy" and splits
+  it; only a tile at the minimum size is recorded as an error and retried on
+  the next run.
 - License: CC BY-SA 4.0 (terms section 3b); logo + link back on published
   output (section 11).
 
@@ -135,9 +195,17 @@ SpeciesNet, from the `google/cameratrapai` repository at version 5.0.5:
 - Device selection is `cuda`, then `mps`, then `cpu`, so Apple silicon is used.
 - The detector returns every box down to 0.01 confidence; thresholding is
   mine, at query time.
+- Its loader applies the EXIF orientation tag (`ImageOps.exif_transpose`)
+  before inference, so box coordinates refer to the upright image. 13 of the
+  400 Lamar frames carry a 180-degree tag; the review renderer applies the
+  same transpose so the boxes I inspect sit where the model put them.
 - Output per image: `classifications{classes[5], scores[5]}`, `detections[{category
   '1'|'2'|'3', label, conf, bbox[x_min,y_min,w,h] normalised}]`, `prediction`,
   `prediction_score`, `prediction_source`, `model_version`.
+
+Overpass, measured the same day: the main instance answers HTTP 406 to
+python-requests' default User-Agent and 200 to the same query with a named
+one. The client sends `parkwild/<version>` and tries the lz4 mirror first.
 
 One optional addition, not a substitution: `phase0.py pull --with-mapillary-detections`
 also stores Mapillary's own segmentation labels (`detections.value`, e.g.

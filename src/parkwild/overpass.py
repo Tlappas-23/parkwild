@@ -5,6 +5,10 @@ which is the density figure Phase 0 asks for.
 
 Overpass is free and shared, so: one query per corridor, a generous timeout,
 and fall back to a mirror if the main instance is busy.
+
+Learned 2026-09-05: overpass-api.de answers HTTP 406 to python-requests'
+default User-Agent, while the same query from curl or with a named UA returns
+normally. So every request identifies this project by name.
 """
 from __future__ import annotations
 
@@ -17,10 +21,13 @@ from .geo import BBox, path_length_m
 
 log = logging.getLogger(__name__)
 
+# lz4 first: same data as the main instance and answered fastest in testing.
 OVERPASS_URLS = (
+    "https://lz4.overpass-api.de/api/interpreter",
     "https://overpass-api.de/api/interpreter",
     "https://overpass.kumi.systems/api/interpreter",
 )
+HEADERS = {"User-Agent": "parkwild/0.0.1 (wildlife side project; road length per park corridor)"}
 
 # OSM highway=* values that a car (or at least a Mapillary contributor's car)
 # drives on, versus ones that are walked. Street-level imagery is mostly the
@@ -44,8 +51,8 @@ def fetch_highways(bbox: BBox, *, timeout_s: int = 120) -> list[dict]:
     for url in OVERPASS_URLS:
         for attempt in range(3):
             try:
-                resp = requests.post(url, data={"data": query}, timeout=timeout_s + 30)
-                if resp.status_code in (429, 504):
+                resp = requests.post(url, data={"data": query}, headers=HEADERS, timeout=timeout_s + 30)
+                if resp.status_code in (406, 429, 504):
                     log.warning("Overpass %s returned %d; waiting", url, resp.status_code)
                     time.sleep(10 * (attempt + 1))
                     continue

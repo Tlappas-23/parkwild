@@ -1,25 +1,29 @@
 """
 DuckDB persistence. One file, a handful of tables, no ORM.
 
-Rules I'm following from the project brief:
+Rules I'm following from the brief and the build spec:
 
 - `images` is the crawl index: one row per Mapillary image keyed by image ID, and
   the attribution columns (image_id, creator_username, license, source_url) are
   always populated.
 - `tiles` is crawl progress, so a rerun resumes instead of restarting.
 - `predictions_raw` / `detections_raw` hold model output exactly as SpeciesNet
-  emitted it, keyed by (image_id, model_version). Nothing updates those rows.
-  Human corrections go to `manual_review`, so accuracy can be recomputed later
-  against the untouched raw output.
+  emitted it, keyed by (image_id, model_version, variant). They are written with
+  INSERT OR IGNORE, so nothing ever updates or replaces a stored prediction.
+  Human corrections go to `manual_review`; run metadata to `runs`.
+- `sightings` is the one schema both tracks feed: iNaturalist and GBIF rows
+  (human_verified) now, Mapillary detections (model_predicted) later.
+- Every INSERT names its columns. A positional insert once swapped lat and lon.
 
-DuckDB's `INSERT OR REPLACE` does the upsert-by-primary-key work; that's why
-every table declares one.
+`variant` distinguishes a whole frame ('full') from a panorama slice
+('yaw000', 'yaw090', ...). See DECISIONS.md ADR-0006.
 """
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from collections.abc import Iterable
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 import duckdb
 
@@ -39,7 +43,7 @@ CREATE TABLE IF NOT EXISTS images (
     captured_at            TIMESTAMP,        -- UTC
     compass_angle          DOUBLE,
     computed_compass_angle DOUBLE,
-    camera_type            VARCHAR,          -- perspective | fisheye | equirectangular
+    camera_type            VARCHAR,          -- perspective | fisheye | equirectangular/spherical
     is_pano                BOOLEAN,
     make                   VARCHAR,
     model                  VARCHAR,
@@ -66,7 +70,7 @@ CREATE TABLE IF NOT EXISTS tiles (
     min_lat    DOUBLE,
     max_lon    DOUBLE,
     max_lat    DOUBLE,
-    status     VARCHAR,     -- done | split | capped
+    status     VARCHAR,     -- done | split | capped | error
     n_images   INTEGER,
     fetched_at TIMESTAMP
 );
@@ -74,7 +78,7 @@ CREATE TABLE IF NOT EXISTS tiles (
 CREATE TABLE IF NOT EXISTS downloads (
     image_id      VARCHAR PRIMARY KEY,
     local_path    VARCHAR,
-    size_kind     VARCHAR,   -- original | 2048 | 1024
+    size_kind     VARCHAR,   -- original | 2048 | 1024 | cached
     width         INTEGER,
     height        INTEGER,
     bytes         BIGINT,
@@ -83,9 +87,29 @@ CREATE TABLE IF NOT EXISTS downloads (
     downloaded_at TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS runs (
+    run_id           VARCHAR PRIMARY KEY,
+    corridor         VARCHAR,
+    population       VARCHAR,   -- perspective | pano
+    model_version    VARCHAR,
+    speciesnet_version VARCHAR,
+    backend          VARCHAR,   -- cuda | mps | cpu | kaggle | unknown
+    image_dir        VARCHAR,
+    predictions_json VARCHAR,
+    n_files          INTEGER,
+    country          VARCHAR,
+    admin1_region    VARCHAR,
+    batch_size       INTEGER,
+    exit_code        INTEGER,
+    started_at       TIMESTAMP,
+    finished_at      TIMESTAMP,
+    notes            VARCHAR
+);
+
 CREATE TABLE IF NOT EXISTS predictions_raw (
     image_id          VARCHAR,
     model_version     VARCHAR,
+    variant           VARCHAR NOT NULL DEFAULT 'full',   -- full | yaw000 | yaw090 | yaw180 | yaw270
     run_id            VARCHAR,
     prediction        VARCHAR,   -- SpeciesNet's final ensemble label (full 7-part string)
     prediction_score  DOUBLE,
@@ -97,12 +121,13 @@ CREATE TABLE IF NOT EXISTS predictions_raw (
     failures          VARCHAR,   -- JSON, non-NULL if SpeciesNet reported a failure
     raw_json          VARCHAR,
     predicted_at      TIMESTAMP,
-    PRIMARY KEY (image_id, model_version)
+    PRIMARY KEY (image_id, model_version, variant)
 );
 
 CREATE TABLE IF NOT EXISTS detections_raw (
     image_id      VARCHAR,
     model_version VARCHAR,
+    variant       VARCHAR NOT NULL DEFAULT 'full',
     det_idx       INTEGER,
     category      VARCHAR,   -- '1' animal, '2' human, '3' vehicle
     label         VARCHAR,
@@ -111,11 +136,12 @@ CREATE TABLE IF NOT EXISTS detections_raw (
     bbox_y        DOUBLE,
     bbox_w        DOUBLE,
     bbox_h        DOUBLE,
-    PRIMARY KEY (image_id, model_version, det_idx)
+    PRIMARY KEY (image_id, model_version, variant, det_idx)
 );
 
 CREATE TABLE IF NOT EXISTS manual_review (
     image_id       VARCHAR,
+    variant        VARCHAR NOT NULL DEFAULT 'full',
     det_idx        INTEGER,
     reviewer       VARCHAR,
     verdict        VARCHAR,   -- tp | fp | unsure
@@ -124,7 +150,34 @@ CREATE TABLE IF NOT EXISTS manual_review (
     est_distance_m DOUBLE,
     notes          VARCHAR,
     reviewed_at    TIMESTAMP,
-    PRIMARY KEY (image_id, det_idx, reviewer)
+    PRIMARY KEY (image_id, variant, det_idx, reviewer)
+);
+
+CREATE TABLE IF NOT EXISTS sightings (
+    sighting_id           VARCHAR PRIMARY KEY,   -- '<source>:<source_id>'
+    source                VARCHAR NOT NULL,      -- inaturalist | gbif | mapillary_cv
+    source_id             VARCHAR NOT NULL,
+    dataset               VARCHAR,               -- GBIF datasetKey, 'inaturalist', or a run_id
+    park                  VARCHAR,
+    confidence_basis      VARCHAR NOT NULL,      -- human_verified | model_predicted
+    taxon_id              VARCHAR,
+    scientific_name       VARCHAR,
+    common_name           VARCHAR,
+    taxon_rank            VARCHAR,
+    taxon_class           VARCHAR,               -- Mammalia | Aves
+    observed_at           TIMESTAMP,             -- UTC, NULL if only a date is known
+    observed_on           DATE,
+    lon                   DOUBLE,
+    lat                   DOUBLE,
+    positional_accuracy_m DOUBLE,
+    coordinate_status     VARCHAR NOT NULL,      -- open | obscured | private | missing
+    observer              VARCHAR,
+    license               VARCHAR,
+    url                   VARCHAR,
+    attribution           VARCHAR,               -- display-ready credit line
+    duplicate_of          VARCHAR,               -- canonical sighting_id, NULL if this row is canonical
+    fetched_at            TIMESTAMP,
+    raw_json              VARCHAR
 );
 """
 
@@ -136,23 +189,48 @@ IMAGE_COLUMNS = [
     "thumb_1024_url", "thumb_2048_url", "thumb_original_url", "mapillary_detections",
     "fetched_at", "raw_json",
 ]
+TILE_COLUMNS = ["tile_id", "corridor", "min_lon", "min_lat", "max_lon", "max_lat", "status", "n_images", "fetched_at"]
+DOWNLOAD_COLUMNS = ["image_id", "local_path", "size_kind", "width", "height", "bytes", "sha256", "error", "downloaded_at"]
+RUN_COLUMNS = [
+    "run_id", "corridor", "population", "model_version", "speciesnet_version", "backend", "image_dir",
+    "predictions_json", "n_files", "country", "admin1_region", "batch_size", "exit_code",
+    "started_at", "finished_at", "notes",
+]
 PREDICTION_COLUMNS = [
-    "image_id", "model_version", "run_id", "prediction", "prediction_score",
+    "image_id", "model_version", "variant", "run_id", "prediction", "prediction_score",
     "prediction_source", "top5_classes", "top5_scores", "n_detections",
     "max_animal_conf", "failures", "raw_json", "predicted_at",
 ]
 DETECTION_COLUMNS = [
-    "image_id", "model_version", "det_idx", "category", "label", "conf",
+    "image_id", "model_version", "variant", "det_idx", "category", "label", "conf",
     "bbox_x", "bbox_y", "bbox_w", "bbox_h",
 ]
 REVIEW_COLUMNS = [
-    "image_id", "det_idx", "reviewer", "verdict", "true_species", "species_agree",
+    "image_id", "variant", "det_idx", "reviewer", "verdict", "true_species", "species_agree",
     "est_distance_m", "notes", "reviewed_at",
 ]
+SIGHTING_COLUMNS = [
+    "sighting_id", "source", "source_id", "dataset", "park", "confidence_basis",
+    "taxon_id", "scientific_name", "common_name", "taxon_rank", "taxon_class",
+    "observed_at", "observed_on", "lon", "lat", "positional_accuracy_m", "coordinate_status",
+    "observer", "license", "url", "attribution", "duplicate_of", "fetched_at", "raw_json",
+]
+
+# Tables whose rows must never change once written (ADR-0007).
+APPEND_ONLY_TABLES = ("predictions_raw", "detections_raw")
+
+POPULATION_FILTER = {
+    "perspective": "NOT coalesce(is_pano, false)",
+    "pano": "coalesce(is_pano, false)",
+}
+VARIANT_FILTER = {
+    "perspective": "variant = 'full'",
+    "pano": "variant LIKE 'yaw%'",
+}
 
 
 def _utcnow() -> datetime:
-    return datetime.now(timezone.utc).replace(tzinfo=None)
+    return datetime.now(UTC).replace(tzinfo=None)
 
 
 class Store:
@@ -162,12 +240,29 @@ class Store:
             Path(path).parent.mkdir(parents=True, exist_ok=True)
         self.con = duckdb.connect(path, read_only=read_only)
         if not read_only:
+            self._migrate()
             self.con.execute(SCHEMA)
+
+    def _migrate(self) -> None:
+        """The scaffold's first schema had no `variant` column. Those tables are
+        recreated only if they are empty; a populated old-schema table is a
+        stop-and-ask, never a silent drop."""
+        existing = {r[0] for r in self.con.execute("SELECT table_name FROM information_schema.tables").fetchall()}
+        for table in ("predictions_raw", "detections_raw", "manual_review"):
+            if table not in existing:
+                continue
+            cols = {r[0] for r in self.con.execute(f"SELECT column_name FROM information_schema.columns WHERE table_name = '{table}'").fetchall()}
+            if "variant" in cols:
+                continue
+            n = self.con.execute(f"SELECT count(*) FROM {table}").fetchone()[0]
+            if n:
+                raise RuntimeError(f"{table} has {n} rows in the pre-variant schema; migrate by hand, not by dropping")
+            self.con.execute(f"DROP TABLE {table}")
 
     def close(self) -> None:
         self.con.close()
 
-    def __enter__(self) -> "Store":
+    def __enter__(self) -> Store:
         return self
 
     def __exit__(self, *exc: Any) -> None:
@@ -183,31 +278,42 @@ class Store:
         return row[0] if row else None
 
     def df(self, query: str, params: Iterable[Any] | None = None):
-        """pandas DataFrame result. pandas is only in the dev extras, so it is
-        imported lazily here rather than at module load."""
+        """pandas DataFrame result; pandas is imported lazily by DuckDB."""
         return self.con.execute(query, list(params) if params else None).df()
 
-    def _upsert(self, table: str, columns: list[str], rows: list[dict]) -> int:
+    def _write(self, table: str, columns: list[str], rows: list[dict], *, mode: str) -> int:
+        """Explicit-column insert. mode 'replace' upserts by primary key; mode
+        'ignore' keeps the existing row and returns how many were actually new."""
         if not rows:
             return 0
+        if table in APPEND_ONLY_TABLES and mode != "ignore":
+            raise ValueError(f"{table} is append-only")
         placeholders = ", ".join("?" for _ in columns)
-        sql = f"INSERT OR REPLACE INTO {table} ({', '.join(columns)}) VALUES ({placeholders})"
-        self.con.executemany(sql, [[row.get(c) for c in columns] for row in rows])
-        return len(rows)
+        verb = "INSERT OR REPLACE" if mode == "replace" else "INSERT OR IGNORE"
+        before = self.one(f"SELECT count(*) FROM {table}")
+        self.con.executemany(
+            f"{verb} INTO {table} ({', '.join(columns)}) VALUES ({placeholders})",
+            [[row.get(c) for c in columns] for row in rows],
+        )
+        after = self.one(f"SELECT count(*) FROM {table}")
+        return len(rows) if mode == "replace" else int(after - before)
+
+    def count(self, table: str) -> int:
+        return int(self.one(f"SELECT count(*) FROM {table}") or 0)
 
     # ---- tiles (crawl progress) ---------------------------------------------
 
     def done_tile_ids(self, corridor: str) -> set[str]:
-        """Tiles I can skip on a rerun. 'split' tiles count too: their children
-        carry the real work and are tracked separately."""
-        return {r[0] for r in self.sql("SELECT tile_id FROM tiles WHERE corridor = ?", [corridor])}
+        """Tiles to skip on a rerun. 'split' tiles count too: their children carry
+        the real work and are tracked separately. 'error' tiles are retried."""
+        return {r[0] for r in self.sql("SELECT tile_id FROM tiles WHERE corridor = ? AND status <> 'error'", [corridor])}
 
     def upsert_tile(self, corridor: str, tile: BBox, status: str, n_images: int) -> None:
-        self.con.execute(
-            "INSERT OR REPLACE INTO tiles VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            [tile.tile_id, corridor, tile.min_lon, tile.min_lat, tile.max_lon, tile.max_lat,
-             status, n_images, _utcnow()],
-        )
+        self._write("tiles", TILE_COLUMNS, [{
+            "tile_id": tile.tile_id, "corridor": corridor,
+            "min_lon": tile.min_lon, "min_lat": tile.min_lat, "max_lon": tile.max_lon, "max_lat": tile.max_lat,
+            "status": status, "n_images": n_images, "fetched_at": _utcnow(),
+        }], mode="replace")
 
     def clear_tiles(self, corridor: str) -> None:
         self.con.execute("DELETE FROM tiles WHERE corridor = ?", [corridor])
@@ -218,7 +324,7 @@ class Store:
         now = _utcnow()
         for row in rows:
             row.setdefault("fetched_at", now)
-        return self._upsert("images", IMAGE_COLUMNS, rows)
+        return self._write("images", IMAGE_COLUMNS, rows, mode="replace")
 
     def count_images(self, corridor: str) -> int:
         return int(self.one("SELECT count(*) FROM images WHERE corridor = ?", [corridor]) or 0)
@@ -231,7 +337,7 @@ class Store:
         *,
         limit: int,
         max_per_sequence: int = 20,
-        exclude_pano: bool = True,
+        population: str = "perspective",
         seed: str = "phase0",
     ) -> list[dict]:
         """Pick which indexed images to fetch pixels for.
@@ -239,14 +345,16 @@ class Store:
         Consecutive frames in one sequence are near-duplicates, so a naive random
         sample of a corridor with one long drive in it would be 400 photos of the
         same 4 km. Capping per sequence spreads the sample across contributors and
-        dates.
+        dates. `population` selects perspective frames or panoramas (ADR-0006).
 
-        "Random" here is `hash(image_id || seed)`, not DuckDB's random(): the hash
-        is a deterministic shuffle that gives the same pick on every run and every
-        machine, whereas setseed()+random() turned out not to be stable across calls.
+        "Random" is `hash(image_id || seed)`, a deterministic shuffle that gives
+        the same pick on every run and every machine; DuckDB's setseed()+random()
+        turned out not to be stable across calls.
         """
+        if population not in POPULATION_FILTER:
+            raise ValueError(f"population must be one of {list(POPULATION_FILTER)}")
         rows = self.con.execute(
-            """
+            f"""
             WITH candidates AS (
                 SELECT i.image_id, i.sequence_id, i.thumb_original_url, i.thumb_2048_url, i.thumb_1024_url,
                        row_number() OVER (PARTITION BY i.sequence_id ORDER BY hash(i.image_id || ':' || ?)) AS rn_in_seq,
@@ -255,7 +363,7 @@ class Store:
                 LEFT JOIN downloads d ON d.image_id = i.image_id AND d.error IS NULL
                 WHERE i.corridor = ?
                   AND d.image_id IS NULL
-                  AND (NOT ? OR NOT coalesce(i.is_pano, false))
+                  AND {POPULATION_FILTER[population]}
             )
             SELECT image_id, sequence_id, thumb_original_url, thumb_2048_url, thumb_1024_url
             FROM candidates
@@ -263,7 +371,7 @@ class Store:
             ORDER BY r
             LIMIT ?
             """,
-            [str(seed), str(seed), corridor, exclude_pano, max_per_sequence, limit],
+            [str(seed), str(seed), corridor, max_per_sequence, limit],
         ).fetchall()
         keys = ["image_id", "sequence_id", "thumb_original_url", "thumb_2048_url", "thumb_1024_url"]
         return [dict(zip(keys, r)) for r in rows]
@@ -271,32 +379,37 @@ class Store:
     def record_download(self, row: dict) -> None:
         row = dict(row)
         row.setdefault("downloaded_at", _utcnow())
-        self._upsert(
-            "downloads",
-            ["image_id", "local_path", "size_kind", "width", "height", "bytes", "sha256", "error", "downloaded_at"],
-            [row],
-        )
+        self._write("downloads", DOWNLOAD_COLUMNS, [row], mode="replace")
 
-    def downloaded_paths(self, corridor: str) -> list[tuple[str, str]]:
-        return self.sql(
-            """
-            SELECT d.image_id, d.local_path FROM downloads d
+    def downloaded(self, corridor: str, *, population: str = "perspective") -> list[dict]:
+        rows = self.sql(
+            f"""
+            SELECT d.image_id, d.local_path, i.width, i.height FROM downloads d
             JOIN images i USING (image_id)
-            WHERE i.corridor = ? AND d.error IS NULL
+            WHERE i.corridor = ? AND d.error IS NULL AND {POPULATION_FILTER[population]}
             """,
             [corridor],
         )
+        return [dict(zip(["image_id", "local_path", "width", "height"], r)) for r in rows]
 
-    # ---- model output (append-only in spirit) -------------------------------
+    # ---- model output: append-only -----------------------------------------
 
-    def upsert_predictions(self, rows: list[dict]) -> int:
+    def record_run(self, row: dict) -> None:
+        self._write("runs", RUN_COLUMNS, [row], mode="replace")
+
+    def append_predictions(self, rows: list[dict]) -> int:
+        """Returns how many rows were new. Existing (image, model, variant) rows
+        are left exactly as they were."""
         now = _utcnow()
         for row in rows:
             row.setdefault("predicted_at", now)
-        return self._upsert("predictions_raw", PREDICTION_COLUMNS, rows)
+            row.setdefault("variant", "full")
+        return self._write("predictions_raw", PREDICTION_COLUMNS, rows, mode="ignore")
 
-    def upsert_detections(self, rows: list[dict]) -> int:
-        return self._upsert("detections_raw", DETECTION_COLUMNS, rows)
+    def append_detections(self, rows: list[dict]) -> int:
+        for row in rows:
+            row.setdefault("variant", "full")
+        return self._write("detections_raw", DETECTION_COLUMNS, rows, mode="ignore")
 
     # ---- human review -------------------------------------------------------
 
@@ -304,4 +417,25 @@ class Store:
         now = _utcnow()
         for row in rows:
             row.setdefault("reviewed_at", now)
-        return self._upsert("manual_review", REVIEW_COLUMNS, rows)
+            row.setdefault("variant", "full")
+        return self._write("manual_review", REVIEW_COLUMNS, rows, mode="replace")
+
+    # ---- sightings (Track A now, Track B later) -----------------------------
+
+    def upsert_sightings(self, rows: list[dict]) -> int:
+        """Reference data is a mirror of the source and may be refreshed; that is
+        not model output, so replace is correct here."""
+        now = _utcnow()
+        for row in rows:
+            row.setdefault("fetched_at", now)
+        return self._write("sightings", SIGHTING_COLUMNS, rows, mode="replace")
+
+    def mark_duplicates(self, pairs: list[tuple[str, str]]) -> int:
+        """pairs of (duplicate_sighting_id, canonical_sighting_id)."""
+        if not pairs:
+            return 0
+        self.con.executemany("UPDATE sightings SET duplicate_of = ? WHERE sighting_id = ?", [[c, d] for d, c in pairs])
+        return len(pairs)
+
+    def clear_duplicates(self, park: str) -> None:
+        self.con.execute("UPDATE sightings SET duplicate_of = NULL WHERE park = ?", [park])

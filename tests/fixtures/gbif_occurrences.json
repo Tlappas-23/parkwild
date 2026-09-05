@@ -1,0 +1,30 @@
+[
+  {
+    "key": 5001, "datasetKey": "d1000000-0000-0000-0000-000000000001", "datasetName": "Park Ranger Observations",
+    "species": "Bison bison", "scientificName": "Bison bison (Linnaeus, 1758)", "taxonRank": "SPECIES", "taxonKey": 2441176, "class": "Mammalia",
+    "vernacularName": "American Bison", "decimalLatitude": 44.9004, "decimalLongitude": -110.2003, "coordinateUncertaintyInMeters": 30,
+    "eventDate": "2023-06-14T15:14:00", "year": 2023, "month": 6, "day": 14, "recordedBy": "Alice", "license": "CC_BY_NC_4_0",
+    "references": "https://example.org/occ/5001", "basisOfRecord": "HUMAN_OBSERVATION"
+  },
+  {
+    "key": 5002, "datasetKey": "50c9509d-22c7-4a22-a47d-8c48425ef4a7", "datasetName": "iNaturalist Research-grade Observations",
+    "species": "Bison bison", "taxonRank": "SPECIES", "taxonKey": 2441176, "class": "Mammalia",
+    "decimalLatitude": 44.9, "decimalLongitude": -110.2, "coordinateUncertaintyInMeters": 25,
+    "eventDate": "2023-06-14T09:12:00", "year": 2023, "month": 6, "day": 14, "recordedBy": "alice", "license": "CC_BY_NC_4_0",
+    "references": "https://www.inaturalist.org/observations/1001", "basisOfRecord": "HUMAN_OBSERVATION"
+  },
+  {
+    "key": 5003, "datasetKey": "d1000000-0000-0000-0000-000000000002", "datasetName": "Museum Sightings",
+    "species": "Canis lupus", "taxonRank": "SPECIES", "taxonKey": 5219173, "class": "Mammalia", "vernacularName": "Gray Wolf",
+    "decimalLatitude": 44.7, "decimalLongitude": -110.5, "coordinateUncertaintyInMeters": 15000, "dataGeneralizations": "coordinates generalized to 0.1 degree",
+    "eventDate": "2022-10-03", "year": 2022, "month": 10, "day": 3, "recordedBy": "Dana", "license": "CC0_1_0",
+    "basisOfRecord": "HUMAN_OBSERVATION"
+  },
+  {
+    "key": 5004, "datasetKey": "d1000000-0000-0000-0000-000000000003", "datasetName": "eBird-like",
+    "species": "Corvus corax", "taxonRank": "SPECIES", "taxonKey": 2482468, "class": "Aves", "vernacularName": "Common Raven",
+    "decimalLatitude": 44.95, "decimalLongitude": -110.1, "coordinateUncertaintyInMeters": null,
+    "eventDate": "2021-07-04/2021-07-05", "year": 2021, "month": 7, "day": 4, "recordedBy": "Eve", "license": "CC_BY_4_0",
+    "basisOfRecord": "HUMAN_OBSERVATION"
+  }
+]

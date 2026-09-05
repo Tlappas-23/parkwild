@@ -3,7 +3,11 @@ import math
 import pytest
 
 from parkwild.geo import (
-    MAPILLARY_MAX_BBOX_AREA_DEG2, BBox, haversine_m, path_length_m, tile_bbox,
+    MAPILLARY_MAX_BBOX_AREA_DEG2,
+    BBox,
+    haversine_m,
+    path_length_m,
+    tile_bbox,
 )
 
 
@@ -64,3 +68,10 @@ def test_path_length_clipping():
     assert math.isclose(path_length_m(inside, clip_to=box), full)
     assert math.isclose(path_length_m(straddle, clip_to=box), path_length_m(straddle) / 2)
     assert path_length_m(outside, clip_to=box) == 0
+
+
+def test_overpass_requests_identify_themselves():
+    """overpass-api.de returns 406 to the default python-requests User-Agent."""
+    from parkwild.overpass import HEADERS, OVERPASS_URLS
+    assert "parkwild" in HEADERS["User-Agent"]
+    assert OVERPASS_URLS[0].startswith("https://lz4.overpass-api.de")

@@ -1,7 +1,15 @@
 from datetime import datetime
 
 from parkwild.geo import BBox
-from parkwild.mapillary import COVERAGE_FIELDS, SEARCH_LIMIT, MapillaryClient, flatten_image, image_page_url
+from parkwild.mapillary import (
+    CAP_SUSPECT_ROWS,
+    COVERAGE_FIELDS,
+    SEARCH_LIMIT,
+    MapillaryClient,
+    MapillaryServerError,
+    flatten_image,
+    image_page_url,
+)
 
 RAW = {
     "id": "123456789",
@@ -48,16 +56,21 @@ def test_flatten_handles_missing_optional_fields():
 
 
 class FakeClient(MapillaryClient):
-    """Pretends busy tiles: anything wider than 0.02 deg returns the cap."""
+    """Pretends busy tiles: anything wider than 0.02 deg returns a truncated-looking
+    count just under 2000, the way the real server does."""
 
     def __init__(self):
         super().__init__("token", min_interval_s=0)
         self.calls = []
 
-    def search_images(self, bbox, *, fields=COVERAGE_FIELDS, limit=SEARCH_LIMIT, **filters):
+    def search_images(self, bbox, *, fields=COVERAGE_FIELDS, limit=SEARCH_LIMIT, retries=None, **filters):
         self.calls.append(bbox.tile_id)
-        n = SEARCH_LIMIT if bbox.width_deg > 0.02 else 7
+        n = 1879 if bbox.width_deg > 0.02 else 7
         return [{"id": f"{bbox.tile_id}-{i}"} for i in range(n)]
+
+
+def test_cap_zone_is_below_the_documented_limit():
+    assert 1500 <= CAP_SUSPECT_ROWS < 1879 < SEARCH_LIMIT
 
 
 def test_crawl_splits_capped_tiles_and_skips_done_ones():
@@ -73,3 +86,33 @@ def test_crawl_splits_capped_tiles_and_skips_done_ones():
     client2 = FakeClient()
     assert list(client2.crawl(BBox(0, 0, 0.05, 0.05), tile_deg=0.05, skip_tile_ids=done_ids)) == []
     assert client2.calls == []
+
+
+class HeavyTileClient(MapillaryClient):
+    """Mimics what Mapillary did on Cades Cove: HTTP 500 for a 0.05 deg tile
+    with too many images, fine answers for its quarters. Tiles at the minimum
+    size still error, to exercise the give-up path."""
+
+    def __init__(self):
+        super().__init__("token", min_interval_s=0)
+        self.calls = 0
+
+    def search_images(self, bbox, *, fields=COVERAGE_FIELDS, limit=SEARCH_LIMIT, retries=None, **filters):
+        self.calls += 1
+        if bbox.width_deg > 0.03 or bbox.width_deg <= 0.0016:
+            raise MapillaryServerError("500")
+        return [{"id": f"{bbox.tile_id}-{i}"} for i in range(3)]
+
+
+def test_crawl_splits_on_server_error_and_reports_unsplittable_errors():
+    client = HeavyTileClient()
+    results = list(client.crawl(BBox(0, 0, 0.05, 0.05), tile_deg=0.05))
+    by_status = {}
+    for r in results:
+        by_status.setdefault(r.status, []).append(r)
+    assert len(by_status["split"]) == 1 and by_status["split"][0].error == "500"
+    assert len(by_status["done"]) == 4
+    assert "error" not in by_status          # 0.025 quarters answered; nothing reached the floor
+
+    tiny = list(client.crawl(BBox(0, 0, 0.0015, 0.0015), tile_deg=0.0015))
+    assert [r.status for r in tiny] == ["error"] and tiny[0].records == []

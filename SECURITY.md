@@ -1,0 +1,77 @@
+# Security model
+
+The requirement, in the owner's words: "tight security so no one can write over
+what I build." Reads of the finished app are public by design (BUILD_SPEC.md:
+"publicly reachable", "no auth"). Everything that can *change* what is
+published is locked to one person. A free read gate exists if the owner wants
+it; see the last section.
+
+## What is protected, from what
+
+| Asset | Threat | Control |
+|---|---|---|
+| Source code | someone else pushing, force-pushing, or deleting | private GitHub repo, single writer, 2FA, protected `main` |
+| Secrets (`MAPILLARY_TOKEN`) | committed by accident, leaked in CI logs | gitignored `.env`, pre-commit secret scan, CI secret scan, never echoed |
+| Raw model output | overwritten by a rerun or a "fix" | `predictions_raw` / `detections_raw` are append-only (`INSERT OR IGNORE`); corrections live in `manual_review` |
+| Published data files | tampered after build | `manifest.json` with SHA-256 per file and the git commit; the app checks hashes before using data |
+| Deployed site | deployed from an unreviewed branch, or by someone else | static site, deploy only from protected `main` via CI, deploy tokens only in Actions secrets |
+| Runtime | injection, framing, third-party scripts | no server, no write path, strict CSP, no CDN scripts |
+
+## Source control
+
+- Repo is private until launch. Only the owner's account has write access.
+- 2FA on the GitHub account (Settings > Password and authentication).
+- `main` is protected: status checks required (`test` job), no force-push, no
+  deletion, linear history, rules enforced for admins too. Applied with
+  `make protect REPO=owner/name`, which runs `scripts/github_protect.sh`.
+- `.github/CODEOWNERS` names the owner for every path.
+- Commit signing is recommended, not required: `git config commit.gpgsign true`
+  with an SSH or GPG key registered on GitHub.
+
+## Secrets
+
+- `.env` is gitignored. `make hooks` installs a pre-commit hook that runs
+  `scripts/check_secrets.py --staged`; it refuses commits containing a Mapillary
+  token (`MLY|...`), private keys, GitHub or AWS tokens, or any `.env` file.
+  CI runs the same scan across the whole tree on every push.
+- The Mapillary client token is read-only for public data. If it leaks, revoke
+  and regenerate it in the Mapillary developer dashboard. It was pasted into a
+  chat once during setup; rotate it before launch.
+- Nothing in CI needs the token. Tests run offline against fixtures.
+
+## Data integrity
+
+- Raw model tables never change once written. A rerun over the same image with
+  the same model version is a no-op; a new model version is a new row.
+- Every ingest and filter appends a line to `reports/decision_log.jsonl` with
+  rows in, rows out, and the rule, so a missing population is explainable.
+- Stage-boundary contracts (`parkwild/contracts.py`) assert coordinate ranges,
+  normalised boxes, millisecond timestamps, and row conservation.
+- Exports carry `manifest.json`: SHA-256 per file, build time, git commit.
+
+## Deployment (Phase 5+)
+
+- Static files only. No API, no database, no writable surface at runtime.
+- Cloudflare Pages (or GitHub Pages) deploys from `main` only; preview deploys
+  from branches are fine because they are not the production URL.
+- `_headers` sets `Content-Security-Policy: default-src 'self'; img-src 'self'
+  data: <tile host>; connect-src 'self' <tile host>; frame-ancestors 'none'`,
+  plus `X-Content-Type-Options: nosniff`, `Referrer-Policy:
+  strict-origin-when-cross-origin`, `Permissions-Policy` denying sensors.
+- All JS is bundled; no third-party script tags. Dependencies pinned via
+  lockfile; Dependabot alerts on.
+
+## Optional read gate, zero cost
+
+Cloudflare Access (Zero Trust free plan, up to 50 users) can sit in front of the
+Pages site with no code changes. Viewers sign in with an emailed one-time code,
+GitHub, or Google. The installed PWA keeps working offline from cache; fresh
+data fetches need a session. This contradicts "publicly reachable" in the spec,
+so it is a decision for the owner (DECISIONS.md, ADR-0008), off by default.
+
+## Not covered
+
+- Loss of the local machine: `data/` is regenerable from the scripts, but the
+  hand-entered `review.csv` files are committed so they survive.
+- Reuse of the published dataset: it is derived from CC BY-SA and CC-licensed
+  sources and is meant to be reused, with attribution.

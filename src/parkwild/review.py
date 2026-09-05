@@ -3,27 +3,33 @@ Build the manual-inspection set for Phase 0.
 
 The brief asks me to look at ~30 detections with my own eyes and say honestly
 how many are animals versus rocks, shrubs and logs. This module picks the
-sample deterministically, draws the boxes so I can see what the model saw, and
-writes a CSV I fill in by hand. The filled CSV is loaded into `manual_review`
-by `phase0.py report`.
+sample deterministically and stratified by detector confidence (ADR-0010),
+draws the boxes so I can see what the model saw, and writes a CSV I fill in by
+hand. The filled CSV is loaded into `manual_review` by `phase0.py report`.
 """
 from __future__ import annotations
 
 import csv
 import json
 import logging
+import math
 from pathlib import Path
 
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageOps
 
+from .pano import slice_path_for
 from .speciesnet_runner import ANIMAL_CATEGORY, display_name
-from .storage import Store
+from .storage import VARIANT_FILTER, Store
 
 log = logging.getLogger(__name__)
 
+# Detector-confidence bands for stratified sampling. Top-N by confidence would
+# inflate precision; uniform sampling would tell me little about the high band.
+BANDS = ((0.2, 0.5), (0.5, 0.8), (0.8, 1.01))
+
 REVIEW_COLUMNS = [
     # filled by the script
-    "image_id", "det_idx", "conf", "predicted", "prediction_score", "prediction_source",
+    "image_id", "variant", "det_idx", "band", "conf", "predicted", "prediction_score", "prediction_source",
     "top5", "source_url", "frame_file", "crop_file",
     # filled by me
     "verdict",          # tp | fp | unsure
@@ -34,46 +40,83 @@ REVIEW_COLUMNS = [
 ]
 
 
-def pick_sample(store: Store, corridor: str, *, n: int = 30, min_conf: float = 0.2, seed: int = 42) -> list[dict]:
-    """Random sample of animal detections above `min_conf`, at most one per
-    image so 30 rows means 30 different frames. Ordering by a hash of the key
-    plus seed is a shuffle that gives the same answer on every machine."""
+def band_of(conf: float) -> str:
+    for lo, hi in BANDS:
+        if lo <= conf < hi:
+            return f"{lo:.1f}-{min(hi, 1.0):.1f}"
+    return "out"
+
+
+def pick_sample(
+    store: Store,
+    corridor: str,
+    *,
+    population: str = "perspective",
+    n: int = 30,
+    min_conf: float = 0.2,
+    seed: int = 42,
+) -> list[dict]:
+    """Stratified sample of animal boxes: equal allocation across BANDS, at most
+    one box per frame, deterministic order from a seeded hash. If a band has
+    fewer candidates than its share, the shortfall is left unfilled and reported
+    rather than back-filled from an easier band."""
     rows = store.sql(
-        """
-        WITH dets AS (
-            SELECT d.image_id, d.model_version, d.det_idx, d.conf,
-                   d.bbox_x, d.bbox_y, d.bbox_w, d.bbox_h,
-                   p.prediction, p.prediction_score, p.prediction_source, p.top5_classes,
-                   dl.local_path, i.source_url,
-                   row_number() OVER (PARTITION BY d.image_id ORDER BY hash(d.image_id || ':' || CAST(d.det_idx AS VARCHAR) || ':' || ?)) AS rn
-            FROM detections_raw d
-            JOIN predictions_raw p USING (image_id, model_version)
-            JOIN downloads dl USING (image_id)
-            JOIN images i USING (image_id)
-            WHERE i.corridor = ? AND d.category = ? AND d.conf >= ? AND dl.error IS NULL
-        )
-        SELECT * EXCLUDE (rn) FROM dets WHERE rn = 1
-        ORDER BY hash(image_id || ':' || ?)
-        LIMIT ?
+        f"""
+        SELECT d.image_id, d.model_version, d.variant, d.det_idx, d.conf,
+               d.bbox_x, d.bbox_y, d.bbox_w, d.bbox_h,
+               p.prediction, p.prediction_score, p.prediction_source, p.top5_classes,
+               dl.local_path, i.source_url
+        FROM detections_raw d
+        JOIN predictions_raw p USING (image_id, model_version, variant)
+        JOIN downloads dl USING (image_id)
+        JOIN images i USING (image_id)
+        WHERE i.corridor = ? AND d.category = ? AND d.conf >= ? AND dl.error IS NULL
+          AND d.{VARIANT_FILTER[population]}
+        ORDER BY hash(d.image_id || ':' || d.variant || ':' || CAST(d.det_idx AS VARCHAR) || ':' || ?)
         """,
-        [str(seed), corridor, ANIMAL_CATEGORY, min_conf, str(seed), n],
+        [corridor, ANIMAL_CATEGORY, min_conf, str(seed)],
     )
     keys = [
-        "image_id", "model_version", "det_idx", "conf", "bbox_x", "bbox_y", "bbox_w", "bbox_h",
+        "image_id", "model_version", "variant", "det_idx", "conf", "bbox_x", "bbox_y", "bbox_w", "bbox_h",
         "prediction", "prediction_score", "prediction_source", "top5_classes", "local_path", "source_url",
     ]
-    return [dict(zip(keys, r)) for r in rows]
+    candidates = [dict(zip(keys, r)) for r in rows]
+    per_band = math.ceil(n / len(BANDS))
+    quota = {band_of(lo): per_band for lo, _ in BANDS}
+    taken_images: set[str] = set()
+    sample: list[dict] = []
+    for c in candidates:
+        band = band_of(c["conf"])
+        if band not in quota or quota[band] == 0 or c["image_id"] in taken_images:
+            continue
+        c["band"] = band
+        sample.append(c)
+        quota[band] -= 1
+        taken_images.add(c["image_id"])
+        if len(sample) >= n:
+            break
+    short = {b: q for b, q in quota.items() if q > 0}
+    if short:
+        log.warning("bands short of their quota (not back-filled): %s", short)
+    return sample
 
 
-def _all_animal_boxes(store: Store, image_id: str, model_version: str, min_conf: float) -> list[dict]:
+def _all_animal_boxes(store: Store, image_id: str, model_version: str, variant: str, min_conf: float) -> list[dict]:
     rows = store.sql(
         """
         SELECT det_idx, conf, bbox_x, bbox_y, bbox_w, bbox_h FROM detections_raw
-        WHERE image_id = ? AND model_version = ? AND category = ? AND conf >= ?
+        WHERE image_id = ? AND model_version = ? AND variant = ? AND category = ? AND conf >= ?
         """,
-        [image_id, model_version, ANIMAL_CATEGORY, min_conf],
+        [image_id, model_version, variant, ANIMAL_CATEGORY, min_conf],
     )
     return [dict(zip(["det_idx", "conf", "x", "y", "w", "h"], r)) for r in rows]
+
+
+def source_image_path(row: dict) -> Path:
+    """Whole frame: the download itself. Panorama slice: the derived slice file."""
+    if row["variant"] == "full":
+        return Path(row["local_path"])
+    return slice_path_for(Path(row["local_path"]), row["image_id"], row["variant"])
 
 
 def render_review_images(
@@ -86,17 +129,22 @@ def render_review_images(
     crop_pad: float = 0.75,
 ) -> None:
     """For each sampled detection write two JPEGs into out_dir:
-    <image_id>_<det_idx>_frame.jpg  - the whole frame, all animal boxes drawn,
-                                      the sampled one in a thicker line
-    <image_id>_<det_idx>_crop.jpg   - the sampled box with padding, upscaled,
-                                      so a 40 px blob is actually judgeable
-    The box coordinates are SpeciesNet's normalised (x_min, y_min, w, h)."""
+    <image_id>_<variant>_<det_idx>_frame.jpg  - the whole frame, all animal boxes
+                                     drawn, the sampled one in a thicker line
+    <image_id>_<variant>_<det_idx>_crop.jpg   - the sampled box with padding,
+                                     upscaled, so a 40 px blob is judgeable
+    Box coordinates are SpeciesNet's normalised (x_min, y_min, w, h)."""
     out_dir.mkdir(parents=True, exist_ok=True)
     for row in sample:
-        with Image.open(row["local_path"]) as im:
-            im = im.convert("RGB")
+        stem = f"{row['image_id']}_{row['variant']}_{row['det_idx']}"
+        with Image.open(source_image_path(row)) as raw:
+            # SpeciesNet's loader applies the EXIF orientation tag before running
+            # the detector, so its box coordinates refer to the upright image. 13 of
+            # the 400 Lamar frames carry a 180-degree tag; without this transpose
+            # the boxes would land on the wrong part of the picture.
+            im = ImageOps.exif_transpose(raw).convert("RGB")
             W, H = im.size
-            boxes = _all_animal_boxes(store, row["image_id"], row["model_version"], min_conf)
+            boxes = _all_animal_boxes(store, row["image_id"], row["model_version"], row["variant"], min_conf)
 
             frame = im.copy()
             draw = ImageDraw.Draw(frame)
@@ -107,7 +155,7 @@ def render_review_images(
                 draw.rectangle([x0, y0, x1, y1], outline=(255, 80, 0) if is_target else (255, 220, 0), width=6 if is_target else 3)
                 draw.text((x0, max(0, y0 - 14)), f"{b['conf']:.2f}", fill=(255, 255, 255))
             frame.thumbnail((frame_max_px, frame_max_px))
-            frame.save(out_dir / f"{row['image_id']}_{row['det_idx']}_frame.jpg", quality=85)
+            frame.save(out_dir / f"{stem}_frame.jpg", quality=85)
 
             # Crop around the sampled box with generous padding for context.
             bx, by, bw, bh = row["bbox_x"] * W, row["bbox_y"] * H, row["bbox_w"] * W, row["bbox_h"] * H
@@ -117,7 +165,7 @@ def render_review_images(
             if crop.width < 512:  # nearest-neighbour upscale keeps the pixels honest
                 scale = 512 / crop.width
                 crop = crop.resize((int(crop.width * scale), int(crop.height * scale)), Image.NEAREST)
-            crop.save(out_dir / f"{row['image_id']}_{row['det_idx']}_crop.jpg", quality=90)
+            crop.save(out_dir / f"{stem}_crop.jpg", quality=90)
 
 
 def write_review_template(sample: list[dict], path: Path) -> None:
@@ -132,18 +180,21 @@ def write_review_template(sample: list[dict], path: Path) -> None:
         writer.writeheader()
         for row in sample:
             top5 = json.loads(row["top5_classes"] or "[]")
+            stem = f"{row['image_id']}_{row['variant']}_{row['det_idx']}"
             writer.writerow(
                 {
                     "image_id": row["image_id"],
+                    "variant": row["variant"],
                     "det_idx": row["det_idx"],
+                    "band": row.get("band", band_of(row["conf"])),
                     "conf": round(row["conf"], 3),
                     "predicted": display_name(row["prediction"]),
                     "prediction_score": round(row["prediction_score"], 3) if row["prediction_score"] is not None else "",
                     "prediction_source": row["prediction_source"],
                     "top5": " | ".join(display_name(c) for c in top5),
                     "source_url": row["source_url"],
-                    "frame_file": f"{row['image_id']}_{row['det_idx']}_frame.jpg",
-                    "crop_file": f"{row['image_id']}_{row['det_idx']}_crop.jpg",
+                    "frame_file": f"{stem}_frame.jpg",
+                    "crop_file": f"{stem}_crop.jpg",
                     "verdict": "", "true_species": "", "species_agree": "", "est_distance_m": "", "notes": "",
                 }
             )
@@ -164,6 +215,7 @@ def load_review_csv(path: Path, *, reviewer: str = "me") -> list[dict]:
             rows.append(
                 {
                     "image_id": rec["image_id"],
+                    "variant": (rec.get("variant") or "full").strip() or "full",
                     "det_idx": int(rec["det_idx"]),
                     "reviewer": reviewer,
                     "verdict": verdict,

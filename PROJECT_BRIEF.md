@@ -1,6 +1,6 @@
 # Project: Wildlife Detection Pipeline from Open Street-Level Imagery
 
-_The original brief, kept verbatim so the repo is self-contained. Working
+_Superseded by BUILD_SPEC.md on 2026-09-05. Kept verbatim for history. Working
 decisions and deviations are recorded in README.md, not here._
 
 ## Objective

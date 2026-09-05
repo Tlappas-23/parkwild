@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1001, "quality_grade": "research", "observed_on": "2023-06-14", "time_observed_at": "2023-06-14T09:12:00-06:00",
+    "obscured": false, "geoprivacy": null, "taxon_geoprivacy": null,
+    "geojson": {"type": "Point", "coordinates": [-110.2, 44.9]}, "positional_accuracy": 25, "public_positional_accuracy": 25,
+    "license_code": "cc-by-nc", "uri": "https://www.inaturalist.org/observations/1001",
+    "user": {"id": 1, "login": "alice"},
+    "taxon": {"id": 42403, "name": "Bison bison", "preferred_common_name": "American Bison", "rank": "species", "iconic_taxon_name": "Mammalia"}
+  },
+  {
+    "id": 1002, "quality_grade": "research", "observed_on": "2023-06-15", "time_observed_at": null,
+    "obscured": true, "geoprivacy": null, "taxon_geoprivacy": "obscured",
+    "geojson": {"type": "Point", "coordinates": [-110.35, 44.85]}, "positional_accuracy": 10, "public_positional_accuracy": 28000,
+    "license_code": "cc0", "uri": "https://www.inaturalist.org/observations/1002",
+    "user": {"id": 2, "login": "bob"},
+    "taxon": {"id": 41638, "name": "Ursus arctos horribilis", "preferred_common_name": "Grizzly Bear", "rank": "subspecies", "iconic_taxon_name": "Mammalia"}
+  },
+  {
+    "id": 1003, "quality_grade": "research", "observed_on": "2023-06-14", "time_observed_at": "2023-06-14T09:20:00-06:00",
+    "obscured": false, "geoprivacy": null, "taxon_geoprivacy": null,
+    "geojson": {"type": "Point", "coordinates": [-110.2005, 44.9003]}, "positional_accuracy": 40, "public_positional_accuracy": 40,
+    "license_code": null, "uri": "https://www.inaturalist.org/observations/1003",
+    "user": {"id": 3, "login": "carol"},
+    "taxon": {"id": 7, "name": "Corvus corax", "preferred_common_name": "Common Raven", "rank": "species", "iconic_taxon_name": "Aves"}
+  }
+]

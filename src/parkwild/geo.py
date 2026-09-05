@@ -9,8 +9,8 @@ test in milliseconds.
 from __future__ import annotations
 
 import math
+from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
-from typing import Iterable, Sequence
 
 # Mean Earth radius (IUGG). Good to well under 1% for the distances I care about.
 EARTH_RADIUS_M = 6_371_008.8
@@ -42,7 +42,7 @@ class BBox:
             raise ValueError(f"bad latitude range: {self.min_lat}..{self.max_lat}")
 
     @classmethod
-    def from_list(cls, values: Sequence[float]) -> "BBox":
+    def from_list(cls, values: Sequence[float]) -> BBox:
         if len(values) != 4:
             raise ValueError("bbox needs exactly 4 numbers: min_lon, min_lat, max_lon, max_lat")
         return cls(*(float(v) for v in values))
@@ -83,7 +83,7 @@ class BBox:
     def fits_mapillary(self) -> bool:
         return self.area_deg2 < MAPILLARY_MAX_BBOX_AREA_DEG2
 
-    def split(self) -> list["BBox"]:
+    def split(self) -> list[BBox]:
         """Quarter the box. Used when a tile comes back at the 2000-image cap and
         I need finer tiles to see everything inside it."""
         mid_lon, mid_lat = self.center

@@ -1,7 +1,10 @@
 import json
 
+import pytest
 from conftest import write_payload
-from parkwild.speciesnet_runner import build_command, display_name, parse_predictions, split_label
+
+from parkwild.contracts import ContractError
+from parkwild.speciesnet_runner import build_command, display_name, parse_predictions, split_label, split_stem
 
 
 def test_build_command_flags(tmp_path):
@@ -24,14 +27,29 @@ def test_split_label_and_display_name():
     assert display_name(None) == ""
 
 
+def test_split_stem_variants():
+    assert split_stem("/a/b/123.jpg") == ("123", "full")
+    assert split_stem("/a/b/123__yaw090.jpg") == ("123", "yaw090")
+
+
 def test_parse_predictions(tmp_path):
     preds, dets = parse_predictions(write_payload(tmp_path), run_id="r1")
-    assert [p["image_id"] for p in preds] == ["img1", "img2", "img3"]
-    p1, p2, p3 = preds
+    expected = [("img1", "full"), ("img2", "full"), ("img3", "full"), ("img4", "full"), ("img5", "full"), ("pano1", "yaw090")]
+    assert [(p["image_id"], p["variant"]) for p in preds] == expected
+    p1, p2, p3 = preds[:3]
     assert p1["max_animal_conf"] == 0.88 and p1["n_detections"] == 3
     assert json.loads(p1["top5_classes"])[0].endswith("american bison")
     assert p2["max_animal_conf"] is None and p2["prediction"] == "blank"
     assert p3["failures"] is not None and p3["prediction"] is None
-    assert len(dets) == 3
+    assert len(dets) == 7
     assert dets[2]["category"] == "3" and dets[2]["bbox_w"] == 0.20
-    assert all(d["model_version"] == "4.0.3a" for d in dets)
+    assert dets[-1]["variant"] == "yaw090"
+
+
+def test_parse_rejects_pixel_boxes(tmp_path):
+    p = tmp_path / "bad.json"
+    payload = {"predictions": [{"filepath": "x.jpg", "model_version": "m",
+                                "detections": [{"category": "1", "label": "animal", "conf": 0.5, "bbox": [120, 80, 40, 30]}]}]}
+    p.write_text(json.dumps(payload))
+    with pytest.raises(ContractError):
+        parse_predictions(p, run_id="r")

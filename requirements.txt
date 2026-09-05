@@ -8,3 +8,5 @@ pytest>=8
 ipykernel
 pandas
 matplotlib
+ruff
+h3>=4

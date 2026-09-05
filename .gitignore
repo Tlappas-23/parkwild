@@ -21,3 +21,6 @@ data/review/*/*
 
 # macOS
 .DS_Store
+
+# run logs are noise; the decision log is a record and stays tracked
+reports/*.log

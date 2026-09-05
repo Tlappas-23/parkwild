@@ -138,18 +138,19 @@ def download_images(
     size: str = "original",
     limit: int = 400,
     max_per_sequence: int = 20,
-    exclude_pano: bool = True,
+    population: str = "perspective",
     workers: int = 4,
 ) -> dict[str, int]:
-    """Download up to `limit` not-yet-fetched images for a corridor and record
-    each outcome (success or error) in the `downloads` table."""
+    """Download up to `limit` not-yet-fetched images of one population
+    (perspective frames or panoramas) for a corridor and record each outcome,
+    success or error, in the `downloads` table."""
     if size not in SIZE_PREFERENCE:
         raise ValueError(f"size must be one of {list(SIZE_PREFERENCE)}")
     out_dir.mkdir(parents=True, exist_ok=True)
     rows = store.images_pending_download(
-        corridor, limit=limit, max_per_sequence=max_per_sequence, exclude_pano=exclude_pano
+        corridor, limit=limit, max_per_sequence=max_per_sequence, population=population
     )
-    log.info("%d images to download for %s (size=%s)", len(rows), corridor, size)
+    log.info("%d %s images to download for %s (size=%s)", len(rows), population, corridor, size)
 
     session = requests.Session()
     ok = failed = 0

@@ -7,9 +7,12 @@ PY       ?= /opt/anaconda3/bin/python
 VENV     := .venv
 BIN      := $(VENV)/bin
 CORRIDOR ?= lamar_valley
+POPULATION ?= perspective
+PARK ?= yellowstone
+TRACKA := $(BIN)/python scripts/track_a.py
 PHASE0   := $(BIN)/python scripts/phase0.py
 
-.PHONY: setup setup-ml test coverage pull download detect sample report notebook
+.PHONY: setup setup-ml test lint secrets hooks protect coverage pull download slice detect sample report notebook track-a export bias smoke
 
 $(BIN)/python:
 	$(PY) -m venv $(VENV)
@@ -29,6 +32,22 @@ setup-ml: $(BIN)/python
 test:
 	$(BIN)/python -m pytest -q
 
+lint:
+	$(BIN)/ruff check src tests scripts
+
+## secret scan over everything git tracks (CI runs the same)
+secrets:
+	$(BIN)/python scripts/check_secrets.py --tree
+
+## install the pre-commit secret guard for this clone
+hooks:
+	git config core.hooksPath .githooks
+	@echo "pre-commit secret scan installed"
+
+## lock main on GitHub: make protect REPO=owner/name
+protect:
+	scripts/github_protect.sh $(REPO)
+
 # ---- Phase 0, in order ----------------------------------------------------------
 coverage:
 	$(PHASE0) coverage
@@ -39,14 +58,31 @@ pull:
 download:
 	$(PHASE0) download --corridor $(CORRIDOR) --limit 400
 
+slice:
+	$(PHASE0) slice --corridor $(CORRIDOR)
+
 detect:
-	$(PHASE0) detect --corridor $(CORRIDOR)
+	$(PHASE0) detect --corridor $(CORRIDOR) --population $(POPULATION)
 
 sample:
-	$(PHASE0) sample --corridor $(CORRIDOR) --n 30
+	$(PHASE0) sample --corridor $(CORRIDOR) --population $(POPULATION) --n 30
 
 report:
-	$(PHASE0) report --corridor $(CORRIDOR) --write --json
+	$(PHASE0) report --corridor $(CORRIDOR) --population $(POPULATION) --write --json
+
+# ---- Track A: reference sightings ---------------------------------------------
+track-a:
+	$(TRACKA) all --park $(PARK)
+
+export:
+	$(TRACKA) export --park $(PARK)
+
+bias:
+	$(TRACKA) bias --park $(PARK) --corridor $(CORRIDOR) --write
+
+## end-to-end on fixtures, no network; CI runs this with a 5 minute cap
+smoke:
+	$(BIN)/python scripts/smoke.py
 
 notebook:
 	$(BIN)/python -m jupyter lab notebooks/ 2>/dev/null || /opt/anaconda3/bin/jupyter lab notebooks/

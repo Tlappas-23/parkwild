@@ -1,0 +1,175 @@
+{
+  "predictions": [
+    {
+      "filepath": "/data/images/test/img1.jpg",
+      "classifications": {
+        "classes": [
+          "a1b2;mammalia;cetartiodactyla;bovidae;bison;bison;american bison",
+          "c3d4;mammalia;cetartiodactyla;cervidae;;;deer family"
+        ],
+        "scores": [
+          0.91,
+          0.05
+        ]
+      },
+      "detections": [
+        {
+          "category": "1",
+          "label": "animal",
+          "conf": 0.88,
+          "bbox": [
+            0.4,
+            0.5,
+            0.05,
+            0.03
+          ]
+        },
+        {
+          "category": "1",
+          "label": "animal",
+          "conf": 0.15,
+          "bbox": [
+            0.1,
+            0.55,
+            0.02,
+            0.02
+          ]
+        },
+        {
+          "category": "3",
+          "label": "vehicle",
+          "conf": 0.95,
+          "bbox": [
+            0.6,
+            0.6,
+            0.2,
+            0.15
+          ]
+        }
+      ],
+      "prediction": "a1b2;mammalia;cetartiodactyla;bovidae;bison;bison;american bison",
+      "prediction_score": 0.91,
+      "prediction_source": "classifier",
+      "model_version": "4.0.3a"
+    },
+    {
+      "filepath": "/data/images/test/img2.jpg",
+      "classifications": {
+        "classes": [
+          "blank"
+        ],
+        "scores": [
+          0.99
+        ]
+      },
+      "detections": [],
+      "prediction": "blank",
+      "prediction_score": 0.99,
+      "prediction_source": "classifier",
+      "model_version": "4.0.3a"
+    },
+    {
+      "filepath": "/data/images/test/img3.jpg",
+      "failures": [
+        "CLASSIFIER",
+        "DETECTOR"
+      ],
+      "model_version": "4.0.3a"
+    },
+    {
+      "filepath": "/data/images/test/img4.jpg",
+      "classifications": {
+        "classes": [
+          "e5f6;mammalia;cetartiodactyla;cervidae;cervus;canadensis;elk"
+        ],
+        "scores": [
+          0.71
+        ]
+      },
+      "detections": [
+        {
+          "category": "1",
+          "label": "animal",
+          "conf": 0.35,
+          "bbox": [
+            0.3,
+            0.45,
+            0.04,
+            0.04
+          ]
+        },
+        {
+          "category": "1",
+          "label": "animal",
+          "conf": 0.62,
+          "bbox": [
+            0.36,
+            0.46,
+            0.03,
+            0.03
+          ]
+        }
+      ],
+      "prediction": "e5f6;mammalia;cetartiodactyla;cervidae;cervus;canadensis;elk",
+      "prediction_score": 0.71,
+      "prediction_source": "classifier",
+      "model_version": "4.0.3a"
+    },
+    {
+      "filepath": "/data/images/test/img5.jpg",
+      "classifications": {
+        "classes": [
+          "e5f6;mammalia;cetartiodactyla;cervidae;cervus;canadensis;elk"
+        ],
+        "scores": [
+          0.66
+        ]
+      },
+      "detections": [
+        {
+          "category": "1",
+          "label": "animal",
+          "conf": 0.55,
+          "bbox": [
+            0.33,
+            0.47,
+            0.03,
+            0.03
+          ]
+        }
+      ],
+      "prediction": "e5f6;mammalia;cetartiodactyla;cervidae;cervus;canadensis;elk",
+      "prediction_score": 0.66,
+      "prediction_source": "classifier",
+      "model_version": "4.0.3a"
+    },
+    {
+      "filepath": "/data/images/test/pano1__yaw090.jpg",
+      "classifications": {
+        "classes": [
+          "a1b2;mammalia;cetartiodactyla;bovidae;bison;bison;american bison"
+        ],
+        "scores": [
+          0.55
+        ]
+      },
+      "detections": [
+        {
+          "category": "1",
+          "label": "animal",
+          "conf": 0.41,
+          "bbox": [
+            0.5,
+            0.5,
+            0.02,
+            0.02
+          ]
+        }
+      ],
+      "prediction": "a1b2;mammalia;cetartiodactyla;bovidae;bison;bison;american bison",
+      "prediction_score": 0.55,
+      "prediction_source": "classifier",
+      "model_version": "4.0.3a"
+    }
+  ]
+}

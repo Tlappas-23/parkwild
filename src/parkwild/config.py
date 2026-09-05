@@ -24,6 +24,8 @@ PREDICTIONS_DIR = DATA_DIR / "predictions"  # data/predictions/<corridor>.json (
 REVIEW_DIR = DATA_DIR / "review"          # data/review/<corridor>/  gallery + review.csv
 DB_PATH = DATA_DIR / "parkwild.duckdb"
 CORRIDORS_TOML = ROOT / "config" / "corridors.toml"
+PARKS_TOML = ROOT / "config" / "parks.toml"
+EXPORT_DIR = DATA_DIR / "export"          # data/export/<park>/{cells.geojson,species.json,sightings.parquet,manifest.json}
 RESULTS_MD = ROOT / "RESULTS.md"
 
 # Every Mapillary record I store carries this. Terms of service section 3(b):
@@ -100,3 +102,38 @@ def get_corridor(key: str) -> Corridor:
     if key not in corridors:
         raise KeyError(f"unknown corridor {key!r}; known: {', '.join(corridors)}")
     return corridors[key]
+
+
+@dataclass(frozen=True)
+class Park:
+    key: str
+    name: str
+    state: str
+    inat_place_id: int
+    bbox: BBox
+    corridors: tuple[str, ...] = ()
+
+
+def load_parks(path: Path = PARKS_TOML) -> dict[str, Park]:
+    """Parse config/parks.toml. iNaturalist place ids were looked up live and
+    are the exact park boundary on that side; the bbox is for GBIF."""
+    with open(path, "rb") as fh:
+        raw = tomllib.load(fh)
+    return {
+        key: Park(
+            key=key,
+            name=section["name"],
+            state=section["state"],
+            inat_place_id=int(section["inat_place_id"]),
+            bbox=BBox.from_list(section["bbox"]),
+            corridors=tuple(section.get("corridors", ())),
+        )
+        for key, section in raw.items()
+    }
+
+
+def get_park(key: str) -> Park:
+    parks = load_parks()
+    if key not in parks:
+        raise KeyError(f"unknown park {key!r}; known: {', '.join(parks)}")
+    return parks[key]

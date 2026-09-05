@@ -1,0 +1,6 @@
+#!/bin/sh
+# Refuse commits that contain secrets. Installed by `make hooks`
+# (git config core.hooksPath .githooks).
+PY=".venv/bin/python"
+[ -x "$PY" ] || PY="python3"
+exec "$PY" scripts/check_secrets.py --staged

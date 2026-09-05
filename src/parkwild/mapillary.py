@@ -14,6 +14,12 @@ What it does and why:
        quarters, which `crawl()` does automatically.
 - Rate-limits politely. The documented cap for search calls is 10,000/min per app;
   I sleep a fixed minimum between requests and back off with jitter on 429 / 5xx.
+- Treats >= CAP_SUSPECT_ROWS (1500) rows as "probably capped", because the
+  documented 2000 limit is applied loosely (see the constant for the numbers).
+- Splits on HTTP 500 as well as on the cap. Observed 2026-09-05 on Cades
+  Cove: a 0.05 deg tile holding several thousand images returns 500 no matter
+  what `limit` says, while its four quarters return fine. So a persistent server
+  error on a splittable tile is treated as "too heavy", not as an outage.
 """
 from __future__ import annotations
 
@@ -22,9 +28,9 @@ import logging
 import random
 import threading
 import time
+from collections.abc import Iterator, Sequence
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from typing import Iterator, Sequence
+from datetime import UTC, datetime
 
 import requests
 
@@ -35,6 +41,14 @@ log = logging.getLogger(__name__)
 
 GRAPH_URL = "https://graph.mapillary.com"
 SEARCH_LIMIT = 2000  # documented max and default for /images
+
+# The 2000 cap is fuzzy. Measured on Lamar Valley, 2026-09-05: tiles that came
+# back with 1879, 1929, 1938 and 1973 rows were truncated (their quarters summed
+# to 2500-3400), while 1849 and below were complete. The server seems to fetch
+# up to 2000 candidates and then drop some, so "fewer than 2000" does not mean
+# "all of them". Any tile at or above this many rows is treated as capped and
+# split. 1500 leaves a wide margin below the lowest truncation I saw.
+CAP_SUSPECT_ROWS = 1500
 
 # Below this tile width I stop splitting. 0.002 deg is ~160 m at 45 N; if a box
 # that small still has 2000+ images it is a parking lot or a bug, not a road, and
@@ -83,19 +97,26 @@ class MapillaryAuthError(MapillaryError):
     pass
 
 
+class MapillaryServerError(MapillaryError):
+    """Raised after the retry budget is spent on 429 / 5xx / network errors."""
+
+
 @dataclass
 class TileResult:
     """What `crawl()` yields for each tile it finished querying."""
 
     tile: BBox
     records: list[dict] = field(default_factory=list)
-    hit_cap: bool = False  # came back with SEARCH_LIMIT rows: there may be more
+    hit_cap: bool = False  # came back in the cap zone (>= CAP_SUSPECT_ROWS): there may be more
     split: bool = False    # I subdivided it; its children will be crawled too
+    error: str | None = None  # server gave up on this tile and it could not be split
 
     @property
     def status(self) -> str:
         if self.split:
             return "split"
+        if self.error:
+            return "error"
         return "capped" if self.hit_cap else "done"
 
 
@@ -128,11 +149,13 @@ class MapillaryClient:
                 time.sleep(wait)
             self._last_call = time.monotonic()
 
-    def _get(self, path: str, params: dict) -> dict:
+    def _get(self, path: str, params: dict, *, retries: int | None = None) -> dict:
         """GET with throttling and exponential backoff. 4xx other than 429 are
-        treated as my mistake and raised immediately with the server's message."""
+        treated as my mistake and raised immediately with the server's message.
+        `retries` overrides the client-wide budget for one call."""
         url = f"{GRAPH_URL}{path}"
-        for attempt in range(self._max_retries + 1):
+        max_retries = self._max_retries if retries is None else retries
+        for attempt in range(max_retries + 1):
             self._throttle()
             try:
                 resp = self._session.get(url, params=params, timeout=self._timeout)
@@ -150,7 +173,7 @@ class MapillaryClient:
                 self._backoff(attempt)
                 continue
             raise MapillaryError(f"HTTP {resp.status_code} for {path} {params}: {resp.text[:500]}")
-        raise MapillaryError(f"gave up on {path} after {self._max_retries} retries")
+        raise MapillaryServerError(f"gave up on {path} {params} after {max_retries} retries")
 
     @staticmethod
     def _backoff(attempt: int) -> None:
@@ -164,6 +187,7 @@ class MapillaryClient:
         *,
         fields: Sequence[str] = IMAGE_FIELDS,
         limit: int = SEARCH_LIMIT,
+        retries: int | None = None,
         **filters: str,
     ) -> list[dict]:
         """One /images search inside `bbox`. Extra keyword args become query
@@ -171,7 +195,7 @@ class MapillaryClient:
         if not bbox.fits_mapillary():
             raise ValueError(f"bbox area {bbox.area_deg2:.4f} deg^2 is over Mapillary's 0.01 limit; tile it first")
         params = {"bbox": bbox.as_mapillary(), "fields": ",".join(fields), "limit": limit, **filters}
-        data = self._get("/images", params)
+        data = self._get("/images", params, retries=retries)
         return data.get("data", [])
 
     def get_image(self, image_id: str, *, fields: Sequence[str] = IMAGE_FIELDS) -> dict:
@@ -187,25 +211,39 @@ class MapillaryClient:
         fields: Sequence[str] = IMAGE_FIELDS,
         tile_deg: float = DEFAULT_TILE_DEG,
         skip_tile_ids: frozenset[str] | set[str] = frozenset(),
+        tile_retries: int = 2,
         **filters: str,
     ) -> Iterator[TileResult]:
         """Enumerate every image in `bbox` by walking a grid of tiles.
 
-        A tile that returns exactly SEARCH_LIMIT rows might be hiding more, so it is
-        quartered and its children pushed onto the work stack. `skip_tile_ids` lets
-        the caller pass tiles it already finished (from the `tiles` table) so an
-        interrupted crawl resumes instead of restarting.
+        A tile that returns CAP_SUSPECT_ROWS or more might be hiding more, so it is
+        quartered and its children pushed onto the work stack. So is a tile the
+        server keeps answering with 5xx: in practice that means "too many images
+        in here", and the quarters come back fine. `tile_retries` is kept small so
+        a heavy tile fails fast instead of sitting through two minutes of backoff.
+        `skip_tile_ids` lets the caller pass tiles it already finished (from the
+        `tiles` table) so an interrupted crawl resumes instead of restarting.
         """
         stack: list[BBox] = list(reversed(tile_bbox(bbox, tile_deg)))
         while stack:
             tile = stack.pop()
             if tile.tile_id in skip_tile_ids:
                 continue
-            records = self.search_images(tile, fields=fields, **filters)
-            hit_cap = len(records) >= SEARCH_LIMIT
             can_split = tile.width_deg > MIN_SPLIT_TILE_DEG and tile.height_deg > MIN_SPLIT_TILE_DEG
+            try:
+                records = self.search_images(tile, fields=fields, retries=tile_retries, **filters)
+            except MapillaryServerError as exc:
+                if can_split:
+                    log.info("tile %s: server error, treating as too heavy; splitting", tile.tile_id)
+                    stack.extend(reversed(tile.split()))
+                    yield TileResult(tile, [], split=True, error=str(exc))
+                else:
+                    log.error("tile %s: server error at minimum size; skipping: %s", tile.tile_id, exc)
+                    yield TileResult(tile, [], error=str(exc))
+                continue
+            hit_cap = len(records) >= CAP_SUSPECT_ROWS
             if hit_cap and can_split:
-                log.info("tile %s hit the %d cap; splitting", tile.tile_id, SEARCH_LIMIT)
+                log.info("tile %s returned %d rows (cap zone); splitting", tile.tile_id, len(records))
                 stack.extend(reversed(tile.split()))
                 yield TileResult(tile, records, hit_cap=True, split=True)
             else:
@@ -248,7 +286,7 @@ def flatten_image(rec: dict, corridor: str | None = None) -> dict:
 
     captured_ms = rec.get("captured_at")
     captured_at = (
-        datetime.fromtimestamp(captured_ms / 1000, tz=timezone.utc).replace(tzinfo=None)
+        datetime.fromtimestamp(captured_ms / 1000, tz=UTC).replace(tzinfo=None)
         if captured_ms is not None
         else None
     )

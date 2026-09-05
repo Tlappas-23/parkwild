@@ -9,8 +9,7 @@ the package. Two reasons:
    and the notebook all work in the light venv without the ML install.
 2. SpeciesNet's CLI already resumes: given an existing --predictions_json it
    reloads finished predictions and only processes new files. That is exactly
-   the "never re-run inference on an image already processed" rule from the
-   brief, for free.
+   the "never re-run inference on an image already processed" rule, for free.
 
 Flag names below were checked against speciesnet/scripts/run_model.py
 (package version 5.0.5, 2026-09-05).
@@ -22,6 +21,8 @@ import logging
 import subprocess
 import sys
 from pathlib import Path
+
+from .contracts import check_bbox_normalized
 
 log = logging.getLogger(__name__)
 
@@ -37,6 +38,24 @@ def speciesnet_available(python: str = sys.executable) -> bool:
     """True if `import speciesnet` works in the given interpreter."""
     proc = subprocess.run([python, "-c", "import speciesnet"], capture_output=True)
     return proc.returncode == 0
+
+
+def speciesnet_env_info(python: str = sys.executable) -> dict[str, str]:
+    """Version and torch backend of the interpreter that will run inference, for
+    the `runs` table. Best effort: 'unknown' if anything fails."""
+    code = (
+        "import json, importlib.metadata as m\n"
+        "try:\n import torch; b='cuda' if torch.cuda.is_available() else ('mps' if torch.backends.mps.is_available() else 'cpu')\n"
+        "except Exception: b='unknown'\n"
+        "try: v=m.version('speciesnet')\n"
+        "except Exception: v='unknown'\n"
+        "print(json.dumps({'speciesnet_version': v, 'backend': b}))"
+    )
+    try:
+        out = subprocess.run([python, "-c", code], capture_output=True, text=True, timeout=120).stdout.strip()
+        return json.loads(out.splitlines()[-1])
+    except Exception:
+        return {"speciesnet_version": "unknown", "backend": "unknown"}
 
 
 def build_command(
@@ -112,24 +131,34 @@ def display_name(label: str | None) -> str:
     return label or ""
 
 
+def split_stem(filepath: str) -> tuple[str, str]:
+    """Whole frames are saved as <image_id>.jpg and panorama slices as
+    <image_id>__<variant>.jpg. Returns (image_id, variant)."""
+    stem = Path(filepath).stem
+    if "__" in stem:
+        image_id, variant = stem.split("__", 1)
+        return image_id, variant
+    return stem, "full"
+
+
 def image_id_from_path(filepath: str) -> str:
-    """Images are saved as <image_id>.jpg, so the stem is the Mapillary ID."""
-    return Path(filepath).stem
+    return split_stem(filepath)[0]
 
 
 def parse_predictions(predictions_json: Path, *, run_id: str) -> tuple[list[dict], list[dict]]:
     """Read SpeciesNet's output and return (prediction_rows, detection_rows)
-    ready for Store.upsert_predictions / upsert_detections.
+    ready for Store.append_predictions / append_detections.
 
     Every detection SpeciesNet emitted is kept, down to its 0.01 floor. Filtering
     happens at query time so I can re-evaluate thresholds without re-running.
+    Boxes are contract-checked to be normalised before they reach the store.
     """
     with open(predictions_json) as fh:
         payload = json.load(fh)
     prediction_rows: list[dict] = []
     detection_rows: list[dict] = []
     for item in payload.get("predictions", []):
-        image_id = image_id_from_path(item["filepath"])
+        image_id, variant = split_stem(item["filepath"])
         model_version = str(item.get("model_version") or "unknown")
         detections = item.get("detections") or []
         animal_confs = [d["conf"] for d in detections if str(d.get("category")) == ANIMAL_CATEGORY]
@@ -138,6 +167,7 @@ def parse_predictions(predictions_json: Path, *, run_id: str) -> tuple[list[dict
             {
                 "image_id": image_id,
                 "model_version": model_version,
+                "variant": variant,
                 "run_id": run_id,
                 "prediction": item.get("prediction"),
                 "prediction_score": item.get("prediction_score"),
@@ -156,6 +186,7 @@ def parse_predictions(predictions_json: Path, *, run_id: str) -> tuple[list[dict
                 {
                     "image_id": image_id,
                     "model_version": model_version,
+                    "variant": variant,
                     "det_idx": idx,
                     "category": str(det.get("category")),
                     "label": det.get("label"),
@@ -163,4 +194,5 @@ def parse_predictions(predictions_json: Path, *, run_id: str) -> tuple[list[dict
                     "bbox_x": x, "bbox_y": y, "bbox_w": w, "bbox_h": h,
                 }
             )
+    check_bbox_normalized(detection_rows)
     return prediction_rows, detection_rows
