@@ -1,0 +1,32 @@
+# Candidate Phase 0 corridors, in the priority order from the project brief.
+#
+# bbox = [min_lon, min_lat, max_lon, max_lat]  (same order Mapillary uses:
+# left, bottom, right, top). Boxes are deliberately generous; the coverage check
+# (`phase0.py coverage`) tells me what Mapillary actually has inside them.
+#
+# `state` is the ISO 3166-2 admin1 code SpeciesNet's geofence accepts alongside
+# country=USA. It tightens the species list to what plausibly occurs there.
+
+[lamar_valley]
+name  = "Lamar Valley, Yellowstone NP"
+park  = "Yellowstone National Park"
+state = "WY"
+bbox  = [-110.42, 44.85, -110.10, 44.96]
+road  = "Northeast Entrance Road (US-212) from Tower Junction to Pebble Creek"
+notes = "Bison, elk, pronghorn, wolves, bears. Wide open sightlines - the best case for detection range."
+
+[moose_wilson]
+name  = "Moose-Wilson Road, Grand Teton NP"
+park  = "Grand Teton National Park"
+state = "WY"
+bbox  = [-110.84, 43.57, -110.70, 43.67]
+road  = "Moose-Wilson Road between Moose and Teton Village"
+notes = "Moose, black bear, elk. Narrow, tree-lined road - the worst case for sightlines."
+
+[cades_cove]
+name  = "Cades Cove Loop, Great Smoky Mountains NP"
+park  = "Great Smoky Mountains National Park"
+state = "TN"
+bbox  = [-83.86, 35.57, -83.75, 35.63]
+road  = "Cades Cove Loop Road (11 mi one-way loop)"
+notes = "White-tailed deer, black bear, wild turkey. Open meadows ringed by forest; very high visitor traffic, so probably the densest Mapillary coverage of the three."

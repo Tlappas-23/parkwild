@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "parkwild"
+version = "0.0.1"
+description = "Wildlife detection from crowdsourced street-level imagery in US national parks"
+# Upper bound comes from SpeciesNet (requires-python < 3.15); lower bound from my
+# use of tomllib in config.py.
+requires-python = ">=3.11,<3.15"
+dependencies = [
+    "requests>=2.31",
+    "duckdb>=1.0",
+    "pillow>=10",
+    "tqdm>=4.66",
+]
+
+[project.optional-dependencies]
+# Heavy: pulls PyTorch, yolov5 and the MegaDetector/SpeciesNet weights (several GB).
+# Installed separately and only after an explicit OK - see `make setup-ml`.
+ml = ["speciesnet>=5.0"]
+dev = ["pytest>=8", "ipykernel", "pandas", "matplotlib"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

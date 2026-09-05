@@ -1,0 +1,10 @@
+# Light dependencies: enough to crawl Mapillary, store to DuckDB, download images,
+# run the tests and open the notebook. No PyTorch here.
+requests>=2.31
+duckdb>=1.0
+pillow>=10
+tqdm>=4.66
+pytest>=8
+ipykernel
+pandas
+matplotlib
