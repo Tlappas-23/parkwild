@@ -24,3 +24,6 @@ data/review/*/*
 
 # run logs are noise; the decision log is a record and stays tracked
 reports/*.log
+
+# raw model downloads are re-derivable from the sources in config/models.toml; the compressed ones ship
+app/public/models/raw/

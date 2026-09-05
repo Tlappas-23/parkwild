@@ -13,7 +13,7 @@ PARK ?= yellowstone
 TRACKA := $(BIN)/python scripts/track_a.py
 PHASE0   := $(BIN)/python scripts/phase0.py
 
-.PHONY: setup setup-ml test lint secrets hooks protect ship coverage pull download slice detect sample report notebook track-a track-b export bias smoke app app-data
+.PHONY: setup setup-ml test lint secrets hooks protect ship coverage pull download slice detect sample report notebook track-a track-b export bias smoke app app-data models
 
 $(BIN)/python:
 	$(PY) -m venv $(VENV)
@@ -40,6 +40,10 @@ lint:
 ## Track B -> sightings (after detect): make track-b
 track-b:
 	$(BIN)/python scripts/track_b.py sightings --corridor $(CORRIDOR) --park $(PARK) --population $(POPULATION)
+
+## 3D models: raw GLBs in app/public/models/raw -> compressed, hashed, indexed
+models:
+	$(BIN)/python scripts/models_ingest.py
 
 ## the app: install, build, enforce the JS budget
 app:
