@@ -29,3 +29,12 @@ def test_detections_become_model_predicted_sightings(store, tmp_path):
 
 def test_excluded_labels_and_threshold_are_documented():
     assert "human" in EXCLUDED_LABELS and "vehicle" in EXCLUDED_LABELS and MIN_CONF == 0.5
+
+
+def test_domestic_species_fold_into_unidentified():
+    from parkwild.trackb import _species_from_label
+    cattle = "x;mammalia;cetartiodactyla;bovidae;bos;taurus;domestic cattle"
+    assert _species_from_label(cattle, 0.95)[0] == "Mammalia"
+    bison = "x;mammalia;cetartiodactyla;bovidae;bison;bison;american bison"
+    assert _species_from_label(bison, 0.95)[0] == "Bison bison"
+    assert _species_from_label(bison, 0.5)[0] == "Mammalia"

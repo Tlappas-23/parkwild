@@ -1,18 +1,18 @@
 {
-  "built": "2026-09-05T19:12:12+00:00",
-  "git_commit": "51ac7ae4594201093ddec991750bf13327e71254",
+  "built": "2026-09-05T20:46:02+00:00",
+  "git_commit": "6c3e3ae7fc4fb6be391162fbdfef8118691e00eb",
   "files": {
     "cells.geojson": {
-      "sha256": "e9d1c70573cde9398b65a07f3ca0245a81a99929b1a54d8ef525d52fe4639d55",
-      "bytes": 2738070
+      "sha256": "e89e14965c260714e041913c637a1b50a22e96195d80d8fe37e4d3ef4052034c",
+      "bytes": 2738770
     },
     "species.json": {
-      "sha256": "30abdf19125f415552ed936ed6a647bf2dadfb8590a875d56fa0482b47576701",
-      "bytes": 125149
+      "sha256": "e8bec5e735b34a9ca61efd61217b95fee02dfc4a0d1e20f756195ea2806a4117",
+      "bytes": 125544
     },
     "sightings.parquet": {
-      "sha256": "b3d80a345bb182adaa3058df5f4ce88aff7fdae3e29df6a6bac7ba731e4b98b1",
-      "bytes": 3488203
+      "sha256": "ca86f03081b7680ac9670e283878808c3cf83f91fe1ae0dd540e8408d6b5d0be",
+      "bytes": 3496795
     },
     "bias.json": {
       "sha256": "3f7f2a3130de777ee07cb73cd76840068c6c4c218b9e6b77447ce2a2de0f9fc4",

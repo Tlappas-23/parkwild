@@ -12,7 +12,7 @@ Phases follow BUILD_SPEC.md (three tracks; Phase 0 routes, it does not gate).
 |---|---|---|
 | 0. Feasibility (routing) | **steps 1 to 3 done for perspective frames; panorama slicing built; detection pending** | live coverage, index, 400-frame download, Overpass; offline tests + smoke |
 | 1. Track A reference data | **built; Yellowstone ingest in progress** | live iNaturalist place lookup and GBIF counts; fixture tests |
-| 2. Track B at scale | **in progress at supplementary scope**: all 3,690 Lamar perspective frames downloading, CPU inference next, then `track_b.py sightings` | ADR-0013/0014 |
+| 2. Track B at scale | **done at supplementary scope**: 3,690 Lamar frames scored on CPU, 32 model-predicted sightings in the schema and on the map | ADR-0013/0014, run rows in `runs` |
 | 3. Dedup, validation, bias | cluster counting built for Phase 0; rest not started | |
 | 4. Positions and export | Track A export built (cells.geojson, species.json, parquet, manifest) | fixture tests |
 | 5. Application | **skeleton live-tested locally**: map, species, detail, about on real data; deploys to GitHub Pages on merge | screenshots 2026-09-05 |
@@ -245,7 +245,25 @@ dropped; one sighting per frame-chain; species named only at classifier
 150 m as the stated accuracy (ADR-0014). Panoramas out until the rig is
 masked.
 
-_Numbers land here when the full-corridor inference finishes._
+### Full corridor (2026-09-05, 3,690 perspective frames, CPU)
+
+| | Frames | Share |
+|---|---|---|
+| Scored | 3,690 | |
+| Animal box >= 0.2 | 266 | 7.2% (CI 6.4 to 8.1%) |
+| Animal box >= 0.5 | 102 | 2.8% (CI 2.3 to 3.3%) |
+
+Under ADR-0014 (confidence >= 0.5, human/vehicle/blank labels dropped, one
+sighting per frame-chain, domestic species folded into "unidentified"):
+3,510 animal boxes -> 110 kept -> **32 model-predicted sightings** in the
+`sightings` table: Mammalia 28, Bison bison 3, Bos taurus 1. They appear
+on the map in the model colour with their own badge, placed at the camera
+with 150 m stated accuracy; each links to its Mapillary image by ID.
+
+Runs recorded: lamar_valley:perspective:20260905T154043 backend=cpu files=3690 exit=0; lamar_valley:pano:20260905T150634 backend=cpu files=400 exit=0.
+Expected precision of this layer from Phase 0: about two thirds at 0.5 after
+the human filter, on a very small review sample. Recall: unmeasured.
+
 
 ## Phase 1: Track A reference data
 
