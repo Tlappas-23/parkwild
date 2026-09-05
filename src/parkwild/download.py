@@ -1,15 +1,24 @@
-"""
-Fetch the actual pixels for a sample of indexed images.
+"""Fetch pixels for a sample of indexed images.
 
-Resolution is the binding constraint on detection range (a bison 300 m away is a
-handful of pixels at 1024 px wide), so I default to `thumb_original_url` and
-only fall back to 2048 / 1024 when the original isn't offered. Mapillary's
-thumbnail URLs are signed and expire after a while; if one comes back 403, I
-re-fetch the image entity for a fresh URL and try once more.
+PROBLEM: the index holds URLs, not images, and resolution is the binding
+constraint on detection range: a bison 300 m away is a handful of pixels at
+1024 px wide.
 
-Downloads run in a small thread pool. DuckDB writes happen on the main thread
-as results come in, because a DuckDB connection is not meant to be shared
-across threads.
+FIRST ATTEMPT: an `exclude_pano` boolean, because the first plan sampled
+perspective frames only. Replaced by a `population` name once the build spec
+required both populations measured separately (ADR-0006); the selection
+itself lives in storage.images_pending_download.
+
+CURRENT: default to `thumb_original_url`, fall back to 2048 then 1024; a
+small thread pool for HTTP with all DuckDB writes on the main thread (a
+DuckDB connection must not be shared across threads); verify every file with
+PIL before keeping it, because a truncated JPEG would crash the detector
+halfway through a batch; on 403 re-fetch the image entity for a fresh signed
+URL and retry once. 400 of 400 Lamar frames succeeded, 749 MB.
+
+UNRESOLVED: how long Mapillary's signed thumbnail URLs live. Nothing expired
+within the hour between index and download; the refresh path is untested
+against a real expiry.
 """
 from __future__ import annotations
 
@@ -28,7 +37,11 @@ from .storage import Store
 
 log = logging.getLogger(__name__)
 
-# Which URL fields to try, in order, for each requested size.
+# SIZE_PREFERENCE — DERIVED (from the three thumbnail fields the API offers)
+# Largest first: `thumb_original_url` was present on all 27,430 Lamar images,
+# so the fallbacks have not been exercised. Original files averaged 3789 x
+# 2843 px and 1.9 MB.
+# REVISIT IF: a corridor's originals are huge (>10 MB) and 2048 would do.
 SIZE_PREFERENCE = {
     "original": ("thumb_original_url", "thumb_2048_url", "thumb_1024_url"),
     "2048": ("thumb_2048_url", "thumb_1024_url"),

@@ -25,6 +25,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from parkwild import gbif  # noqa: E402
 from parkwild.bias import render_bias_markdown, road_bias, seasonal_bias  # noqa: E402
 from parkwild.config import EXPORT_DIR, RESULTS_MD, get_corridor, get_park  # noqa: E402
+from parkwild.decisionlog import print_decision_summary  # noqa: E402
 from parkwild.export import export_park  # noqa: E402
 from parkwild.inaturalist import find_places  # noqa: E402
 from parkwild.report import update_results_md  # noqa: E402
@@ -157,6 +158,7 @@ def main(argv=None):
     logging.basicConfig(level=logging.DEBUG if args.verbose else logging.INFO,
                         format="%(asctime)s %(levelname)s %(name)s: %(message)s", datefmt="%H:%M:%S")
     args.func(args)
+    print_decision_summary()
 
 
 if __name__ == "__main__":

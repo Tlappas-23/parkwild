@@ -16,6 +16,8 @@ jobs:
         run: python scripts/check_secrets.py --tree
       - name: lint
         run: ruff check src tests scripts
+      - name: provenance coverage (every constant tagged)
+        run: python scripts/provenance_report.py --strict
       - name: unit tests
         run: python -m pytest -q
       - name: smoke test (fixtures only, must finish under 5 minutes)

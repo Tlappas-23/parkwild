@@ -1,0 +1,23 @@
+#!/bin/sh
+# Local stand-in for server-side branch protection, which GitHub does not
+# offer on a free private repo. Refuses (1) any non-fast-forward push to main
+# and (2) any push when lint, tests, the smoke test or the secret scan fail.
+# Installed by `make hooks`.
+set -e
+PY=".venv/bin/python"; [ -x "$PY" ] || PY="python3"
+RUFF=".venv/bin/ruff";  [ -x "$RUFF" ] || RUFF="ruff"
+remote="$1"
+zero=0000000000000000000000000000000000000000
+while read local_ref local_sha remote_ref remote_sha; do
+  case "$remote_ref" in
+    refs/heads/main)
+      if [ "$remote_sha" != "$zero" ] && ! git merge-base --is-ancestor "$remote_sha" "$local_sha"; then
+        echo "REFUSED: non-fast-forward push to main (history rewrite). See SECURITY.md." >&2
+        exit 1
+      fi ;;
+  esac
+done
+"$PY" scripts/check_secrets.py --tree
+"$RUFF" check src tests scripts
+"$PY" -m pytest -q
+"$PY" scripts/smoke.py > /dev/null

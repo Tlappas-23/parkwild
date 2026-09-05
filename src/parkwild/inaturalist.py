@@ -1,17 +1,25 @@
-"""
-iNaturalist API v1 client and normaliser for the `sightings` schema.
+"""iNaturalist API v1 client and normaliser for the `sightings` schema.
 
-No key is needed. The API asks for at most about one request per second and
-10,000 per day; the crawl sleeps between pages. Pagination is by `id_above`
-rather than page number, because page*per_page is capped at 10,000 and a park
-has more research-grade observations than that.
+PROBLEM: the reference dataset the app can ship on regardless of detection.
+Yellowstone has 51,642 research-grade mammal and bird observations; page
+size is 200 and page*per_page is capped at 10,000, so page numbers cannot
+reach them.
 
-Obscured coordinates: iNaturalist fuzzes the location of threatened taxa and of
-anything the observer chose to hide. The record says so (`obscured: true`,
-`geoprivacy`, `taxon_geoprivacy`) and the public coordinates are the centre of
-a ~0.2 x 0.2 degree cell, not the animal. Those rows are stored with
-coordinate_status='obscured', kept for counts and seasonality, and excluded
-from anything that draws a cell. Nothing here tries to recover the true point.
+CURRENT: `id_above` paging in ascending id order (no cap), one request per
+second, `place_id` for the exact park boundary. Obscured coordinates are
+kept and flagged, never recovered: iNaturalist fuzzes the location of
+threatened taxa and of anything the observer hid, and says so in the record
+(`obscured`, `geoprivacy`, `taxon_geoprivacy`); the public point is the
+centre of a ~0.2 degree cell, not the animal. Those rows count in totals and
+seasonality and never enter a map cell.
+
+CONSIDERED, NOT DONE: the v2 API with field selection (smaller responses).
+v1 returns the whole record, which is stored as raw JSON and turned out to
+be useful (taxon_geoprivacy feeds the suppression list).
+
+UNRESOLVED: the ingest is slow (about 1,300 records a minute) because the
+API answers in 3 to 8 s per page; it is a one-time cost per park and is not
+optimised.
 """
 from __future__ import annotations
 
@@ -29,9 +37,15 @@ log = logging.getLogger(__name__)
 
 API = "https://api.inaturalist.org/v1"
 HEADERS = {"User-Agent": "parkwild/0.0.1 (wildlife side project; park sightings for a public map)"}
+# ICONIC_TAXA — BORROWED (build spec, Phase 1: "Mammalia and Aves")
 ICONIC_TAXA = ("Mammalia", "Aves")
-PER_PAGE = 200            # documented maximum
-MIN_INTERVAL_S = 1.0      # polite pacing
+
+# PER_PAGE — BORROWED (iNaturalist API docs: maximum 200)
+PER_PAGE = 200
+
+# MIN_INTERVAL_S — BORROWED (iNaturalist API recommendations: at most ~1 request/s,
+# 10,000/day). One park is ~260 pages, well inside the daily budget.
+MIN_INTERVAL_S = 1.0
 
 LICENSE_NAMES = {
     "cc0": "CC0 1.0", "cc-by": "CC BY 4.0", "cc-by-nc": "CC BY-NC 4.0", "cc-by-sa": "CC BY-SA 4.0",

@@ -9,6 +9,8 @@ from parkwild.mapillary import (
     MapillaryServerError,
     flatten_image,
     image_page_url,
+    is_capped,
+    is_capped_v1,
 )
 
 RAW = {
@@ -116,3 +118,20 @@ def test_crawl_splits_on_server_error_and_reports_unsplittable_errors():
 
     tiny = list(client.crawl(BBox(0, 0, 0.0015, 0.0015), tile_deg=0.0015))
     assert [r.status for r in tiny] == ["error"] and tiny[0].records == []
+
+
+# Measured 2026-09-05 on Lamar Valley: (rows returned by a tile, rows in its four quarters).
+MEASURED_TILES = [(1573, 1513), (1604, 1604), (1849, 1849), (1879, 2559), (1929, 2771), (1938, 2847), (1973, 3371), (2000, 3165)]
+
+
+def test_v1_cap_rule_undercounts():
+    """The comparison that justifies replacing is_capped_v1 (E-001 -> E-002).
+    Fails if v1 ever catches the measured truncations, which would mean the
+    measurements were wrong or the constant drifted."""
+    truncated = [(n, q) for n, q in MEASURED_TILES if q > n + 50]
+    assert len(truncated) == 5
+    missed_by_v1 = [n for n, _ in truncated if not is_capped_v1(n)]
+    assert len(missed_by_v1) == 4, "v1 must miss the four sub-2000 truncations that motivated v2"
+    assert all(is_capped(n) for n, _ in truncated), "v2 catches every measured truncation"
+    complete = [n for n, q in MEASURED_TILES if q <= n + 50]
+    assert all(not is_capped(n) for n in complete if n < CAP_SUSPECT_ROWS)

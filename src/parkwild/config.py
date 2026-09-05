@@ -25,12 +25,13 @@ REVIEW_DIR = DATA_DIR / "review"          # data/review/<corridor>/  gallery + r
 DB_PATH = DATA_DIR / "parkwild.duckdb"
 CORRIDORS_TOML = ROOT / "config" / "corridors.toml"
 PARKS_TOML = ROOT / "config" / "parks.toml"
+SUPPRESSION_TOML = ROOT / "config" / "suppression.toml"
 EXPORT_DIR = DATA_DIR / "export"          # data/export/<park>/{cells.geojson,species.json,sightings.parquet,manifest.json}
 RESULTS_MD = ROOT / "RESULTS.md"
 
-# Every Mapillary record I store carries this. Terms of service section 3(b):
-# user-contributed imagery is CC BY-SA 4.0; section 11 additionally asks for the
-# Mapillary logo and a link back on anything published.
+# MAPILLARY_LICENSE — BORROWED (Mapillary terms of service, section 3(b), read 2026-09-05)
+# Stored on every image row. Section 11 additionally asks for the Mapillary
+# logo and a link back on anything published; that is the app's job.
 MAPILLARY_LICENSE = "CC BY-SA 4.0"
 
 
@@ -137,3 +138,27 @@ def get_park(key: str) -> Park:
     if key not in parks:
         raise KeyError(f"unknown park {key!r}; known: {', '.join(parks)}")
     return parks[key]
+
+
+@dataclass(frozen=True)
+class Suppression:
+    name: str          # scientific-name prefix
+    common: str
+    action: str        # exclude | coarsen
+    res: int | None    # H3 resolution when coarsening
+    why: str
+
+
+def load_suppression(path: Path = SUPPRESSION_TOML) -> list[Suppression]:
+    """The species suppression list. Every entry carries its own reason, so the
+    choice is visible and revisable rather than buried in export code."""
+    with open(path, "rb") as fh:
+        raw = tomllib.load(fh)
+    out = []
+    for e in raw.get("species", []):
+        if e["action"] not in ("exclude", "coarsen"):
+            raise ValueError(f"suppression {e['name']}: action must be exclude or coarsen")
+        if e["action"] == "coarsen" and "res" not in e:
+            raise ValueError(f"suppression {e['name']}: coarsen needs res")
+        out.append(Suppression(e["name"], e.get("common", ""), e["action"], e.get("res"), e.get("why", "")))
+    return out

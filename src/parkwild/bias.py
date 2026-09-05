@@ -1,20 +1,24 @@
-"""
-Bias measurements for Phase 3, computed from Track A against the Mapillary index.
+"""Bias measurements: Track A against the Mapillary index (BUILD_SPEC.md Phase 3).
 
-Road bias: street-level imagery can only see animals near where cameras
-drove. The fraction of independent human observations that fall outside
-imagery coverage is invisible to Track B by construction. It goes in the UI,
-not just the docs (BUILD_SPEC.md, Phase 3).
+PROBLEM: street-level imagery can only see animals near where cameras
+drove, and contributors upload in summer. Both biases are invisible from
+inside Track B; they can only be measured against independent observations.
 
-Coverage is defined on H3 resolution-9 cells (~174 m edge): a sighting is
-"covered" if its cell, or any neighbour within `ring` cells, contains at least
-one Mapillary image position. Ring 1 means roughly 350 m from a camera, which
-is beyond the range whole-image detection is expected to work at anyway, so
-this is a generous definition of covered and the bias figure is a lower bound.
+CURRENT:
+  road bias      share of canonical, open-coordinate sightings in the corridor
+                 bbox whose H3 r9 cell is not within RING cells of any image
+                 position. That share is invisible to the imagery method by
+                 construction and goes in the UI.
+  seasonal bias  month histograms of imagery captures vs sightings, and the
+                 June-to-August share of each.
 
-Seasonal bias: contributors upload in summer. Comparing the month histogram of
-imagery captures with that of sightings shows how much of the year Track B
-cannot speak to.
+Ring 1 (~350 m from a camera) is generous: whole-image detection is not
+expected to work that far, so the road-bias figure is a lower bound on what
+the imagery cannot see.
+
+UNRESOLVED: the sightings themselves are road-biased (people observe from
+roads too), so "fraction outside coverage" understates how much of the park
+nobody has looked at. Neither source can measure that.
 """
 from __future__ import annotations
 
@@ -24,10 +28,18 @@ from .decisionlog import log_filter
 from .geo import BBox
 from .storage import Store
 
+# H3_RES — BORROWED (same cell size as the export, so coverage and cells line up)
 H3_RES = 9
 
+# RING — ASSUMED
+# Cells within one ring of an image cell count as covered: roughly 350 m from
+# a camera at r9. Generous on purpose; see the module docstring.
+# REVISIT IF: Phase 0 measures a working detection range; then RING should
+#   be derived from it.
+RING = 1
 
-def image_coverage_cells(store: Store, corridor: str, *, res: int = H3_RES, ring: int = 1) -> set[str]:
+
+def image_coverage_cells(store: Store, corridor: str, *, res: int = H3_RES, ring: int = RING) -> set[str]:
     """H3 cells within `ring` of any indexed image position in the corridor."""
     covered: set[str] = set()
     for lon, lat in store.sql("SELECT lon, lat FROM images WHERE corridor = ? AND lon IS NOT NULL", [corridor]):
@@ -36,7 +48,7 @@ def image_coverage_cells(store: Store, corridor: str, *, res: int = H3_RES, ring
     return covered
 
 
-def road_bias(store: Store, park: str, corridor: str, bbox: BBox, *, res: int = H3_RES, ring: int = 1) -> dict:
+def road_bias(store: Store, park: str, corridor: str, bbox: BBox, *, res: int = H3_RES, ring: int = RING) -> dict:
     """Share of canonical, open-coordinate sightings inside the corridor bbox
     that lie outside Mapillary coverage. Reported overall and by class."""
     covered = image_coverage_cells(store, corridor, res=res, ring=ring)

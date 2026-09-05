@@ -1,0 +1,55 @@
+# Species suppressed or coarsened in every public output (cells.geojson,
+# species.json, the app). Aggregated cells for bison or elk are harmless. A
+# public map of wolf sightings is a different kind of artifact: Yellowstone
+# wolves are shot when they leave the park. Built before launch on purpose;
+# retrofitting a suppression list after the map is live is the wrong order.
+#
+# Two rules apply on top of this file, automatically:
+#   1. Any row whose source already obscured the coordinates (coordinate_status
+#      = 'obscured' or 'private') never enters a cell, whatever the species.
+#   2. Any species that iNaturalist obscures by taxon (taxon_geoprivacy set on
+#      any of its observations) is coarsened even if it is not listed here.
+#
+# action = "exclude"  -> no cell anywhere; still counted in species totals
+# action = "coarsen"  -> aggregated at H3 resolution `res` instead of 9
+#                        (res 6 has a ~3.2 km edge; res 9 has ~0.17 km)
+# Matching is by scientific-name prefix, so subspecies are covered.
+
+[[species]]
+name   = "Canis lupus"
+common = "gray wolf"
+action = "exclude"
+why    = "Hunted on crossing the park boundary; a public sighting map is a targeting aid. Legal status flips between states and years; treated as sensitive everywhere."
+
+[[species]]
+name   = "Gulo gulo"
+common = "wolverine"
+action = "exclude"
+why    = "ESA-threatened (2023 listing), a few hundred animals in the lower 48. Any location is a poaching lead."
+
+[[species]]
+name   = "Lynx canadensis"
+common = "Canada lynx"
+action = "exclude"
+why    = "ESA-threatened; rare enough that a single cell identifies an individual's range."
+
+[[species]]
+name   = "Ursus arctos"
+common = "grizzly bear"
+action = "coarsen"
+res    = 6
+why    = "Repeatedly listed and delisted; poaching and conflict-removal pressure. Coarse cells keep presence visible without den-scale precision."
+
+[[species]]
+name   = "Puma concolor"
+common = "mountain lion"
+action = "coarsen"
+res    = 6
+why    = "Hunted with hounds outside the park; coarse cells only."
+
+[[species]]
+name   = "Haliaeetus leucocephalus"
+common = "bald eagle"
+action = "coarsen"
+res    = 6
+why    = "Nest sites are protected under the Eagle Act; sightings cluster at nests."

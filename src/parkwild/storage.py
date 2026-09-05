@@ -1,22 +1,31 @@
-"""
-DuckDB persistence. One file, a handful of tables, no ORM.
+"""DuckDB persistence. One file, a handful of tables, no ORM.
 
-Rules I'm following from the brief and the build spec:
+PROBLEM: one place for the crawl index, the pixels fetched, the model output,
+the human verdicts and the reference sightings, such that a rerun never
+destroys evidence and every published number can be traced back to rows.
 
-- `images` is the crawl index: one row per Mapillary image keyed by image ID, and
-  the attribution columns (image_id, creator_username, license, source_url) are
-  always populated.
-- `tiles` is crawl progress, so a rerun resumes instead of restarting.
-- `predictions_raw` / `detections_raw` hold model output exactly as SpeciesNet
-  emitted it, keyed by (image_id, model_version, variant). They are written with
-  INSERT OR IGNORE, so nothing ever updates or replaces a stored prediction.
-  Human corrections go to `manual_review`; run metadata to `runs`.
-- `sightings` is the one schema both tracks feed: iNaturalist and GBIF rows
-  (human_verified) now, Mapillary detections (model_predicted) later.
-- Every INSERT names its columns. A positional insert once swapped lat and lon.
+FIRST ATTEMPTS, both replaced:
+- `INSERT OR REPLACE` on the raw prediction tables. A rerun with different
+  thresholds would have rewritten history. Now `INSERT OR IGNORE` on
+  `predictions_raw` / `detections_raw` (ADR-0007); a new model version is a
+  new row; corrections go to `manual_review`.
+- `setseed()` + `random()` for a reproducible download sample. Two
+  consecutive calls returned different orders (E-003). Kept below as
+  `images_pending_download_v1`; the current version orders on
+  `hash(image_id || seed)`, which is stable across runs and machines.
 
-`variant` distinguishes a whole frame ('full') from a panorama slice
-('yaw000', 'yaw090', ...). See DECISIONS.md ADR-0006.
+ALSO LEARNED: a positional `INSERT ... VALUES` once swapped lat and lon in an
+early scaffold. Every insert here names its columns.
+
+CURRENT: tables in the SCHEMA string; `variant` distinguishes a whole frame
+('full') from a panorama slice ('yaw090'); the `sightings` table is the one
+shape both tracks write (ADR-0002); `_migrate` recreates only *empty*
+pre-variant tables and refuses to touch populated ones.
+
+UNRESOLVED: DuckDB allows one writer process per file. A long ingest blocks
+every other script for its duration; the Track A ingest and Track B download
+cannot run at the same time. Acceptable for one machine; a queue would be
+needed for more.
 """
 from __future__ import annotations
 
@@ -331,6 +340,35 @@ class Store:
 
     # ---- downloads ----------------------------------------------------------
 
+    def images_pending_download_v1(self, corridor: str, *, limit: int, max_per_sequence: int = 20, seed: float = 0.42) -> list[dict]:
+        """SUPERSEDED 2026-09-05 by images_pending_download(). Kept for comparison.
+
+        Used DuckDB's setseed()+random() for the shuffle. The test that caught
+        it: two consecutive calls in one connection returned different orders
+        (E-003), so the "400-frame sample" would not have been the same sample
+        twice. tests/test_storage.py::test_v2_sampler_is_stable_where_v1_was_not
+        keeps the v2 guarantee pinned; v1 is exercised there only to prove it
+        still runs, since asserting non-determinism would be flaky by nature.
+        """
+        self.con.execute("SELECT setseed(?)", [seed])
+        rows = self.con.execute(
+            """
+            WITH candidates AS (
+                SELECT i.image_id, i.sequence_id, i.thumb_original_url, i.thumb_2048_url, i.thumb_1024_url,
+                       row_number() OVER (PARTITION BY i.sequence_id ORDER BY random()) AS rn_in_seq,
+                       random() AS r
+                FROM images i
+                LEFT JOIN downloads d ON d.image_id = i.image_id AND d.error IS NULL
+                WHERE i.corridor = ? AND d.image_id IS NULL AND NOT coalesce(i.is_pano, false)
+            )
+            SELECT image_id, sequence_id, thumb_original_url, thumb_2048_url, thumb_1024_url
+            FROM candidates WHERE rn_in_seq <= ? ORDER BY r LIMIT ?
+            """,
+            [corridor, max_per_sequence, limit],
+        ).fetchall()
+        keys = ["image_id", "sequence_id", "thumb_original_url", "thumb_2048_url", "thumb_1024_url"]
+        return [dict(zip(keys, r)) for r in rows]
+
     def images_pending_download(
         self,
         corridor: str,
@@ -342,14 +380,11 @@ class Store:
     ) -> list[dict]:
         """Pick which indexed images to fetch pixels for.
 
-        Consecutive frames in one sequence are near-duplicates, so a naive random
-        sample of a corridor with one long drive in it would be 400 photos of the
-        same 4 km. Capping per sequence spreads the sample across contributors and
-        dates. `population` selects perspective frames or panoramas (ADR-0006).
-
-        "Random" is `hash(image_id || seed)`, a deterministic shuffle that gives
-        the same pick on every run and every machine; DuckDB's setseed()+random()
-        turned out not to be stable across calls.
+        Cap per sequence, because consecutive frames are near-duplicates: one
+        long drive would otherwise supply 400 photos of the same 4 km and the
+        detector would be scored 20 times on the same bison. `population`
+        selects perspective frames or panoramas (ADR-0006). The shuffle is
+        `hash(image_id || seed)`: same pick on every run and every machine.
         """
         if population not in POPULATION_FILTER:
             raise ValueError(f"population must be one of {list(POPULATION_FILTER)}")

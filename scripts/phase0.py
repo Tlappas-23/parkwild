@@ -39,7 +39,7 @@ from parkwild.config import (  # noqa: E402
     mapillary_token,
 )
 from parkwild.contracts import check_lon_lat, check_ms_epoch  # noqa: E402
-from parkwild.decisionlog import log_filter  # noqa: E402
+from parkwild.decisionlog import log_filter, print_decision_summary  # noqa: E402
 from parkwild.download import download_images  # noqa: E402
 from parkwild.geo import DEFAULT_TILE_DEG  # noqa: E402
 from parkwild.mapillary import (  # noqa: E402
@@ -57,6 +57,7 @@ from parkwild.speciesnet_runner import parse_predictions, run_speciesnet, specie
 from parkwild.storage import Store  # noqa: E402
 
 log = logging.getLogger("phase0")
+# POPULATIONS — BORROWED (ADR-0006: the two populations measured separately)
 POPULATIONS = ("perspective", "pano")
 
 
@@ -363,6 +364,7 @@ def main(argv: list[str] | None = None) -> None:
         datefmt="%H:%M:%S",
     )
     args.func(args)
+    print_decision_summary()
 
 
 if __name__ == "__main__":

@@ -1,12 +1,28 @@
-"""
-Compute the Phase 0 numbers and write them into RESULTS.md.
+"""The Phase 0 numbers, and how they get into RESULTS.md.
 
-The brief wants five things: detection rate, true-positive rate on manual
-inspection, distance at which detection works, species agreement, and image
-density / date range. The build spec adds: report per population, precision
-with a confidence interval, a distinct-cluster count next to the raw box count,
-and never a recall figure. Everything here is a SQL query over the raw tables
-plus the manual_review table; nothing is hand-edited.
+PROBLEM: five numbers the brief asks for (detection rate, precision on
+inspection, working range, species agreement, imagery density), each of
+which is easy to get subtly wrong: a rate without its n, a precision from a
+cherry-picked sample, a box count that counts one bison twenty times.
+
+FIRST ATTEMPT at the duplicate problem: chain individual *boxes* by
+(sequence, label, time, distance). Two elk in one frame collapsed into one
+cluster (E-007). Kept as `cluster_detections_v1`; the comparison test shows
+it undercounting the in-frame pair.
+
+CURRENT: chain *frames*; the estimated number of individuals is the sum over
+chains of the largest per-frame box count. Precision carries a 95% Wilson
+interval and is reported per confidence band. A trivial baseline (predict
+the most common reviewed species everywhere) is printed next to the model's
+species agreement so a near-tie is visible. Recall is printed as
+"unmeasured" and nothing here computes one.
+
+CONSIDERED, NOT DONE: matching boxes across frames by appearance or by
+projected position. Would give a true individual count; needs Phase 4's
+range estimate first.
+
+UNRESOLVED: the cluster gap and distance are assumptions until a review
+looks at chains and says whether they are one animal.
 """
 from __future__ import annotations
 
@@ -20,7 +36,23 @@ from .geo import haversine_m
 from .speciesnet_runner import ANIMAL_CATEGORY, HUMAN_CATEGORY, VEHICLE_CATEGORY, display_name
 from .storage import POPULATION_FILTER, VARIANT_FILTER, Store
 
+# THRESHOLDS — ARBITRARY
+# Report the detection rate at three cuts so the number at 0.2 (the brief's
+# threshold) can be read against a stricter one. Not used for any decision.
 THRESHOLDS = (0.2, 0.5, 0.8)
+
+# CLUSTER_GAP_S — ASSUMED
+# Consecutive Mapillary frames from a moving car are 1 to 5 s apart; a
+# stopped car photographing a herd can sit for a minute. 60 s links the
+# stopped-car case without linking two separate drive-bys.
+# REVISIT IF: the review of chains shows separate animals linked, or one
+#   animal split.
+CLUSTER_GAP_S = 60.0
+
+# CLUSTER_DIST_M — ASSUMED
+# 60 s at park speed (35 mph) is ~940 m, but the frames that matter are
+# the slow ones near an animal. 200 m bounds a chain to one sighting spot.
+CLUSTER_DIST_M = 200.0
 
 
 def wilson(k: int, n: int, z: float = 1.96) -> tuple[float, float] | None:
@@ -35,14 +67,52 @@ def wilson(k: int, n: int, z: float = 1.96) -> tuple[float, float] | None:
     return max(0.0, centre - half), min(1.0, centre + half)
 
 
+def cluster_detections_v1(store: Store, corridor: str, *, population: str = "perspective", min_conf: float = 0.2,
+                          gap_s: float = CLUSTER_GAP_S, dist_m: float = CLUSTER_DIST_M) -> dict:
+    """SUPERSEDED 2026-09-05 by cluster_detections(). Kept for comparison.
+
+    Chained individual boxes: a box joined the open chain for its (sequence,
+    label) if it was within gap_s and dist_m of the previous box. Two boxes in
+    one frame have zero gap and zero distance, so a herd of five in one frame
+    became one cluster (E-007). tests/test_report_and_review.py::
+    test_v1_clusters_undercount_boxes_in_one_frame fails if this ever stops
+    undercounting the fixture, which would mean the fixture lost its
+    two-elk frame.
+    """
+    rows = store.sql(
+        f"""
+        SELECT d.image_id, i.sequence_id, i.captured_at_ms, i.lon, i.lat, p.prediction
+        FROM detections_raw d
+        JOIN predictions_raw p USING (image_id, model_version, variant)
+        JOIN images i USING (image_id)
+        WHERE i.corridor = ? AND d.category = ? AND d.conf >= ? AND d.{VARIANT_FILTER[population]}
+        ORDER BY i.sequence_id, i.captured_at_ms, d.image_id
+        """,
+        [corridor, ANIMAL_CATEGORY, min_conf],
+    )
+    clusters = 0
+    last: dict | None = None
+    for image_id, seq, ts, lon, lat, label in rows:
+        same = (
+            last is not None and last["seq"] == seq and last["label"] == label
+            and ts is not None and last["ts"] is not None and abs(ts - last["ts"]) <= gap_s * 1000
+            and None not in (lon, lat, last["lon"], last["lat"])
+            and haversine_m(lon, lat, last["lon"], last["lat"]) <= dist_m
+        )
+        if not same:
+            clusters += 1
+        last = {"seq": seq, "label": label, "ts": ts, "lon": lon, "lat": lat}
+    return {"n_boxes": len(rows), "n_images": len({r[0] for r in rows}), "n_clusters": clusters, "n_individuals_est": clusters}
+
+
 def cluster_detections(
     store: Store,
     corridor: str,
     *,
     population: str = "perspective",
     min_conf: float = 0.2,
-    gap_s: float = 60.0,
-    dist_m: float = 200.0,
+    gap_s: float = CLUSTER_GAP_S,
+    dist_m: float = CLUSTER_DIST_M,
 ) -> dict:
     """Group animal boxes that are probably the same animals seen from
     consecutive frames.
@@ -206,6 +276,7 @@ def phase0_numbers(
         "exact": sum(a == "yes" for a in agree),
         "rollup": sum(a == "rollup" for a in agree),
         "wrong": sum(a == "no" for a in agree),
+        "baseline": majority_baseline(store, corridor, population),
     }
 
     # ---- number 5: density and dates (whole corridor, then this population) --
@@ -227,6 +298,22 @@ def phase0_numbers(
     )
     n["images_per_road_km"] = (n["n_indexed_all"] / road_km) if road_km else None
     return n
+
+
+def majority_baseline(store: Store, corridor: str, population: str) -> dict:
+    """The trivial model: label every true positive with the most common
+    reviewed species. If SpeciesNet's exact-agreement rate barely beats this,
+    that is the headline, not the model's number."""
+    rows = store.sql(
+        f"""SELECT lower(trim(m.true_species)) FROM manual_review m JOIN images i USING (image_id)
+           WHERE i.corridor = ? AND m.verdict = 'tp' AND m.true_species IS NOT NULL AND m.{VARIANT_FILTER[population]}""",
+        [corridor],
+    )
+    names = [r[0] for r in rows if r[0]]
+    if not names:
+        return {"n": 0, "species": None, "accuracy": None}
+    top = max(set(names), key=names.count)
+    return {"n": len(names), "species": top, "accuracy": names.count(top) / len(names)}
 
 
 def _percentile(sorted_values: list[float], pct: float) -> float | None:
@@ -302,6 +389,8 @@ def render_phase0_markdown(n: dict) -> str:
         f"**4. Species agreement on true positives** ({r['species']['n_tp_with_label']} judged)",
         "",
         f"- exact: {r['species']['exact']}, correct coarser taxon (rollup): {r['species']['rollup']}, wrong: {r['species']['wrong']}",
+        f"- trivial baseline (always say '{r['species']['baseline']['species']}'): "
+        f"{_pct(r['species']['baseline']['accuracy'])} on n={r['species']['baseline']['n']}",
         "",
         "**5. Mapillary density in the corridor** (whole corridor, both populations)",
         "",

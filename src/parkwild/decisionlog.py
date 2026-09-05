@@ -17,6 +17,11 @@ from .config import ROOT
 REPORTS_DIR = ROOT / "reports"
 LOG_PATH = REPORTS_DIR / "decision_log.jsonl"
 
+# Entries written by this process, so a script can end with a summary of
+# every rule that dropped rows during the run (the build spec's "when 8,000
+# rows vanish, the output names the rule").
+_THIS_RUN: list[dict] = []
+
 
 def log_filter(stage: str, rule: str, n_in: int, n_out: int, *, path: Path = LOG_PATH, **extra) -> dict:
     """Append one line and return it. `extra` holds the parameters that made the
@@ -33,4 +38,15 @@ def log_filter(stage: str, rule: str, n_in: int, n_out: int, *, path: Path = LOG
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "a") as fh:
         fh.write(json.dumps(entry, default=str) + "\n")
+    _THIS_RUN.append(entry)
     return entry
+
+
+def print_decision_summary() -> None:
+    """Called at the end of every script: one line per filter that ran."""
+    if not _THIS_RUN:
+        print("decision summary: no filters ran")
+        return
+    print("decision summary:")
+    for e in _THIS_RUN:
+        print(f"  {e['stage']:<28} {e['n_in']:>9,} -> {e['n_out']:>9,}  ({e['n_dropped']:,} dropped)  {e['rule']}")

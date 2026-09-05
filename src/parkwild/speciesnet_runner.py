@@ -1,18 +1,24 @@
-"""
-Run SpeciesNet (MegaDetector + species classifier + ensemble) and turn its
-JSON into table rows.
+"""Run SpeciesNet (MegaDetector + classifier + ensemble) and parse its JSON.
 
-I shell out to `python -m speciesnet.scripts.run_model` instead of importing
-the package. Two reasons:
+PROBLEM: get camera-trap models to score street-level frames without
+dragging PyTorch into every test and notebook, and without ever scoring an
+image twice.
 
-1. It keeps torch out of this package's import graph, so the crawler, the tests
-   and the notebook all work in the light venv without the ML install.
-2. SpeciesNet's CLI already resumes: given an existing --predictions_json it
-   reloads finished predictions and only processes new files. That is exactly
-   the "never re-run inference on an image already processed" rule, for free.
+FIRST PLAN: import the speciesnet package and call its classes. Rejected
+before writing: it would put torch on the import path of the crawler and
+the tests, and it would lose SpeciesNet's own resume-from-JSON behaviour.
 
-Flag names below were checked against speciesnet/scripts/run_model.py
-(package version 5.0.5, 2026-09-05).
+CURRENT: shell out to `python -m speciesnet.scripts.run_model` (flags checked
+against run_model.py in 5.0.5), parse the JSON into rows, contract-check
+that boxes are normalised. Backend: MPS on Apple silicon. First determinism
+attempt looked like a segfault; it was symlinked inputs (E-010). On real
+files MPS and CPU agreed exactly on three frames; the 20-frame check is in
+reports/determinism.json. `scripts/speciesnet_cpu.py` forces CPU if MPS ever
+misbehaves, and `runs.backend` records which one ran.
+
+UNRESOLVED: the ensemble label "no cv result" appeared on two of three test
+frames that *did* have detections. Meaning to be confirmed from the ensemble
+source before it is interpreted; treated as "no species" for now.
 """
 from __future__ import annotations
 
@@ -26,11 +32,17 @@ from .contracts import check_bbox_normalized
 
 log = logging.getLogger(__name__)
 
-# SpeciesNet's own detector threshold is 0.01, i.e. it returns nearly every box
-# and leaves thresholding to the caller. 0.2 is the Phase 0 reporting cut.
+# ANIMAL_CATEGORY / HUMAN_CATEGORY / VEHICLE_CATEGORY — BORROWED
+# (speciesnet/constants.py, Detection enum: "1" animal, "2" human, "3" vehicle)
 ANIMAL_CATEGORY = "1"
 HUMAN_CATEGORY = "2"
 VEHICLE_CATEGORY = "3"
+
+# DEFAULT_REPORT_THRESHOLD — BORROWED (the brief: "above 0.2 confidence")
+# Only a reporting cut. Every box SpeciesNet emits (its own floor is 0.01)
+# is stored, so the threshold can move without re-running inference.
+# REVISIT IF: the stratified review's precision-by-band curve says the useful
+#   operating point is elsewhere; then a UI_THRESHOLD is set from that curve.
 DEFAULT_REPORT_THRESHOLD = 0.2
 
 

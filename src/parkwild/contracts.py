@@ -15,6 +15,13 @@ class ContractError(AssertionError):
     pass
 
 
+# MS_EPOCH_MIN / MS_EPOCH_MAX — DERIVED (2001-09-09 and 2033-05-18 in ms)
+# A Unix timestamp in seconds (1.7e9) or microseconds (1.7e15) falls outside
+# this window; milliseconds for any photo Mapillary could hold fall inside.
+MS_EPOCH_MIN = 1_000_000_000_000
+MS_EPOCH_MAX = 2_000_000_000_000
+
+
 def check_lon_lat(rows: Iterable[dict], *, lon_key: str = "lon", lat_key: str = "lat", allow_none: bool = True) -> int:
     """Longitude in [-180, 180], latitude in [-90, 90]. A latitude over 90 is
     almost always a swapped pair. Returns the number of rows checked."""
@@ -58,7 +65,7 @@ def check_ms_epoch(values: Iterable[int | None]) -> int:
     for v in values:
         if v is None:
             continue
-        if not (1_000_000_000_000 <= v < 2_000_000_000_000):
+        if not (MS_EPOCH_MIN <= v < MS_EPOCH_MAX):
             raise ContractError(f"captured_at {v} is not a millisecond epoch")
         n += 1
     return n

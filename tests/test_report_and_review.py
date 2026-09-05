@@ -3,8 +3,16 @@ import csv
 from conftest import image_row, seed_phase0
 from PIL import Image
 
-from parkwild.report import cluster_detections, phase0_numbers, render_phase0_markdown, update_results_md, wilson
-from parkwild.review import BANDS, band_of, load_review_csv, pick_sample, render_review_images, write_review_template
+from parkwild.report import cluster_detections, cluster_detections_v1, phase0_numbers, render_phase0_markdown, update_results_md, wilson
+from parkwild.review import (
+    BANDS,
+    band_of,
+    load_review_csv,
+    pick_sample,
+    pick_sample_uniform_v1,
+    render_review_images,
+    write_review_template,
+)
 
 
 def test_wilson_interval():
@@ -126,3 +134,52 @@ def test_render_review_images_applies_exif_orientation(store, tmp_path):
     r, g, b = crop.getpixel((crop.width // 2, crop.height // 2))
     assert r > 200 and g < 80 and b < 80, "crop centre should be the red quadrant after EXIF transpose"
     assert (tmp_path / "out" / "img1_full_0_frame.jpg").exists()
+
+
+def test_v1_clusters_undercount_boxes_in_one_frame(store, tmp_path):
+    """The comparison behind E-007. v1 merges the two elk boxes in img4 into
+    one; v2 keeps them as two individuals. If v1 ever matches v2 here the
+    fixture has lost its two-box frame."""
+    seed_phase0(store, tmp_path)
+    v1 = cluster_detections_v1(store, "test", min_conf=0.2)
+    v2 = cluster_detections(store, "test", min_conf=0.2)
+    assert v1["n_boxes"] == v2["n_boxes"] == 4
+    assert v1["n_individuals_est"] < v2["n_individuals_est"]
+    assert v2["n_individuals_est"] == 3 and v1["n_individuals_est"] == 2
+
+
+def _skewed_population(store, n_low=60, n_mid=12, n_high=6):
+    """Many low-confidence boxes, few high: what a detector on out-of-domain
+    frames actually produces."""
+    rows, preds, dets = [], [], []
+    k = 0
+    for band, count in (((0.2, 0.5), n_low), ((0.5, 0.8), n_mid), ((0.8, 1.01), n_high)):
+        for j in range(count):
+            iid = f"s{k}"
+            k += 1
+            conf = band[0] + (min(band[1], 1.0) - band[0]) * (j + 0.5) / count
+            rows.append(image_row(iid, sequence=f"q{k % 7}"))
+            store.record_download({"image_id": iid, "local_path": f"/x/{iid}.jpg", "size_kind": "original", "error": None})
+            preds.append({"image_id": iid, "model_version": "m", "variant": "full", "run_id": "r", "prediction": "x",
+                          "prediction_score": 0.5, "prediction_source": "classifier", "top5_classes": "[]", "top5_scores": "[]",
+                          "n_detections": 1, "max_animal_conf": conf, "failures": None, "raw_json": "{}"})
+            dets.append({"image_id": iid, "model_version": "m", "variant": "full", "det_idx": 0, "category": "1", "label": "animal",
+                         "conf": conf, "bbox_x": 0.1, "bbox_y": 0.1, "bbox_w": 0.1, "bbox_h": 0.1})
+    store.upsert_images(rows)
+    store.append_predictions(preds)
+    store.append_detections(dets)
+
+
+def test_stratified_beats_uniform_on_a_skewed_population(store):
+    """The comparison behind ADR-0010: v1 follows the population skew, v2 gives
+    every band its share so the high band has a usable n."""
+    _skewed_population(store)
+    from collections import Counter
+    v1 = Counter(s["band"] for s in pick_sample_uniform_v1(store, "test", n=30))
+    v2 = Counter(s["band"] for s in pick_sample(store, "test", n=30))
+    assert sum(v1.values()) == 30
+    # 60 of 78 candidates are low-band, so a uniform draw of 30 lands ~23 there.
+    assert v1["0.2-0.5"] >= 15, f"uniform sample should be dominated by the low band: {v1}"
+    # v2 asks for 10 per band; the high band only has 6, and is left short, not back-filled.
+    assert v2 == Counter({"0.2-0.5": 10, "0.5-0.8": 10, "0.8-1.0": 6})
+    assert v2["0.8-1.0"] > v1["0.8-1.0"]

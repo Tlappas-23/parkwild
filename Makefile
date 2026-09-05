@@ -12,7 +12,7 @@ PARK ?= yellowstone
 TRACKA := $(BIN)/python scripts/track_a.py
 PHASE0   := $(BIN)/python scripts/phase0.py
 
-.PHONY: setup setup-ml test lint secrets hooks protect coverage pull download slice detect sample report notebook track-a export bias smoke
+.PHONY: setup setup-ml test lint secrets hooks protect coverage pull download slice detect sample report notebook track-a export bias smoke app app-data
 
 $(BIN)/python:
 	$(PY) -m venv $(VENV)
@@ -34,6 +34,15 @@ test:
 
 lint:
 	$(BIN)/ruff check src tests scripts
+	$(BIN)/python scripts/provenance_report.py --strict
+
+## the app: install, build, enforce the JS budget
+app:
+	cd app && npm install --no-audit --no-fund && npm run build && npm run budget
+
+## copy the baked exports into the app's public data folder
+app-data:
+	mkdir -p app/public/data/$(PARK) && cp data/export/$(PARK)/*.{geojson,json,parquet} app/public/data/$(PARK)/
 
 ## secret scan over everything git tracks (CI runs the same)
 secrets:

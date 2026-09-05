@@ -1,0 +1,52 @@
+/* One accent, neutral everything else, system type, generous padding. */
+:root {
+  --bg: #fcfcfb; --fg: #0b0b0b; --muted: #52514e; --line: #e5e5e2; --panel: #ffffff;
+  --accent: #2a78d6; --model: #b86e00;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #1a1a19; --fg: #f4f3ef; --muted: #c3c2b7; --line: #333330; --panel: #232322; --accent: #3987e5; --model: #d99a3a; }
+}
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; margin: 0; }
+body { background: var(--bg); color: var(--fg); font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+.app { display: flex; flex-direction: column; min-height: 100%; }
+.topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 24px; border-bottom: 1px solid var(--line); }
+.brand { font-size: 20px; letter-spacing: -0.02em; margin: 0; cursor: pointer; }
+nav button, button { font: inherit; background: none; border: 1px solid var(--line); color: var(--fg); border-radius: 999px; padding: 6px 14px; margin-left: 6px; cursor: pointer; }
+nav button.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+button.link { border: none; padding: 0; margin: 0; color: var(--accent); }
+main { flex: 1; display: flex; flex-direction: column; }
+.muted { color: var(--muted); }
+.small { font-size: 13px; }
+.error { margin: 24px; padding: 16px; border: 1px solid #e34948; border-radius: 8px; }
+.map-page { display: flex; flex-direction: column; flex: 1; }
+.filters { display: flex; flex-wrap: wrap; gap: 16px 24px; align-items: end; padding: 12px 24px; border-bottom: 1px solid var(--line); }
+.filters label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--muted); }
+.filters select, .filters input[type=range] { font: inherit; min-width: 220px; }
+.map-wrap { position: relative; flex: 1; min-height: 60vh; }
+.map { position: absolute; inset: 0; }
+.panel { position: absolute; top: 12px; left: 12px; width: min(340px, calc(100% - 24px)); max-height: calc(100% - 24px); overflow: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; box-shadow: 0 6px 24px rgba(0,0,0,0.08); }
+.panel-head { display: flex; justify-content: space-between; align-items: center; }
+.list { list-style: none; padding: 0; margin: 8px 0 0; }
+.list li { padding: 6px 0; border-top: 1px solid var(--line); }
+.badge { display: inline-block; font-size: 11px; padding: 1px 8px; border-radius: 999px; margin-left: 6px; border: 1px solid; }
+.badge.human { color: var(--accent); border-color: var(--accent); }
+.badge.model { color: var(--model); border-color: var(--model); border-style: dashed; }
+.legend { padding: 8px 24px 16px; }
+.swatch { display: inline-block; width: 14px; height: 14px; border-radius: 3px; vertical-align: -2px; opacity: 0.5; }
+.swatch.human { background: var(--accent); } .swatch.model { background: var(--model); }
+.species-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; padding: 24px; }
+.card { text-align: left; border: 1px solid var(--line); border-radius: 14px; padding: 16px; background: var(--panel); margin: 0; }
+.card-art { font-size: 40px; line-height: 1; margin-bottom: 10px; }
+.card-title { font-weight: 600; letter-spacing: -0.01em; }
+.note { color: var(--model); }
+.detail, .prose { max-width: 760px; margin: 0 auto; padding: 24px; }
+.detail h2, .prose h2 { font-size: 30px; letter-spacing: -0.02em; margin: 12px 0 4px; }
+.hero3d { height: 320px; border-radius: 16px; overflow: hidden; background: #f4f3ef; margin: 20px 0; }
+.placeholder { height: 100%; display: grid; place-items: center; color: var(--muted); }
+.facts { display: grid; grid-template-columns: 140px 1fr; gap: 8px 16px; }
+.facts dt { color: var(--muted); } .facts dd { margin: 0; }
+.bars { display: flex; gap: 6px; height: 120px; align-items: end; }
+.bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: end; height: 100%; }
+.bar { width: 100%; background: var(--accent); border-radius: 4px 4px 0 0; min-height: 2px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }

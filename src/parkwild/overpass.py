@@ -1,14 +1,24 @@
-"""
-Overpass API client, just enough to measure how much road and trail sits inside
-a corridor bbox. That number turns "we have 3,800 images" into "images per km",
-which is the density figure Phase 0 asks for.
+"""Road and trail length inside a corridor, from OpenStreetMap via Overpass.
 
-Overpass is free and shared, so: one query per corridor, a generous timeout,
-and fall back to a mirror if the main instance is busy.
+PROBLEM: "27,430 images" means nothing until it is images per kilometre of
+road. That denominator needs road geometry, and the stack says Overpass.
 
-Learned 2026-09-05: overpass-api.de answers HTTP 406 to python-requests'
-default User-Agent, while the same query from curl or with a named UA returns
-normally. So every request identifies this project by name.
+FIRST ATTEMPT (E-004): POST the query with python-requests' defaults. The main
+instance answered HTTP 406 three times; the kumi mirror answered 429. The same
+query from curl worked. The difference was the User-Agent: overpass-api.de
+refuses the default `python-requests/x.y` string.
+
+CURRENT: a named User-Agent, the lz4 mirror first (same data, fastest in
+testing), one query per corridor, generous timeout, back off on 429/504.
+Lamar Valley: 179 ways, 58.7 km road, 75.9 km trail.
+
+CONSIDERED, NOT DONE: NPS road centreline shapefiles. Authoritative, but a
+second download-and-parse path for a number Overpass gives in one call. May
+return for park boundaries in Phase 1.
+
+UNRESOLVED: segment clipping at the bbox edge is crude (geo.path_length_m),
+so road km carries maybe ±5%. Fine for a density figure; not for anything
+that needs a road network.
 """
 from __future__ import annotations
 
@@ -29,29 +39,34 @@ OVERPASS_URLS = (
 )
 HEADERS = {"User-Agent": "parkwild/0.0.1 (wildlife side project; road length per park corridor)"}
 
-# OSM highway=* values that a car (or at least a Mapillary contributor's car)
-# drives on, versus ones that are walked. Street-level imagery is mostly the
-# first group, but Mapillary also has hikers, so I report both.
+# ROAD_TAGS — BORROWED (OSM wiki, Key:highway; the driveable classes)
+# What a Mapillary contributor's car drives on. `track` is deliberately in
+# TRAIL_TAGS: in Yellowstone a track is a closed service road, not a drive.
+# REVISIT IF: a corridor turns out to have imagery mostly on `track` ways.
 ROAD_TAGS = {
     "motorway", "trunk", "primary", "secondary", "tertiary", "unclassified",
     "residential", "service", "living_street", "road",
     "motorway_link", "trunk_link", "primary_link", "secondary_link", "tertiary_link",
 }
+
+# TRAIL_TAGS — BORROWED (OSM wiki, Key:highway; the walked classes)
+# Mapillary also has hikers, so trail km is reported alongside road km.
 TRAIL_TAGS = {"path", "footway", "track", "bridleway", "cycleway", "steps", "pedestrian"}
 
 
 def fetch_highways(bbox: BBox, *, timeout_s: int = 120) -> list[dict]:
-    """Return every highway=* way touching `bbox`, with its full geometry.
+    """Every highway=* way touching `bbox`, with full geometry.
 
-    Overpass selects ways that intersect the box but returns their entire
-    geometry, so a long highway that clips one corner comes back whole. The
-    length summary clips it back (see geo.path_length_m)."""
+    Overpass selects ways that intersect the box but returns each way whole,
+    so a long highway that clips a corner comes back entire; the length
+    summary clips it back."""
     query = f'[out:json][timeout:{timeout_s}];way["highway"]({bbox.as_overpass()});out geom;'
     last_error: Exception | None = None
     for url in OVERPASS_URLS:
         for attempt in range(3):
             try:
                 resp = requests.post(url, data={"data": query}, headers=HEADERS, timeout=timeout_s + 30)
+                # 406 is the default-UA refusal; 429/504 are load. All three mean "try again elsewhere".
                 if resp.status_code in (406, 429, 504):
                     log.warning("Overpass %s returned %d; waiting", url, resp.status_code)
                     time.sleep(10 * (attempt + 1))

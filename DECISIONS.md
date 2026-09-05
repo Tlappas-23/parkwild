@@ -157,9 +157,10 @@ reports/decision_log.jsonl by the ingest.
 
 | # | Decision | Default until decided | Where |
 |---|---|---|---|
-| O-1 | Run SpeciesNet locally (`make setup-ml`, several GB) or on Kaggle | nothing runs | RESULTS.md Phase 0 |
-| O-2 | Create the private GitHub repo and push (`Tlappas-23`), then `make protect` | local git only | SECURITY.md |
-| O-3 | Enable the Cloudflare Access read gate at launch | public read | ADR-0008 |
-| O-4 | Ingest eBird (421,940 Yellowstone records) | skipped, logged | ADR-0011 |
-| O-5 | Quaternius pack license: CC0 (pack page) vs QAL v1.0 (site license page) | nothing downloaded | docs/3d-assets.md |
-| O-6 | Start the app skeleton (React + Vite + MapLibre + R3F; `npm install` is several hundred MB) | not started | BUILD_SPEC.md Phase 5 |
+| O-1 | Run SpeciesNet locally (`make setup-ml`, several GB) or on Kaggle | **decided: install** (2026-09-05); MPS with determinism check, CPU fallback | RESULTS.md Phase 0 |
+| O-2 | Create the private GitHub repo and push (`Tlappas-23`), then `make protect` | **decided: yes** (2026-09-05); pushed to github.com/Tlappas-23/parkwild; protect failed, see O-7 | SECURITY.md |
+| O-3 | Enable the Cloudflare Access read gate at launch | **decided: public** (2026-09-05), with the species suppression list (config/suppression.toml) | ADR-0008 |
+| O-4 | Ingest eBird (421,940 Yellowstone records) | **decided: skip** (2026-09-05); revisit only for checklists with GPS tracks | ADR-0011 |
+| O-5 | Quaternius pack license: CC0 (pack page) vs QAL v1.0 (site license page) | **decided: QAL, credit anyway** (2026-09-05); license archived + hashed | docs/3d-assets.md |
+| O-6 | Start the app skeleton (React + Vite + MapLibre + R3F; `npm install` is several hundred MB) | **decided: yes** (2026-09-05) | BUILD_SPEC.md Phase 5 |
+| O-7 | Repo visibility: GitHub only protects `main` server-side on public or paid repos. Make it public (protection on, code visible, no secrets in it) or stay private with the local pre-push guard only | private + local guard | SECURITY.md |

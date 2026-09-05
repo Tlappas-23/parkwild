@@ -4,7 +4,8 @@ from datetime import datetime
 from conftest import gbif_occurrences, inat_observations
 
 from parkwild import gbif, inaturalist
-from parkwild.export import cells_geojson, export_park, species_json
+from parkwild.config import Suppression, load_suppression
+from parkwild.export import cells_geojson, export_park, species_json, suppression_for
 from parkwild.sightings import dedupe, park_summary
 
 
@@ -76,3 +77,34 @@ def test_cells_exclude_obscured_even_if_only_rows(store, tmp_path):
     assert r["features"] == 0
     species_json(store, "yellowstone", tmp_path / "s.json")
     assert json.loads((tmp_path / "s.json").read_text())["species"][0]["obscured_coordinates"] == 1
+
+
+def test_suppression_list_loads_with_reasons():
+    rules = load_suppression()
+    names = {r.name for r in rules}
+    assert "Canis lupus" in names and "Gulo gulo" in names
+    assert all(r.why for r in rules)
+    wolf = suppression_for("Canis lupus occidentalis", rules, set())
+    assert wolf is not None and wolf.action == "exclude"
+    assert suppression_for("Bison bison", rules, set()) is None
+    auto = suppression_for("Ursus arctos horribilis", [], {"Ursus arctos horribilis"})
+    assert auto is not None and auto.action == "coarsen" and auto.res == 6
+
+
+def test_export_applies_suppression(store, tmp_path):
+    _load(store)
+    dedupe(store, "yellowstone")
+    # Make the wolf row open-coordinate so only the suppression list can keep it off the map.
+    store.con.execute("UPDATE sightings SET coordinate_status = 'open' WHERE sighting_id = 'gbif:5003'")
+    rules = [Suppression("Canis lupus", "gray wolf", "exclude", None, "test"),
+             Suppression("Corvus corax", "raven", "coarsen", 6, "test")]
+    r = cells_geojson(store, "yellowstone", tmp_path / "c.geojson", rules=rules)
+    fc = json.loads((tmp_path / "c.geojson").read_text())
+    species = {f["properties"]["species"] for f in fc["features"]}
+    assert "Canis lupus" not in species and r["excluded"] == 1
+    ravens = [f for f in fc["features"] if f["properties"]["species"] == "Corvus corax"]
+    assert ravens and all(f["properties"]["coarsened"] and f["properties"]["res"] == 6 for f in ravens)
+    assert fc["suppressed"]["excluded"] == {"Canis lupus": 1}
+    species_json(store, "yellowstone", tmp_path / "s.json", rules=rules)
+    sp = {s["scientific_name"]: s for s in json.loads((tmp_path / "s.json").read_text())["species"]}
+    assert sp["Canis lupus"]["suppression"]["action"] == "exclude" and sp["Bison bison"]["suppression"] is None

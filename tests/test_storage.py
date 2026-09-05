@@ -99,3 +99,14 @@ def test_sightings_upsert_and_duplicate_marking(store):
     assert store.one("SELECT duplicate_of FROM sightings WHERE sighting_id = 'inaturalist:1003'") == "inaturalist:1001"
     store.clear_duplicates("yellowstone")
     assert store.one("SELECT count(*) FROM sightings WHERE duplicate_of IS NOT NULL") == 0
+
+
+def test_v2_sampler_is_stable_where_v1_was_not(store):
+    """E-003: v1 (setseed + random) returned different orders on consecutive
+    calls. v2 must return the identical list every time; v1 is only required
+    to still run, since asserting flakiness would itself be flaky."""
+    store.upsert_images([image_row(f"i{k}", sequence=f"s{k % 4}") for k in range(40)])
+    picks = [[p["image_id"] for p in store.images_pending_download("test", limit=20, max_per_sequence=10)] for _ in range(5)]
+    assert all(p == picks[0] for p in picks)
+    legacy = store.images_pending_download_v1("test", limit=20, max_per_sequence=10)
+    assert len(legacy) == 20

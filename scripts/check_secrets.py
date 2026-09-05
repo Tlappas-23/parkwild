@@ -14,6 +14,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+# PATTERNS — BORROWED (the published formats of each token type; Mapillary's from our own token's shape)
 PATTERNS = {
     "mapillary token": re.compile(r"MLY\|\d{5,}\|[0-9a-f]{20,}"),
     "private key": re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----"),
@@ -22,9 +23,12 @@ PATTERNS = {
     "openai-style key": re.compile(r"\bsk-[A-Za-z0-9]{32,}\b"),
     "cloudflare token": re.compile(r"\bCF_API_TOKEN\s*=\s*\S{20,}"),
 }
+# ALLOWED_ENV_FILES — ARBITRARY (the one env file that is documentation, not secrets)
 ALLOWED_ENV_FILES = {".env.example"}
+# IGNORE_MARKER — ARBITRARY
 # A line carrying this marker is deliberately fake (test fixtures, docs) and is skipped.
 IGNORE_MARKER = "secret-scan:ignore"
+# SKIP_SUFFIXES — ARBITRARY (binary formats where a regex hit would be noise)
 SKIP_SUFFIXES = {".jpg", ".jpeg", ".png", ".gif", ".duckdb", ".parquet", ".glb", ".gltf", ".usdz", ".zip"}
 
 

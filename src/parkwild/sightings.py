@@ -1,8 +1,23 @@
-"""
-Track A orchestration: ingest reference sightings into DuckDB and deduplicate
-across sources.
+"""Track A orchestration: ingest reference sightings and deduplicate across sources.
 
-Everything that drops rows says so in reports/decision_log.jsonl.
+PROBLEM: two sources that overlap (GBIF mirrors iNaturalist) and a schema
+that must never double count, while never deleting a row.
+
+CURRENT: the iNaturalist mirror is removed at the source, by GBIF dataset
+key, before dedupe runs (exact, cheap). What remains is fuzzy cross-source
+dedupe: same species and date, within DEDUPE_DIST_M, and either the
+observer names match after normalisation or both have times within
+DEDUPE_WINDOW_S. The iNaturalist row stays canonical; the other row gets
+`duplicate_of` set. Nothing is deleted; exports filter on `duplicate_of IS
+NULL`. Every drop is logged to reports/decision_log.jsonl.
+
+CONSIDERED, NOT DONE: dedupe within a source. Two iNaturalist users who
+both photographed the same bison are two observations by iNaturalist's own
+definition, and the app counts observations, not animals.
+
+UNRESOLVED: observer names differ in form between sources (login vs display
+name), so the observer match rarely fires and the time match does most of
+the work. Measured duplicate rate on Yellowstone goes in RESULTS.md.
 """
 from __future__ import annotations
 
@@ -18,7 +33,20 @@ from .storage import Store
 
 log = logging.getLogger(__name__)
 
-SOURCE_PRIORITY = {"inaturalist": 0, "gbif": 1, "mappilary_cv": 2, "mapillary_cv": 2}
+# SOURCE_PRIORITY — ASSUMED
+# Which row stays canonical when two match: the source with the richer record
+# and the stable URL. iNaturalist first, then GBIF, then our own detections.
+SOURCE_PRIORITY = {"inaturalist": 0, "gbif": 1, "mapillary_cv": 2}
+
+# DEDUPE_DIST_M — ASSUMED
+# Two reports of one event should land within phone-GPS error of each other.
+# 200 m is generous for GPS and tight against a herd spread along a road.
+# REVISIT IF: the marked-duplicate rate looks implausibly high or low.
+DEDUPE_DIST_M = 200.0
+
+# DEDUPE_WINDOW_S — ASSUMED
+# One hour: a pull-out where several people photograph the same animals.
+DEDUPE_WINDOW_S = 3600.0
 
 
 def ingest_inaturalist(store: Store, park: str, *, place_id: int | None, bbox: BBox | None, max_records: int | None = None, batch: int = 500) -> dict:
@@ -81,7 +109,7 @@ def _norm_observer(name: str | None) -> str:
     return "".join(ch for ch in (name or "").lower() if ch.isalnum())
 
 
-def dedupe(store: Store, park: str, *, dist_m: float = 200.0, time_window_s: float = 3600.0) -> dict:
+def dedupe(store: Store, park: str, *, dist_m: float = DEDUPE_DIST_M, time_window_s: float = DEDUPE_WINDOW_S) -> dict:
     """Mark cross-source duplicates. Two sightings are the same event when they
     share species and date, sit within `dist_m`, and either have observers that
     match after normalisation or both have times within `time_window_s`. The

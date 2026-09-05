@@ -1,18 +1,27 @@
-"""
-GBIF occurrence API client and normaliser for the `sightings` schema.
+"""GBIF occurrence API client and normaliser for the `sightings` schema.
 
-No key is needed for search. GBIF aggregates hundreds of datasets, including a
-full mirror of iNaturalist's research-grade observations, so:
+PROBLEM: records iNaturalist lacks. GBIF aggregates hundreds of datasets,
+which is the point and the trap: it also mirrors all of iNaturalist's
+research-grade observations and all of eBird.
 
-- the iNaturalist dataset is skipped outright here (exact duplicates of what
-  the iNaturalist ingest already stored), and the count is logged;
-- records without coordinates are skipped;
-- coordinate precision is judged from `coordinateUncertaintyInMeters` and the
-  `dataGeneralizations` / `informationWithheld` flags. Anything coarser than
-  1 km is stored as 'obscured' and kept out of the cell map.
+MEASURED FIRST (E-008), before ingesting anything: for the Yellowstone bbox,
+Mammalia 26,248 of which 25,292 are the iNaturalist mirror; Aves 445,426 of
+which 421,940 are eBird checklists and 16,280 the iNaturalist mirror.
 
-The search endpoint pages by offset up to 100,000 results per query, so big
-queries are split by year automatically.
+CURRENT: skip the iNaturalist dataset by key (an exact copy of what the
+direct ingest stored; skipping by key beats fuzzy dedupe); skip eBird by
+decision O-4 (checklist locations are hotspot centroids, and it would be
+nine tenths of the data at the worst accuracy in it); ingest everything else
+for both classes. Precision is judged from coordinateUncertaintyInMeters and
+the generalisation flags; anything coarser than 1 km is 'obscured' and stays
+off the map. Offset paging is capped at 100,000 by GBIF, so a query that big
+is split by year automatically.
+
+CONSIDERED, NOT DONE: the GBIF download API (asynchronous, needs an account,
+no offset cap). Not needed while eBird is out.
+
+UNRESOLVED: eventDate ranges ("2021-07-04/2021-07-05") are truncated to the
+start date; a multi-week range would put a record on its first day.
 """
 from __future__ import annotations
 
@@ -30,13 +39,33 @@ log = logging.getLogger(__name__)
 
 API = "https://api.gbif.org/v1"
 HEADERS = {"User-Agent": "parkwild/0.0.1 (wildlife side project; park sightings for a public map)"}
+# INAT_DATASET_KEY / EBIRD_DATASET_KEY — MEASURED (GBIF datasetKey facet, 2026-09-05)
+# The two datasets that dominate a park's bird and mammal counts; both are
+# skipped by default (ADR-0011). Verified by name on gbif.org.
 INAT_DATASET_KEY = "50c9509d-22c7-4a22-a47d-8c48425ef4a7"    # iNaturalist research-grade observations
 EBIRD_DATASET_KEY = "4fa7b334-ce0d-4e88-aaae-2e0c138d049e"   # eBird Observation Dataset
+
+# CLASS_KEYS — BORROWED (GBIF backbone taxonomy keys for Mammalia and Aves)
 CLASS_KEYS = {"Mammalia": 359, "Aves": 212}
+
+# BASIS_OF_RECORD — ASSUMED
+# Sightings, not specimens: a museum skin collected in 1912 has a location but
+# is not an observation of a living animal in the sense the app makes.
+# REVISIT IF: historical presence becomes a feature.
 BASIS_OF_RECORD = ("HUMAN_OBSERVATION", "MACHINE_OBSERVATION")
-PAGE = 300                 # documented maximum
-OFFSET_CAP = 100_000       # documented maximum offset for search
+
+# PAGE / OFFSET_CAP — BORROWED (GBIF occurrence search docs: limit <= 300, offset <= 100,000)
+PAGE = 300
+OFFSET_CAP = 100_000
+
+# OBSCURED_UNCERTAINTY_M — ASSUMED
+# H3 resolution 9 cells are ~170 m across; a record whose stated uncertainty is
+# over 1 km could sit in any of ~40 cells and is mapped by none of them.
+# REVISIT IF: cell resolution changes.
 OBSCURED_UNCERTAINTY_M = 1000.0
+
+# MIN_INTERVAL_S — ARBITRARY
+# GBIF publishes no per-second limit for search; 0.3 s is politeness.
 MIN_INTERVAL_S = 0.3
 
 

@@ -1,11 +1,26 @@
-"""
-Build the manual-inspection set for Phase 0.
+"""The manual-inspection set for Phase 0.
 
-The brief asks me to look at ~30 detections with my own eyes and say honestly
-how many are animals versus rocks, shrubs and logs. This module picks the
-sample deterministically and stratified by detector confidence (ADR-0010),
-draws the boxes so I can see what the model saw, and writes a CSV I fill in by
-hand. The filled CSV is loaded into `manual_review` by `phase0.py report`.
+PROBLEM: the only honest precision number comes from a human looking at
+boxes. Which boxes get looked at decides what the number means.
+
+FIRST ATTEMPT: uniform random over all boxes above the threshold, one per
+frame. Kept as `pick_sample_uniform_v1`. Its sample follows the population,
+and the population is dominated by the 0.2 to 0.5 band, so the high band
+that a UI threshold would actually use gets two or three boxes and no usable
+precision estimate. (Top-N by confidence, the other obvious choice, inflates
+precision; the build spec forbids it and it was never implemented.)
+
+CURRENT: equal allocation across three detector-confidence bands, one box
+per frame, order from a seeded hash so the sample is reproducible. Bands
+short of their quota stay short and are reported, never back-filled from an
+easier band. tests/test_report_and_review.py::test_stratified_beats_uniform_
+on_a_skewed_population shows the difference on a synthetic population.
+
+CONSIDERED, NOT DONE: stratifying by predicted species as well. Largest
+per-species n in a 30-box sample would be single digits; nothing to learn.
+
+UNRESOLVED: 30 boxes gives a precision interval roughly ±17 points at 50%.
+The Wilson interval in report.py says so; more boxes is the only fix.
 """
 from __future__ import annotations
 
@@ -23,8 +38,13 @@ from .storage import VARIANT_FILTER, Store
 
 log = logging.getLogger(__name__)
 
-# Detector-confidence bands for stratified sampling. Top-N by confidence would
-# inflate precision; uniform sampling would tell me little about the high band.
+# BANDS — ASSUMED (three bands per BUILD_SPEC.md; the cut points are mine)
+# 0.2 is the brief's reporting threshold. 0.5 and 0.8 split the rest into a
+# "maybe" and a "confident" band of roughly comparable population on camera-trap
+# data; whether that holds on street-level frames is exactly what the review
+# measures. The upper bound 1.01 keeps conf == 1.0 in the top band.
+# REVISIT IF: a band ends up with under 5 boxes after the review, or the
+#   precision-by-band curve suggests a different knee.
 BANDS = ((0.2, 0.5), (0.5, 0.8), (0.8, 1.01))
 
 REVIEW_COLUMNS = [
@@ -47,19 +67,7 @@ def band_of(conf: float) -> str:
     return "out"
 
 
-def pick_sample(
-    store: Store,
-    corridor: str,
-    *,
-    population: str = "perspective",
-    n: int = 30,
-    min_conf: float = 0.2,
-    seed: int = 42,
-) -> list[dict]:
-    """Stratified sample of animal boxes: equal allocation across BANDS, at most
-    one box per frame, deterministic order from a seeded hash. If a band has
-    fewer candidates than its share, the shortfall is left unfilled and reported
-    rather than back-filled from an easier band."""
+def _candidates(store: Store, corridor: str, population: str, min_conf: float, seed: int) -> list[dict]:
     rows = store.sql(
         f"""
         SELECT d.image_id, d.model_version, d.variant, d.det_idx, d.conf,
@@ -80,7 +88,46 @@ def pick_sample(
         "image_id", "model_version", "variant", "det_idx", "conf", "bbox_x", "bbox_y", "bbox_w", "bbox_h",
         "prediction", "prediction_score", "prediction_source", "top5_classes", "local_path", "source_url",
     ]
-    candidates = [dict(zip(keys, r)) for r in rows]
+    return [dict(zip(keys, r)) for r in rows]
+
+
+def pick_sample_uniform_v1(store: Store, corridor: str, *, population: str = "perspective", n: int = 30,
+                           min_conf: float = 0.2, seed: int = 42) -> list[dict]:
+    """SUPERSEDED 2026-09-05 by pick_sample(). Kept for comparison.
+
+    Uniform random over boxes above min_conf, one per frame. Follows the
+    population's confidence distribution, which is bottom-heavy, so the band a
+    UI would actually threshold at gets almost no boxes. The comparison test
+    builds a skewed population and shows v1 puts most of the sample in the
+    lowest band while v2 splits it evenly.
+    """
+    sample: list[dict] = []
+    taken: set[str] = set()
+    for c in _candidates(store, corridor, population, min_conf, seed):
+        if c["image_id"] in taken:
+            continue
+        c["band"] = band_of(c["conf"])
+        sample.append(c)
+        taken.add(c["image_id"])
+        if len(sample) >= n:
+            break
+    return sample
+
+
+def pick_sample(
+    store: Store,
+    corridor: str,
+    *,
+    population: str = "perspective",
+    n: int = 30,
+    min_conf: float = 0.2,
+    seed: int = 42,
+) -> list[dict]:
+    """Stratified sample of animal boxes: equal allocation across BANDS, at most
+    one box per frame, deterministic order from a seeded hash. If a band has
+    fewer candidates than its share, the shortfall is left unfilled and reported
+    rather than back-filled from an easier band."""
+    candidates = _candidates(store, corridor, population, min_conf, seed)
     per_band = math.ceil(n / len(BANDS))
     quota = {band_of(lo): per_band for lo, _ in BANDS}
     taken_images: set[str] = set()

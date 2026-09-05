@@ -28,7 +28,25 @@ once Track A has run; this is the obvious Lamar Valley set.
 | Bighorn sheep | "Bighorn (Demo Free Download)" by WildMesh 3D on Sketchfab | Sketchfab | open | demo of a paid model; license must be read on the page |
 | Common raven / bald eagle | "Eagle" | OpenGameArt "Animated Animales Low Poly" (Quaternius, CC0 listing) | **ask** | FBX only; would need conversion to glTF |
 
-## The Quaternius license question
+## License record: Quaternius (decision O-5: proceed under QAL, credit anyway)
+
+| Field | Value |
+|---|---|
+| Source | https://quaternius.com/license.html |
+| License | Quaternius Asset License (QAL) v1.0, "Last updated: 8/28/2026" |
+| Key terms | "You can use these assets, free of charge, in personal, educational, and commercial games and other projects, with no credit required. You just can't resell or redistribute the assets themselves as assets." |
+| Retrieved | 2026-09-05 |
+| Archive | https://web.archive.org/web/20260905165351/https://quaternius.com/license.html |
+| Page hash (sha256 of the HTML as fetched) | d1b56be5228d372b049b45cc7447a823da7989a6cf7036f60cfac2284c8fcb0d |
+| Pack page archive | https://web.archive.org/web/20260905165409/https://quaternius.com/packs/ultimateanimatedanimals.html |
+
+The license page was updated eight days before this was retrieved, which is
+why older listings (OpenGameArt, the pack page itself) still say CC0. Per the
+decision, assets from Quaternius are used under QAL, credited on the
+attribution page anyway, and the file hash of each downloaded asset is added
+to the table above at download time.
+
+## The Quaternius license question (resolved by O-5; kept for the record)
 
 Two statements disagree, checked 2026-09-05:
 

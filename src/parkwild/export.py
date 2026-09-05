@@ -1,16 +1,30 @@
-"""
-Bake the static artifacts the app consumes (BUILD_SPEC.md, Phase 4):
+"""Bake the static artifacts the app consumes (BUILD_SPEC.md Phase 4).
 
-  cells.geojson     H3 resolution-9 cells, one feature per (cell, species),
-                    with counts, date range, month histogram and source mix
-  species.json      per-species metadata and seasonality
-  sightings.parquet full canonical records with attribution, minus raw JSON
-  manifest.json     sha256 per file + build info, so the app can refuse
-                    tampered data (SECURITY.md)
+PROBLEM: the app has no server and no database. Everything it shows must be
+a file, small enough to fetch on a phone, aggregated enough to make no false
+claim of precision, and verifiable so a swapped file is refused.
 
-Only rows with coordinate_status='open' go into cells. Obscured and private
-rows still count in species.json totals, flagged as such, because "we know it
-is here, we do not know where" is real information.
+CURRENT:
+  cells.geojson     H3 cells, one feature per (cell, species), counts, date
+                    range, month histogram, source mix. Resolution 9 by default,
+                    coarser for species on the suppression list; excluded
+                    species never appear.
+  species.json      per-species metadata and seasonality, including the
+                    obscured share and the suppression treatment.
+  sightings.parquet full canonical records with attribution, minus raw JSON.
+  manifest.json     SHA-256 per file plus the git commit; the app compiles a
+                    copy in and refuses data that does not match.
+
+Only rows with coordinate_status='open' enter cells. Obscured and private
+rows still count in species.json, flagged, because "it is here, we do not
+know where" is real information.
+
+FIRST ATTEMPT that failed: `COPY ... TO ?` with a bound parameter. DuckDB
+takes a literal path there; the park key is validated and interpolated.
+
+UNRESOLVED: one feature per (cell, species) repeats each hexagon's geometry
+once per species in it. Fine at Yellowstone scale; a vector-tile build would
+be the fix if a park ever has hundreds of species per cell.
 """
 from __future__ import annotations
 
@@ -23,11 +37,40 @@ from pathlib import Path
 
 import h3
 
-from .config import ROOT
+from .config import ROOT, Suppression, load_suppression
 from .decisionlog import log_filter
 from .storage import Store
 
-H3_RES = 9   # ~174 m edge; comparable to the positional error we expect
+# H3_RES — BORROWED (build spec, Phase 4: "H3 resolution 9 (~170 m edge),
+# comparable to the error magnitude"). Coarsened species use the resolution
+# in config/suppression.toml.
+H3_RES = 9
+
+
+def suppression_for(name: str | None, rules: list[Suppression], auto_sensitive: set[str]) -> Suppression | None:
+    """First matching rule by scientific-name prefix. Species iNaturalist obscures
+    by taxon get an automatic coarsen-to-r6 unless a rule says otherwise."""
+    if not name:
+        return None
+    for r in rules:
+        if name == r.name or name.startswith(r.name + " "):
+            return r
+    if name in auto_sensitive:
+        return Suppression(name, "", "coarsen", 6, "iNaturalist obscures this taxon by default (taxon_geoprivacy)")
+    return None
+
+
+def auto_sensitive_species(store: Store, park: str) -> set[str]:
+    """Species with any iNaturalist observation carrying taxon_geoprivacy."""
+    rows = store.sql(
+        """
+        SELECT DISTINCT scientific_name FROM sightings
+        WHERE park = ? AND source = 'inaturalist' AND scientific_name IS NOT NULL
+          AND json_extract_string(raw_json, '$.taxon_geoprivacy') IN ('obscured', 'private')
+        """,
+        [park],
+    )
+    return {r[0] for r in rows}
 
 SIGHTING_EXPORT_COLUMNS = [
     "sighting_id", "source", "dataset", "park", "confidence_basis", "taxon_id", "scientific_name",
@@ -40,7 +83,9 @@ def _canonical_where(park_param: str = "?") -> str:
     return f"park = {park_param} AND duplicate_of IS NULL"
 
 
-def cells_geojson(store: Store, park: str, out_path: Path, *, res: int = H3_RES) -> dict:
+def cells_geojson(store: Store, park: str, out_path: Path, *, res: int = H3_RES, rules: list[Suppression] | None = None) -> dict:
+    rules = load_suppression() if rules is None else rules
+    auto = auto_sensitive_species(store, park)
     rows = store.sql(
         f"""
         SELECT lon, lat, scientific_name, common_name, taxon_class, confidence_basis, observed_on
@@ -53,11 +98,22 @@ def cells_geojson(store: Store, park: str, out_path: Path, *, res: int = H3_RES)
     log_filter("export.cells", "canonical rows with open coordinates and a taxon name", n_canonical, len(rows), park=park, h3_res=res)
 
     agg: dict[tuple[str, str], dict] = {}
+    excluded: dict[str, int] = {}
+    coarsened: dict[str, int] = {}
     for lon, lat, sci, common, cls, basis, on in rows:
-        cell = h3.latlng_to_cell(lat, lon, res)
+        rule = suppression_for(sci, rules, auto)
+        cell_res = res
+        if rule is not None and rule.action == "exclude":
+            excluded[sci] = excluded.get(sci, 0) + 1
+            continue
+        if rule is not None and rule.action == "coarsen":
+            cell_res = rule.res or 6
+            coarsened[sci] = coarsened.get(sci, 0) + 1
+        cell = h3.latlng_to_cell(lat, lon, cell_res)
         key = (cell, sci)
         a = agg.setdefault(key, {
-            "cell": cell, "species": sci, "common_name": common, "class": cls,
+            "cell": cell, "species": sci, "common_name": common, "class": cls, "res": cell_res,
+            "coarsened": cell_res != res,
             "count": 0, "human_verified": 0, "model_predicted": 0,
             "first": None, "last": None, "months": [0] * 12,
         })
@@ -76,13 +132,20 @@ def cells_geojson(store: Store, park: str, out_path: Path, *, res: int = H3_RES)
         boundary = h3.cell_to_boundary(a["cell"])           # [(lat, lng), ...]
         ring = [[lng, lat] for lat, lng in boundary] + [[boundary[0][1], boundary[0][0]]]
         features.append({"type": "Feature", "geometry": {"type": "Polygon", "coordinates": [ring]}, "properties": a})
-    fc = {"type": "FeatureCollection", "features": features, "park": park, "h3_res": res}
+    n_excluded = sum(excluded.values())
+    log_filter("export.cells.suppression", "species suppression list + iNaturalist taxon_geoprivacy (config/suppression.toml)",
+               len(rows), len(rows) - n_excluded, park=park, excluded=excluded, coarsened=coarsened)
+    fc = {"type": "FeatureCollection", "features": features, "park": park, "h3_res": res,
+          "suppressed": {"excluded": excluded, "coarsened": coarsened}}
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(json.dumps(fc, separators=(",", ":")))
-    return {"features": len(features), "sightings_in_cells": len(rows), "cells": len({k[0] for k in agg})}
+    return {"features": len(features), "sightings_in_cells": len(rows) - n_excluded, "cells": len({k[0] for k in agg}),
+            "excluded": n_excluded, "coarsened": sum(coarsened.values())}
 
 
-def species_json(store: Store, park: str, out_path: Path) -> dict:
+def species_json(store: Store, park: str, out_path: Path, *, rules: list[Suppression] | None = None) -> dict:
+    rules = load_suppression() if rules is None else rules
+    auto = auto_sensitive_species(store, park)
     rows = store.sql(
         f"""
         SELECT scientific_name, any_value(common_name), any_value(taxon_class), any_value(taxon_id),
@@ -108,8 +171,10 @@ def species_json(store: Store, park: str, out_path: Path) -> dict:
         for m in months or []:
             if m:
                 hist[int(m) - 1] += 1
+        rule = suppression_for(sci, rules, auto)
         species.append({
             "scientific_name": sci, "common_name": common, "class": cls, "taxon_id": tid,
+            "suppression": None if rule is None else {"action": rule.action, "res": rule.res, "why": rule.why},
             "sightings": n, "open_coordinates": n_open, "obscured_coordinates": n_obs,
             "sources": {"inaturalist": n_inat, "gbif": n_gbif, "mapillary_cv": n_cv},
             "confidence_basis": {"human_verified": n_hv, "model_predicted": n_mp},
@@ -124,6 +189,7 @@ def species_json(store: Store, park: str, out_path: Path) -> dict:
     return {"species": len(species)}
 
 
+# PARK_KEY — DERIVED (the TOML table-key alphabet used in config/parks.toml)
 PARK_KEY = re.compile(r"^[a-z0-9_]+$")
 
 
