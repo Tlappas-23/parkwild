@@ -31,11 +31,34 @@ export async function fetchVerified<T>(park: string, name: string, manifest: Man
   const buf = await res.arrayBuffer();
   if (expected) {
     const actual = await sha256Hex(buf);
-    if (actual !== expected) throw new Error(`${name} failed its integrity check (expected ${expected.slice(0, 12)}…, got ${actual.slice(0, 12)}…)`);
+    if (actual !== expected) {
+      // Usually this means the app shell is a cached older build and the server
+      // has newer data. Ask the service worker for the new build and reload
+      // once; only if that does not resolve it is the mismatch shown.
+      if (await refreshOnce()) throw new Error("A newer version is available; reloading…");
+      throw new Error(`${name} failed its integrity check (expected ${expected.slice(0, 12)}…, got ${actual.slice(0, 12)}…)`);
+    }
   } else {
     console.warn(`[parkwild] no baked manifest entry for ${name}; integrity not verified (dev build?)`);
   }
   return JSON.parse(new TextDecoder().decode(buf)) as T;
+}
+
+const RELOAD_KEY = "parkwild:integrity-reload";
+
+async function refreshOnce(): Promise<boolean> {
+  if (typeof sessionStorage === "undefined" || sessionStorage.getItem(RELOAD_KEY)) return false;
+  sessionStorage.setItem(RELOAD_KEY, String(Date.now()));
+  try {
+    if ("serviceWorker" in navigator) {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map((r) => r.update()));
+      // Drop any cached shell so the reload fetches the build the server has.
+      if ("caches" in window) await Promise.all((await caches.keys()).map((k) => caches.delete(k)));
+    }
+  } catch { /* fall through to a plain reload */ }
+  location.reload();
+  return true;
 }
 
 export async function loadPark(park: string) {

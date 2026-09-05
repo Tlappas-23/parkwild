@@ -24,6 +24,12 @@ export default defineConfig({
       workbox: {
         globPatterns: ["**/*.{js,css,html,svg,webmanifest}", "data/**/*.{geojson,json}"],
         maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
+        // Data URLs carry ?v=<manifest hash>. Ignoring that parameter when
+        // matching the precache means a cached app shell is always served its
+        // own cached data, never a newer file from the server: after a deploy,
+        // an old shell saw new data and its integrity check refused it (E-023).
+        ignoreURLParametersMatching: [/^v$/],
+        cleanupOutdatedCaches: true,
         runtimeCaching: [
           {
             urlPattern: ({ url }) => url.hostname === "tiles.openfreemap.org",
