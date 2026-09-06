@@ -2637,3 +2637,27 @@ nav button.active {
 .weather.compact .weather-now strong {
   font-size: var(--t-14);
 }
+
+/* weather beside the folded Filters pill, and under the stop name on the tour card */
+.weather-pill {
+  position: absolute;
+  top: 62px;
+  left: 14px;
+  z-index: 5;
+  background: var(--glass);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 999px;
+  padding: 5px 12px;
+  box-shadow: var(--shadow-sm);
+}
+.weather-pill .weather {
+  margin: 0;
+  gap: 0;
+}
+.weather-pill .weather-typical {
+  display: none;
+}
+.tour-title .weather {
+  margin: 2px 0 4px;
+}
