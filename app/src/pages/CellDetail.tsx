@@ -28,7 +28,7 @@ function observationsUrl(feature: CellFeature, taxon: Species | null): string {
 }
 
 export default function CellDetail() {
-  const { cells, species, selectedCell, selectCell, selectSpecies, speciesFilter, photosCells, photosSpecies } = useStore();
+  const { cells, species, selectedCell, selectCell, selectSpecies, speciesFilter, photosCells, photosSpecies, addSite } = useStore();
   const feature = useMemo(
     () => (cells && selectedCell ? cells.features.find((f) => f.properties.cell === selectedCell) ?? null : null),
     [cells, selectedCell],
@@ -121,6 +121,14 @@ export default function CellDetail() {
             : "No licensed photographs for this cell; the observations are linked from each species page."}
         </p>
       )}
+
+      {/* Into the route planner as a place to go and look. */}
+      <button className="ghost small-btn pad-btn" onClick={() => {
+        const ring = feature.geometry.coordinates[0], k = ring.length - 1;
+        let x = 0, y = 0;
+        for (let i = 0; i < k; i++) { x += ring[i][0]; y += ring[i][1]; }
+        addSite({ id: `cell:${cell.cell}`, label: focus ? `${focus.common ?? focus.species} spot · ${focus.count.toLocaleString()} sightings` : `Wildlife spot · ${cell.count.toLocaleString()} sightings`, lon: x / k, lat: y / k, kind: "cell" });
+      }}>+ Add this spot to a route</button>
 
       {/* The check-it-yourself link: the same box, the same species, on the source. */}
       <a className="verify" href={observationsUrl(feature, focusMeta)} target="_blank" rel="noreferrer">

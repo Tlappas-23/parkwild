@@ -145,6 +145,7 @@ make track-a PARK=yellowstone          # ingest iNaturalist + GBIF, dedupe, expo
 .venv/bin/python scripts/track_a.py ingest --park yellowstone --gbif-counts-only   # what GBIF holds, by dataset
 .venv/bin/python scripts/track_a.py ingest --park yellowstone --include-ebird      # only after ADR-0011 is decided
 .venv/bin/python scripts/track_a.py landmarks --park yellowstone   # park outline + OSM landmarks + tour stops (network, no DB)
+.venv/bin/python scripts/track_a.py roads --park yellowstone       # roads.json: OSM roads + trails graph for the route planner (network, no DB)
 ```
 
 ### Adding a park
@@ -153,8 +154,8 @@ make track-a PARK=yellowstone          # ingest iNaturalist + GBIF, dedupe, expo
    a `[key]` table to `config/parks.toml` with name, state, place id, bbox and
    an ordered `tour` list (OSM feature names; `tour_fallback` gives a
    coordinate and an `@wiki` article title for stops OSM cannot name).
-2. `make track-a PARK=key`, then `track_a.py landmarks --park key`, then
-   `make app-data PARK=key`. The app lists every park whose data folder was
+2. `make track-a PARK=key`, then `track_a.py landmarks --park key` and
+   `track_a.py roads --park key`, then `make app-data PARK=key`. The app lists every park whose data folder was
    baked in; `?park=key` opens it directly. Suppression and taxonomy rules
    apply everywhere; the imagery track and bias figures are per corridor.
 
@@ -182,8 +183,10 @@ caps). Pages: a map of the park (OpenFreeMap vector basemap under a hillshade an
 3D terrain from the AWS terrain tiles, a USGS imagery toggle, everything
 outside the iNaturalist park polygon washed out) with H3 cells, species and
 year filters, landmarks, a guided tour that flies stop to stop and lists the
-species recorded within 2.5 km of each, and a cell panel that follows the
-species filter and links the same box on iNaturalist; species grid and detail
+species recorded within 2.5 km of each, a route planner that orders the sites
+you tick from your position over the park's own road and trail graph
+(ADR-0018), and a cell panel that follows the species filter and links the
+same box on iNaturalist; species grid and detail
 with month histogram and a lazy 3D viewer; About with methods, limitations,
 suppression and licensing. A park select switches between every park baked
 into the build (ADR-0017). Deploy target is

@@ -294,6 +294,25 @@ pulled.
 
 ---
 
+## ADR-0018: Directions are computed in the browser from the park's own road graph
+
+**Context.** "Based on current location, click which sites and get the best
+route" (owner, 2026-09-05). Zero cost, no backend, no key in a public page.
+**Decision.** Each park's OpenStreetMap roads and trails become a graph
+(`roads.json`, hashed into the manifest like every data file); the browser
+snaps start and sites to it, runs Dijkstra per site, orders the visit
+exactly for up to nine sites, and draws the legs. Driving uses roads only;
+hiking uses trails too. Every leg links to OpenStreetMap's own directions
+page for turn-by-turn. Position comes from the browser's geolocation API on
+a tap, is never sent anywhere and never stored.
+**Rejected.** OSRM's demo server (terms), GraphHopper and OpenRouteService
+free tiers (keys), self-hosted Valhalla (a backend), Google Maps (the brief).
+**Consequence.** One more file per park (0.6 to 2 MB, gzipped a quarter of
+that), loaded on demand. Routes ignore closures and seasons and say so.
+`Permissions-Policy` allows geolocation for the page itself only.
+
+---
+
 ## Open decisions (owner's call; recorded here so nothing is decided by drift)
 
 | # | Decision | Default until decided | Where |
@@ -305,3 +324,16 @@ pulled.
 | O-5 | Quaternius pack license: CC0 (pack page) vs QAL v1.0 (site license page) | **decided: QAL, credit anyway** (2026-09-05); license archived + hashed | docs/3d-assets.md |
 | O-6 | Start the app skeleton (React + Vite + MapLibre + R3F; `npm install` is several hundred MB) | **decided: yes** (2026-09-05) | BUILD_SPEC.md Phase 5 |
 | O-7 | Repo visibility: GitHub only protects `main` server-side on public or paid repos. Make it public (protection on, code visible, no secrets in it) or stay private with the local pre-push guard only | **decided: public** (2026-09-05); `main` protected server-side, local guard kept | SECURITY.md |
+
+
+### O-8: where park data lives once there are 63 parks (raised 2026-09-05)
+
+Each park adds 3 to 6 MB to `app/public/data/` (cells, photos, roads,
+parquet), all of it re-exported and re-committed on every pipeline change.
+Sixty-three parks is about 250 MB in the repository and in the Pages
+build, and git history grows by that much per re-export. Options: (a) keep
+going and accept a fat repo; (b) publish data from a separate orphan
+branch or repository that CI writes and Pages serves alongside the app;
+(c) GitHub Releases assets fetched at runtime (CORS allows it) with the
+manifest still baked into the app. **Recommendation: (b)**, before the tenth
+park. Until decided, parks are added a few at a time.

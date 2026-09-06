@@ -5,7 +5,7 @@
 // (import.meta.glob below), so a file swapped on the CDN after the build fails
 // the hash check and is refused. In development, with no baked manifest, the
 // check is skipped and a warning is logged instead of blocking work.
-import type { BiasFile, BoundaryFile, CellsFile, LandmarksFile, Manifest, PhotosCellsFile, PhotosSpeciesFile, SpeciesFile } from "./types";
+import type { BiasFile, BoundaryFile, CellsFile, LandmarksFile, Manifest, PhotosCellsFile, PhotosSpeciesFile, RoadsFile, SpeciesFile } from "./types";
 
 const baked = import.meta.glob<Manifest>("../public/data/*/manifest.json", { eager: true, import: "default" });
 
@@ -129,4 +129,9 @@ export async function loadPark(park: string) {
 // The per-cell photo file is a megabyte; it is fetched the first time a cell is opened.
 export function loadCellPhotos(park: string, manifest: Manifest | null) {
   return fetchVerified<PhotosCellsFile>(park, "photos_cells.json", manifest);
+}
+
+// The road-and-trail graph is the largest file and only a planner needs it.
+export function loadRoads(park: string, manifest: Manifest | null) {
+  return fetchVerified<RoadsFile>(park, "roads.json", manifest);
 }

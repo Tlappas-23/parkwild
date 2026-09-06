@@ -1,12 +1,15 @@
 // One store for UI state. Data is loaded once per park; filters are applied
 // in selectors so the map and the species pages agree on what "filtered" means.
 import { create } from "zustand";
-import type { BiasFile, BoundaryFile, CellFeature, CellsFile, LandmarksFile, Manifest, PhotosCellsFile, PhotosSpeciesFile, SpeciesFile } from "./types";
-import { availableParks, loadCellPhotos, loadPark } from "./data";
+import type { BiasFile, BoundaryFile, CellFeature, CellsFile, LandmarksFile, Manifest, PhotosCellsFile, PhotosSpeciesFile, RoadsFile, SpeciesFile } from "./types";
+import { availableParks, loadCellPhotos, loadPark, loadRoads } from "./data";
+import { MAX_SITES, planRoute, routerFor, type Mode, type PlanResult, type Site } from "./routing";
 
 export type Page = "map" | "species" | "about";
 export type Basemap = "terrain" | "satellite";
 export interface TourState { active: boolean; stop: number; playing: boolean; }
+export interface Location { lon: number; lat: number; accuracyM: number; }
+export interface PlanState { open: boolean; start: Site | null; sites: Site[]; mode: Mode; result: PlanResult | null; error: string | null; busy: boolean; }
 
 interface State {
   park: string;
@@ -30,6 +33,10 @@ interface State {
   terrain3d: boolean;
   tour: TourState;
   tourPrevBasemap: Basemap | null;   // what the visitor had before the tour switched to satellite
+  location: Location | null;         // the device's position, only ever asked for on a tap
+  locationError: string | null;
+  roads: RoadsFile | null;           // loaded on the first route request
+  plan: PlanState;
   setPage: (p: Page) => void;
   setSpeciesFilter: (s: string | null) => void;
   setYearRange: (r: [number, number]) => void;
@@ -44,6 +51,16 @@ interface State {
   tourNext: () => void;
   tourPrev: () => void;
   tourPlay: (on: boolean) => void;
+  locate: () => Promise<void>;
+  ensureRoads: () => Promise<void>;
+  openPlan: () => void;
+  closePlan: () => void;
+  addSite: (s: Site) => void;
+  removeSite: (id: string) => void;
+  setPlanStart: (s: Site | null) => void;
+  setPlanMode: (m: Mode) => void;
+  computePlan: () => Promise<void>;
+  clearPlan: () => void;
   load: () => Promise<void>;
   ensureCellPhotos: () => Promise<void>;
 }
@@ -65,6 +82,7 @@ function readBasemap(): Basemap {
   try { return localStorage.getItem("parkwild:basemap") === "satellite" ? "satellite" : "terrain"; } catch { return "terrain"; }
 }
 const NO_TOUR: TourState = { active: false, stop: 0, playing: false };
+const NO_PLAN: PlanState = { open: false, start: null, sites: [], mode: "drive", result: null, error: null, busy: false };
 
 export const useStore = create<State>((set, get) => ({
   park: initialPark(),
@@ -88,6 +106,10 @@ export const useStore = create<State>((set, get) => ({
   terrain3d: !prefersReduced,        // relief on by default; off for people who asked the OS for less motion
   tour: NO_TOUR,
   tourPrevBasemap: null,
+  location: null,
+  locationError: null,
+  roads: null,
+  plan: NO_PLAN,
   setPage: (page) => set({ page, selectedSpecies: page === "species" ? get().selectedSpecies : null }),
   setSpeciesFilter: (speciesFilter) => set({ speciesFilter }),
   setYearRange: (yearRange) => set({ yearRange }),
@@ -99,7 +121,7 @@ export const useStore = create<State>((set, get) => ({
     if (park === get().park || !PARKS.some((p) => p.key === park)) return;
     set({ park, parkName: nameOf(park), cells: null, species: null, bias: null, photosSpecies: null, photosCells: null,
           landmarks: null, boundary: null, manifest: null, error: null, speciesFilter: null, selectedCell: null,
-          selectedSpecies: null, tour: NO_TOUR });
+          selectedSpecies: null, tour: NO_TOUR, roads: null, plan: { ...NO_PLAN, start: get().plan.start?.kind === "me" ? get().plan.start : null } });
     try { const u = new URL(window.location.href); u.searchParams.set("park", park); window.history.replaceState(null, "", u.toString()); } catch { /* ignore */ }
     void get().load();
   },
@@ -118,6 +140,55 @@ export const useStore = create<State>((set, get) => ({
   },
   tourPrev: () => { const t = get().tour; if (t.stop > 0) set({ tour: { ...t, stop: t.stop - 1 } }); },
   tourPlay: (playing) => set({ tour: { ...get().tour, playing } }),
+  // Position is asked for on a tap, never on load; the answer becomes the
+  // route's start. Errors are shown in words, not codes.
+  locate: () => new Promise<void>((resolve) => {
+    if (!("geolocation" in navigator)) { set({ locationError: "This browser has no location service." }); resolve(); return; }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const location = { lon: pos.coords.longitude, lat: pos.coords.latitude, accuracyM: pos.coords.accuracy };
+        set({ location, locationError: null, plan: { ...get().plan, start: { id: "me", label: "My location", lon: location.lon, lat: location.lat, kind: "me" }, result: null } });
+        resolve();
+      },
+      (err) => { set({ locationError: err.code === 1 ? "Location permission was refused." : "Location is unavailable right now." }); resolve(); },
+      { enableHighAccuracy: true, timeout: 15_000, maximumAge: 60_000 },
+    );
+  }),
+  ensureRoads: async () => {
+    if (get().roads) return;
+    const park = get().park;
+    try {
+      const roads = await loadRoads(park, get().manifest);
+      if (get().park === park) set({ roads });
+    } catch (e) {
+      console.warn("[parkwild] roads unavailable:", (e as Error).message);
+    }
+  },
+  openPlan: () => set({ plan: { ...get().plan, open: true } }),
+  closePlan: () => set({ plan: { ...get().plan, open: false } }),
+  addSite: (site) => {
+    const p = get().plan;
+    if (p.sites.some((s) => s.id === site.id) || p.sites.length >= MAX_SITES) { set({ plan: { ...p, open: true } }); return; }
+    set({ plan: { ...p, open: true, sites: [...p.sites, site], result: null } });
+  },
+  removeSite: (id) => set({ plan: { ...get().plan, sites: get().plan.sites.filter((s) => s.id !== id), result: null } }),
+  setPlanStart: (start) => set({ plan: { ...get().plan, start, result: null } }),
+  setPlanMode: (mode) => set({ plan: { ...get().plan, mode, result: null } }),
+  computePlan: async () => {
+    const p = get().plan;
+    if (!p.start || p.sites.length === 0) return;
+    set({ plan: { ...p, busy: true, error: null } });
+    await get().ensureRoads();
+    const roads = get().roads;
+    if (!roads) { set({ plan: { ...get().plan, busy: false, error: "No road data for this park yet." } }); return; }
+    try {
+      const result = planRoute(routerFor(roads), p.start, p.sites, p.mode);
+      set({ plan: { ...get().plan, busy: false, result, error: null } });
+    } catch (e) {
+      set({ plan: { ...get().plan, busy: false, error: (e as Error).message } });
+    }
+  },
+  clearPlan: () => set({ plan: { ...get().plan, result: null } }),
   load: async () => {
     const park = get().park;
     try {
@@ -179,3 +250,7 @@ export function speciesMatches(s: { common_name: string | null; other_names?: st
   if (!needle) return true;
   return [s.common_name ?? "", ...(s.other_names ?? []), s.scientific_name, ...s.aliases].some((n) => n.toLowerCase().includes(needle));
 }
+
+// Exposed for automated checks in a real browser (like window.__parkwildMap);
+// not part of the UI.
+if (typeof window !== "undefined") (window as unknown as { __parkwildStore?: typeof useStore }).__parkwildStore = useStore;

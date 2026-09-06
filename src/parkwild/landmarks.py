@@ -249,12 +249,54 @@ def match_tour(park: Park, landmarks: list[dict]) -> tuple[list[dict], list[str]
     return stops, missing
 
 
+# AUTO_TOUR_STOPS — ARBITRARY (a morning's drive; the curated lists run 8 to 11)
+AUTO_TOUR_STOPS = 8
+
+
+def auto_tour(landmarks: list[dict]) -> list[dict]:
+    """Stops for a park nobody has curated yet: landmarks with a Wikipedia
+    article, one of each kind first (a visitor centre, a peak, a lake, a
+    waterfall…) then the rest by kind rank, capped at AUTO_TOUR_STOPS and
+    ordered as a nearest-neighbour chain from the westernmost, which is a
+    fair stand-in for "drive through". Curated lists in config/parks.toml
+    always win; this only fills the gap so every park has a tour."""
+    with_article = [r for r in landmarks if r.get("url")]
+    picked: list[dict] = []
+    seen_kinds: set[str] = set()
+    for r in with_article:
+        if r["kind"] not in seen_kinds:
+            picked.append(r)
+            seen_kinds.add(r["kind"])
+    for r in with_article:
+        if len(picked) >= AUTO_TOUR_STOPS:
+            break
+        if r not in picked:
+            picked.append(r)
+    picked = picked[:AUTO_TOUR_STOPS]
+    if not picked:
+        return []
+    from .geo import haversine_m
+    order = [min(picked, key=lambda r: r["lon"])]
+    rest = [r for r in picked if r is not order[0]]
+    while rest:
+        cur = order[-1]
+        nxt = min(rest, key=lambda r: haversine_m(cur["lon"], cur["lat"], r["lon"], r["lat"]))
+        order.append(nxt)
+        rest.remove(nxt)
+    for i, r in enumerate(order):
+        r["tour"] = i
+    return order
+
+
 def build_landmarks(park: Park, out_dir: Path, *, summaries: bool = True) -> dict:
     """Fetch, match, summarise, write boundary.geojson + landmarks.json, rehash the manifest."""
     session = requests.Session()
     boundary = fetch_boundary(park, session=session)
     landmarks, counts = fetch_osm_landmarks(park, boundary)
     stops, missing = match_tour(park, landmarks)
+    auto = False
+    if not park.tour:
+        stops, auto = auto_tour(landmarks), True
     landmarks, counts["over_kind_cap"] = cap_by_kind(landmarks, stops)
     log_filter("landmarks.osm", "named, wikidata-tagged OSM features of the listed kinds inside the park boundary, capped per kind",
                counts["fetched"], len(landmarks), park=park.key, **{k: v for k, v in counts.items() if k != "fetched"})
@@ -271,12 +313,13 @@ def build_landmarks(park: Park, out_dir: Path, *, summaries: bool = True) -> dic
                         "boundary": f"iNaturalist place {park.inat_place_id}"},
         "landmarks": [{k: v for k, v in r.items() if k != "rank"} for r in landmarks],
         "tour": [s["id"] for s in stops],
+        "tour_source": "auto" if auto else "curated",
         "missing_stops": missing,
     }
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "boundary.geojson").write_text(json.dumps(boundary, separators=(",", ":")))
     (out_dir / "landmarks.json").write_text(json.dumps(payload, separators=(",", ":"), ensure_ascii=False))
     write_park_manifest(out_dir, park.key)
-    return {"landmarks": len(landmarks), "stops": len(stops), "missing": missing, "osm": counts,
+    return {"landmarks": len(landmarks), "stops": len(stops), "tour_source": "auto" if auto else "curated", "missing": missing, "osm": counts,
             "boundary_bytes": (out_dir / "boundary.geojson").stat().st_size,
             "landmarks_bytes": (out_dir / "landmarks.json").stat().st_size}
