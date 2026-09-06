@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
+    "test": "node scripts/test.mjs",
     "budget": "node scripts/budget.mjs",
     "prebuild": "node scripts/copy-ort.mjs",
     "predev": "node scripts/copy-ort.mjs"
@@ -14,19 +15,16 @@
   "dependencies": {
     "@huggingface/transformers": "^4.2.0",
     "@mlc-ai/web-llm": "^0.2.84",
-    "@react-three/fiber": "^9",
     "lucide-react": "^1.41.0",
     "maplibre-gl": "^5",
     "react": "^19",
     "react-dom": "^19",
-    "three": "^0.180.0",
     "zustand": "^5"
   },
   "devDependencies": {
     "@gltf-transform/cli": "^4.5.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@types/three": "^0.180.0",
     "@vitejs/plugin-react": "^5",
     "typescript": "^5.7",
     "vite": "^7",

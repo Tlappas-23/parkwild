@@ -5,7 +5,7 @@ import { VitePWA } from "vite-plugin-pwa";
 // The map library alone is ~230 KB gzipped, which is more than the whole
 // initial-JS budget (200 KB). It is therefore split into its own chunk and
 // imported lazily by the map page; the budget script measures the entry chunk
-// only and reports the lazy chunks separately. Same for three/R3F.
+// only and reports the lazy chunks separately.
 // GitHub Pages serves a project site under /<repo>/; the deploy workflow sets
 // VITE_BASE=/parkwild/. Locally the default "/" keeps `npm run dev` simple.
 export default defineConfig({
@@ -72,7 +72,6 @@ export default defineConfig({
       output: {
         manualChunks: {
           maplibre: ["maplibre-gl"],
-          three: ["three", "@react-three/fiber"],
           // On-device AI: loaded only from the Ask page, after the visitor opts in.
           webllm: ["@mlc-ai/web-llm"],
           transformers: ["@huggingface/transformers"],

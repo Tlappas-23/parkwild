@@ -263,6 +263,23 @@ ID. Run: lamar_valley:perspective:20260905T154043, backend cpu, 3,690 files, exi
 Expected precision of this layer from Phase 0: about two thirds at 0.5 after
 the human filter, on a very small review sample. Recall: unmeasured.
 
+### Three more corridors (2026-09-06, overnight chain, CPU, unreviewed)
+
+Same filters as Lamar Valley. Nobody has reviewed these yet, so no precision
+is claimed; each park's About page says so and draws these sightings in the
+model colour. Frames are the perspective frames downloaded, capped at 6,000.
+
+| Corridor | Park | Images indexed | Frames scored | Animal box >= 0.5 | Model-predicted sightings | Named to species |
+|---|---|---|---|---|---|---|
+| Hayden Valley | Yellowstone | 5,115 | 5,115 | 42 (0.8%) | 12 | 1 |
+| Moose-Wilson Road | Grand Teton | 23,844 | 6,000 | 139 (2.3%) | 30 | 0 |
+| Cades Cove | Great Smoky Mountains | 39,356 | 5,996 | 74 (1.2%) | 21 | 1 |
+
+The species review sample over all four corridors (120 boxes, 30 per
+classifier band) is in `data/review/species/perspective/review_me.csv`,
+waiting for the owner; ADR-0020 says the naming bar moves only on that
+number.
+
 ## Phase 1: Track A reference data
 
 Yellowstone first (iNaturalist place 10211; GBIF by the park's bbox).

@@ -1,5 +1,4 @@
 // Performance budget (BUILD_SPEC.md Phase 7): entry JS under 200 KB gzipped.
-// Lazy chunks (map, three) are reported but not counted against the entry
 // budget; each is capped separately so a regression is still visible.
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { gzipSync } from "node:zlib";
@@ -7,7 +6,6 @@ import { join } from "node:path";
 
 const dist = join(process.cwd(), "dist", "assets");
 const ENTRY_BUDGET = 200 * 1024;
-const CHUNK_BUDGET = { maplibre: 300 * 1024, three: 250 * 1024 };
 let failed = false;
 const rows = [];
 for (const f of readdirSync(dist)) {

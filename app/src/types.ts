@@ -55,7 +55,6 @@ export interface Species {
   first: string | null;
   last: string | null;
   months: number[];
-  model: { url: string; title: string; author: string; license: string; credit: string; source: string } | null;
 }
 
 export interface SpeciesFile {

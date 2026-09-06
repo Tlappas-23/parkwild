@@ -238,21 +238,12 @@ def cells_geojson(store: Store, park: str, out_path: Path, *, res: int = H3_RES,
             "species": len(index), "excluded": n_excluded, "coarsened": sum(coarsened.values()), "bytes": out_path.stat().st_size}
 
 
-# MODELS_INDEX — DERIVED (written by scripts/models_ingest.py next to the compressed GLBs)
-MODELS_INDEX = ROOT / "app" / "public" / "models" / "index.json"
 
 
-def load_models_index(path: Path = MODELS_INDEX) -> dict[str, dict]:
-    """species -> 3D asset record, written by scripts/models_ingest.py; {} if none yet."""
-    return json.loads(path.read_text()) if path.exists() else {}
-
-
-def species_json(store: Store, park: str, out_path: Path, *, rules: list[Suppression] | None = None,
-                 models: dict[str, dict] | None = None) -> dict:
+def species_json(store: Store, park: str, out_path: Path, *, rules: list[Suppression] | None = None) -> dict:
     """Per-species metadata after name normalisation, so 'Bos bison', 'Bos
     bison bison' and 'Bison bison' are one species with one count."""
     rules = load_suppression() if rules is None else rules
-    models = load_models_index() if models is None else models
     auto = auto_sensitive_species(store, park)
     synonyms = load_synonyms()
     names = common_name_votes(store, park)
@@ -306,8 +297,6 @@ def species_json(store: Store, park: str, out_path: Path, *, rules: list[Suppres
             "sightings": a["sightings"], "open_coordinates": a["open_coordinates"], "obscured_coordinates": a["obscured_coordinates"],
             "sources": a["sources"], "confidence_basis": a["confidence_basis"],
             "first": a["first"], "last": a["last"], "months": a["months"],
-            # 3D asset (Phase 6): url + credit from app/public/models/index.json, or null.
-            "model": ({k: models[sci][k] for k in ("url", "title", "author", "license", "credit", "source")} if sci in models else None),
         })
     payload = {"park": park, "generated": datetime.now(UTC).isoformat(timespec="seconds"), "species": species,
                "notes": {"recall": "unmeasured",
