@@ -5,12 +5,29 @@
 // (ADR-0019): public domain, CC0, CC BY, CC BY-SA; nothing else is shown.
 const cache = new Map<string, Promise<unknown>>();
 function once<T>(key: string, fn: () => Promise<T>): Promise<T> {
-  if (!cache.has(key)) cache.set(key, fn().catch((e) => { cache.delete(key); throw e; }));
+  if (!cache.has(key))
+    cache.set(
+      key,
+      fn().catch((e) => {
+        cache.delete(key);
+        throw e;
+      }),
+    );
   return cache.get(key) as Promise<T>;
 }
 
-export interface Summary { title: string; extract: string; url: string; }
-export interface CommonsPhoto { url: string; page: string; artist: string; license: string; distM: number; }
+export interface Summary {
+  title: string;
+  extract: string;
+  url: string;
+}
+export interface CommonsPhoto {
+  url: string;
+  page: string;
+  artist: string;
+  license: string;
+  distM: number;
+}
 
 // REUSABLE — BORROWED (Commons' LicenseShortName prefixes that allow reuse with credit)
 const REUSABLE = ["public domain", "pd", "cc0", "cc by"];
@@ -18,16 +35,31 @@ const REUSABLE = ["public domain", "pd", "cc0", "cc by"];
 export const PHOTO_RADIUS_M = 400;
 
 function text(html: string | undefined): string {
-  return (html ?? "").replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
+  return (html ?? "")
+    .replace(/<[^>]+>/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 export function wikiSummary(title: string): Promise<Summary | null> {
   return once(`s:${title}`, async () => {
-    const r = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title.replace(/ /g, "_"))}`, { headers: { accept: "application/json" } });
+    const r = await fetch(
+      `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title.replace(/ /g, "_"))}`,
+      { headers: { accept: "application/json" } },
+    );
     if (!r.ok) return null;
-    const j = await r.json() as { type?: string; title?: string; extract?: string; content_urls?: { desktop?: { page?: string } } };
+    const j = (await r.json()) as {
+      type?: string;
+      title?: string;
+      extract?: string;
+      content_urls?: { desktop?: { page?: string } };
+    };
     if (j.type === "disambiguation" || !j.extract) return null;
-    return { title: j.title ?? title, extract: j.extract, url: j.content_urls?.desktop?.page ?? `https://en.wikipedia.org/wiki/${encodeURIComponent(title)}` };
+    return {
+      title: j.title ?? title,
+      extract: j.extract,
+      url: j.content_urls?.desktop?.page ?? `https://en.wikipedia.org/wiki/${encodeURIComponent(title)}`,
+    };
   });
 }
 
@@ -36,12 +68,14 @@ export function wikiSummary(title: string): Promise<Summary | null> {
 // "Fairy Falls (Wyoming)" but "Campsite" never lands on anything.
 export function wikiFind(name: string, park: string): Promise<Summary | null> {
   return once(`f:${name}|${park}`, async () => {
-    const stem = name.replace(/\b(trail|trailhead|campground|campsite|picnic area|overlook|viewpoint|visitor center)\b/gi, "").trim();
+    const stem = name
+      .replace(/\b(trail|trailhead|campground|campsite|picnic area|overlook|viewpoint|visitor center)\b/gi, "")
+      .trim();
     if (stem.split(/\s+/).filter(Boolean).length === 0 || /^\d/.test(stem)) return null;
     const u = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(`"${stem}" ${park}`)}&srlimit=3&format=json&origin=*`;
     const r = await fetch(u);
     if (!r.ok) return null;
-    const j = await r.json() as { query?: { search?: { title: string }[] } };
+    const j = (await r.json()) as { query?: { search?: { title: string }[] } };
     const key = stem.toLowerCase();
     const hit = (j.query?.search ?? []).find((h) => h.title.toLowerCase().includes(key));
     return hit ? wikiSummary(hit.title) : null;
@@ -51,14 +85,32 @@ export function wikiFind(name: string, park: string): Promise<Summary | null> {
 export function commonsNear(lat: number, lon: number, radiusM = PHOTO_RADIUS_M, limit = 6): Promise<CommonsPhoto[]> {
   return once(`c:${lat.toFixed(4)},${lon.toFixed(4)},${radiusM}`, async () => {
     const api = "https://commons.wikimedia.org/w/api.php";
-    const g = await fetch(`${api}?action=query&list=geosearch&gscoord=${lat}%7C${lon}&gsradius=${radiusM}&gsnamespace=6&gslimit=16&format=json&origin=*`);
+    const g = await fetch(
+      `${api}?action=query&list=geosearch&gscoord=${lat}%7C${lon}&gsradius=${radiusM}&gsnamespace=6&gslimit=16&format=json&origin=*`,
+    );
     if (!g.ok) return [];
-    const gj = await g.json() as { query?: { geosearch?: { title: string; dist: number }[] } };
+    const gj = (await g.json()) as { query?: { geosearch?: { title: string; dist: number }[] } };
     const hits = (gj.query?.geosearch ?? []).filter((h) => /\.(jpe?g|png)$/i.test(h.title));
     if (!hits.length) return [];
-    const q = await fetch(`${api}?action=query&titles=${encodeURIComponent(hits.map((h) => h.title).join("|"))}&prop=imageinfo&iiprop=extmetadata%7Curl&iiurlwidth=640&format=json&origin=*`);
+    const q = await fetch(
+      `${api}?action=query&titles=${encodeURIComponent(hits.map((h) => h.title).join("|"))}&prop=imageinfo&iiprop=extmetadata%7Curl&iiurlwidth=640&format=json&origin=*`,
+    );
     if (!q.ok) return [];
-    const qj = await q.json() as { query?: { pages?: Record<string, { title: string; imageinfo?: { thumburl?: string; descriptionurl?: string; extmetadata?: Record<string, { value: string }> }[] }> } };
+    const qj = (await q.json()) as {
+      query?: {
+        pages?: Record<
+          string,
+          {
+            title: string;
+            imageinfo?: {
+              thumburl?: string;
+              descriptionurl?: string;
+              extmetadata?: Record<string, { value: string }>;
+            }[];
+          }
+        >;
+      };
+    };
     const pages = new Map(Object.values(qj.query?.pages ?? {}).map((p) => [p.title, p]));
     const out: CommonsPhoto[] = [];
     for (const h of hits) {
@@ -67,7 +119,13 @@ export function commonsNear(lat: number, lon: number, radiusM = PHOTO_RADIUS_M, 
       const license = text(em.LicenseShortName?.value);
       if (!info?.thumburl || !REUSABLE.some((p) => license.toLowerCase().startsWith(p))) continue;
       const artist = text(em.Artist?.value) || "unknown";
-      out.push({ url: info.thumburl.replace("https://thumb.wikimedia.org/", "https://upload.wikimedia.org/").split("?")[0], page: info.descriptionurl ?? "", artist: artist.length > 60 ? artist.slice(0, 59) + "…" : artist, license, distM: Math.round(h.dist) });
+      out.push({
+        url: info.thumburl.replace("https://thumb.wikimedia.org/", "https://upload.wikimedia.org/").split("?")[0],
+        page: info.descriptionurl ?? "",
+        artist: artist.length > 60 ? artist.slice(0, 59) + "…" : artist,
+        license,
+        distM: Math.round(h.dist),
+      });
       if (out.length >= limit) break;
     }
     return out;

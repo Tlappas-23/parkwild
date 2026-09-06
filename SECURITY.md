@@ -15,7 +15,7 @@ it; see the last section.
 | Raw model output | overwritten by a rerun or a "fix" | `predictions_raw` / `detections_raw` are append-only (`INSERT OR IGNORE`); corrections live in `manual_review` |
 | Published data files | tampered after build | `manifest.json` with SHA-256 per file and the git commit; the app checks hashes before using data |
 | Deployed site | deployed from an unreviewed branch, or by someone else | static site, deploy only from protected `main` via CI, deploy tokens only in Actions secrets |
-| Runtime | injection, framing, third-party scripts | no server, no write path, strict CSP, no CDN scripts; the two MapLibre popups built from data go through one HTML escaper (`app/src/html.ts`) |
+| Runtime | injection, framing, third-party scripts | no server, no write path, strict CSP, no CDN scripts; the two MapLibre popups built from data go through one HTML escaper (`app/src/lib/html.ts`) |
 
 ## Source control
 

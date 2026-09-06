@@ -72,19 +72,19 @@ All files live in `app/public/data/<park>/` and are listed, with a SHA-256, in t
 
 ## The app
 
-`app/src` is React 19 + Vite 7 + MapLibre GL 5 + Zustand, with lazy chunks for the map, the 3D viewer and the two on-device models.
+`app/src` is React 19 + Vite 7 + MapLibre GL 5 + Zustand, with lazy chunks for the map and the two on-device models. Source layout: `src/app` (shell), `src/pages`, `src/components`, `src/lib` (pure logic, unit-tested), `src/data` (loaders, types), `src/store`, `src/styles`; `npm run lint` (ESLint) and `npm run format:check` (Prettier) gate every pull request.
 
 | Module | Role |
 |---|---|
-| `store.ts` | One store: park, page, loaded files, filters, selection, tour state, planner state, panel state. `filteredFeatures` is the single definition of "filtered". |
-| `data.ts` | Fetch with integrity check against the baked manifest; the self-heal after a deploy; park list from baked manifests |
+| `store/index.ts` | One store: park, page, loaded files, filters, selection, tour state, planner state, panel state. `filteredFeatures` is the single definition of "filtered". |
+| `data/loaders.ts` | Fetch with integrity check against the baked manifest; the self-heal after a deploy; park list from baked manifests |
 | `pages/HomePage.tsx`, `HomeMap.tsx` | Park cards with credited photographs, the country map with every park |
 | `pages/MapPage.tsx` | The park map: OpenFreeMap style, USGS imagery toggle, terrain, park mask and outline, cells, landmarks, corridors, route, places, All parks; the tour camera and orbit |
-| `pages/Tour.tsx`, `tour.ts` | The stop card (Wildlife / Things to do / Photos), species and things near a point or along a trail, near-here photographs |
-| `pages/PlanPanel.tsx`, `routing.ts` | Start, sites, drive/hike; Dijkstra over `roads.json`; exact visiting order up to nine sites |
-| `pages/CellDetail.tsx`, `PlaceDetail.tsx` | The two drawers: a cell (filter-aware, verification link) and a place (facts, Wikipedia, animals, Commons photographs) |
+| `components/Tour.tsx`, `lib/tour.ts` | The stop card (Wildlife / Things to do / Photos), species and things near a point or along a trail, near-here photographs |
+| `components/PlanPanel.tsx`, `lib/routing.ts` | Start, sites, drive/hike; Dijkstra over `roads.json`; exact visiting order up to nine sites |
+| `components/CellDetail.tsx`, `PlaceDetail.tsx` | The two drawers: a cell (filter-aware, verification link) and a place (facts, Wikipedia, animals, Commons photographs) |
 | `pages/SpeciesPage.tsx`, `SpeciesDetail.tsx` | Grid and detail: photographs, busiest month and effort-adjusted month, sources, model badge only where a pass ran |
-| `pages/AskPage.tsx`, `ai.ts`, `photoId.ts`, `wiki.ts` | Opt-in on-device language model with grounded facts and citations; photo suggestion; runtime Wikipedia/Commons lookups |
+| `pages/AskPage.tsx`, `lib/ai.ts`, `lib/photoId.ts`, `lib/wiki.ts` | Opt-in on-device language model with grounded facts and citations; photo suggestion; runtime Wikipedia/Commons lookups |
 | `pages/AboutPage.tsx` | Per-park methods and honesty page |
 
 Map layers, bottom to top: imagery (satellite mode) · hillshade · vector landcover · mask · outline · corridors · cells · route · vector lines and labels · landmarks · things · route stops · focus · parks · location.

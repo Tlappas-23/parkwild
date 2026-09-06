@@ -8,6 +8,9 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "test": "node scripts/test.mjs",
+    "lint": "eslint --max-warnings 0 .",
+    "format": "prettier --write \"src/**/*.{ts,tsx,css}\" \"scripts/**/*.mjs\" \"*.config.*\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,css}\" \"scripts/**/*.mjs\" \"*.config.*\"",
     "budget": "node scripts/budget.mjs",
     "prebuild": "node scripts/copy-ort.mjs",
     "predev": "node scripts/copy-ort.mjs"
@@ -22,11 +25,18 @@
     "zustand": "^5"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@gltf-transform/cli": "^4.5.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^5",
+    "eslint": "^10.10.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.6",
+    "globals": "^17.12.0",
+    "prettier": "^3.9.6",
     "typescript": "^5.7",
+    "typescript-eslint": "^8.69.0",
     "vite": "^7",
     "vite-plugin-pwa": "^1.3.0"
   },

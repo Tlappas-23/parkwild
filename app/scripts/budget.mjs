@@ -20,7 +20,16 @@ for (const f of readdirSync(dist)) {
   else if (CHUNK_BUDGET[name]) budget = CHUNK_BUDGET[name];
   const over = budget !== null && gz > budget;
   failed ||= over;
-  rows.push({ file: f, raw_kb: (raw / 1024).toFixed(0), gzip_kb: (gz / 1024).toFixed(0), budget_kb: budget ? (budget / 1024).toFixed(0) : "-", status: over ? "OVER" : "ok" });
+  rows.push({
+    file: f,
+    raw_kb: (raw / 1024).toFixed(0),
+    gzip_kb: (gz / 1024).toFixed(0),
+    budget_kb: budget ? (budget / 1024).toFixed(0) : "-",
+    status: over ? "OVER" : "ok",
+  });
 }
 console.table(rows);
-if (failed) { console.error("performance budget exceeded"); process.exit(1); }
+if (failed) {
+  console.error("performance budget exceeded");
+  process.exit(1);
+}

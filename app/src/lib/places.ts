@@ -1,11 +1,31 @@
 // The Places page's vocabulary: which kinds belong to which group, what to
 // call them, and how to say when people go from a month histogram.
-import type { PlaceRec } from "./types";
+import type { PlaceRec } from "../data/types";
 
 export type PlaceGroup = "all" | "trails" | "sites" | "camping" | "facilities";
 export type PlaceSort = "recorded" | "readers" | "az" | "longest";
 
-const SITE_KINDS = new Set(["peak", "attraction", "place", "feature", "viewpoint", "waterfall", "lake", "spring", "geyser", "valley", "canyon", "arch", "cave", "glacier", "island", "beach", "meadow", "pass", "river"]);
+const SITE_KINDS = new Set([
+  "peak",
+  "attraction",
+  "place",
+  "feature",
+  "viewpoint",
+  "waterfall",
+  "lake",
+  "spring",
+  "geyser",
+  "valley",
+  "canyon",
+  "arch",
+  "cave",
+  "glacier",
+  "island",
+  "beach",
+  "meadow",
+  "pass",
+  "river",
+]);
 const CAMP_KINDS = new Set(["camp", "stay"]);
 const FACILITY_KINDS = new Set(["trailhead", "picnic", "info", "boat"]);
 
@@ -17,9 +37,27 @@ export function groupOf(p: PlaceRec): Exclude<PlaceGroup, "all"> {
 }
 
 const LABELS: Record<string, string> = {
-  trail: "Trail", peak: "Peak", attraction: "Attraction", place: "Place", feature: "Natural feature", viewpoint: "Viewpoint",
-  camp: "Campground", stay: "Lodging", trailhead: "Trailhead", picnic: "Picnic area", info: "Visitor centre", boat: "Boat launch",
-  waterfall: "Waterfall", lake: "Lake", spring: "Hot spring", geyser: "Geyser", valley: "Valley", canyon: "Canyon", arch: "Arch", cave: "Cave", glacier: "Glacier",
+  trail: "Trail",
+  peak: "Peak",
+  attraction: "Attraction",
+  place: "Place",
+  feature: "Natural feature",
+  viewpoint: "Viewpoint",
+  camp: "Campground",
+  stay: "Lodging",
+  trailhead: "Trailhead",
+  picnic: "Picnic area",
+  info: "Visitor centre",
+  boat: "Boat launch",
+  waterfall: "Waterfall",
+  lake: "Lake",
+  spring: "Hot spring",
+  geyser: "Geyser",
+  valley: "Valley",
+  canyon: "Canyon",
+  arch: "Arch",
+  cave: "Cave",
+  glacier: "Glacier",
 };
 export function kindLabel(p: PlaceRec): string {
   const sub = p.sub && p.sub !== p.kind ? p.sub : null;
@@ -36,8 +74,17 @@ export function busiest(months: number[]): { label: string; peak: number } | nul
   if (total < MIN_FOR_MONTHS) return null;
   const order = months.map((n, i) => [n, i] as const).sort((a, b) => b[0] - a[0] || a[1] - b[1]);
   const peak = order[0][1];
-  const top = order.slice(0, 3).filter(([n]) => n > 0).map(([, i]) => i).sort((a, b) => a - b);
-  if (top.length === 3 && (top[2] - top[0] === 2 || (top[0] === 0 && top[1] === 1 && top[2] === 11) || (top[0] === 0 && top[1] === 10 && top[2] === 11))) {
+  const top = order
+    .slice(0, 3)
+    .filter(([n]) => n > 0)
+    .map(([, i]) => i)
+    .sort((a, b) => a - b);
+  if (
+    top.length === 3 &&
+    (top[2] - top[0] === 2 ||
+      (top[0] === 0 && top[1] === 1 && top[2] === 11) ||
+      (top[0] === 0 && top[1] === 10 && top[2] === 11))
+  ) {
     const seq = top[2] - top[0] === 2 ? top : [top[1] === 1 ? 11 : 10, top[1] === 1 ? 0 : 11, top[1] === 1 ? 1 : 0];
     return { label: `Busiest ${MONTHS[seq[0]]} to ${MONTHS[seq[2]]}`, peak };
   }
