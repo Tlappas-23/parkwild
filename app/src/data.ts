@@ -5,7 +5,8 @@
 // (import.meta.glob below), so a file swapped on the CDN after the build fails
 // the hash check and is refused. In development, with no baked manifest, the
 // check is skipped and a warning is logged instead of blocking work.
-import type { AmenitiesFile, BiasFile, BoundaryFile, CameraPassFile, CellsFile, LandmarksFile, Manifest, PhotosCellsFile, PhotosSpeciesFile, RoadsFile, SpeciesFile } from "./types";
+import type { AmenitiesFile, BiasFile, BoundaryFile, CameraPassFile, CellsFile, LandmarksFile, Manifest, PhotosCellsFile, PhotosSpeciesFile, RoadsFile, SpeciesFile, SpeciesIndexFile } from "./types";
+import { PARKS_INDEX } from "./parksIndex";
 
 const baked = import.meta.glob<Manifest>("../public/data/*/manifest.json", { eager: true, import: "default" });
 
@@ -33,10 +34,19 @@ async function sha256Hex(buf: ArrayBuffer): Promise<string> {
 }
 
 export async function fetchVerified<T>(park: string, name: string, manifest: Manifest | null): Promise<T> {
+  return fetchChecked<T>(`data/${park}/${name}`, manifest?.files[name]?.sha256, name);
+}
+
+// The cross-park species index sits beside the park folders; its hash rides in
+// parks.json, which is baked into the build like the park manifests.
+export async function loadSpeciesIndex(): Promise<SpeciesIndexFile> {
+  return fetchChecked<SpeciesIndexFile>("data/species_index.json", PARKS_INDEX.species_index?.sha256, "species_index.json");
+}
+
+async function fetchChecked<T>(path: string, expected: string | undefined, name: string): Promise<T> {
   // The manifest hash doubles as a cache key: a rebuild changes the URL, so a
   // browser can never serve last build's file against this build's manifest.
-  const expected = manifest?.files[name]?.sha256;
-  const url = `${import.meta.env.BASE_URL}data/${park}/${name}` + (expected ? `?v=${expected.slice(0, 16)}` : "");
+  const url = `${import.meta.env.BASE_URL}${path}` + (expected ? `?v=${expected.slice(0, 16)}` : "");
   const res = await fetch(url);
   if (!res.ok) throw new Error(`${name}: HTTP ${res.status}`);
   const buf = await res.arrayBuffer();

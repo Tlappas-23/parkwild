@@ -1,8 +1,8 @@
 // One store for UI state. Data is loaded once per park; filters are applied
 // in selectors so the map and the species pages agree on what "filtered" means.
 import { create } from "zustand";
-import type { AmenitiesFile, BiasFile, BoundaryFile, CameraPassFile, CellFeature, CellsFile, LandmarksFile, Manifest, PhotosCellsFile, PhotosSpeciesFile, RoadsFile, SpeciesFile } from "./types";
-import { availableParks, loadCellPhotos, loadPark, loadRoads } from "./data";
+import type { AmenitiesFile, BiasFile, BoundaryFile, CameraPassFile, CellFeature, CellsFile, LandmarksFile, Manifest, PhotosCellsFile, PhotosSpeciesFile, RoadsFile, SpeciesFile, SpeciesHotspot, SpeciesIndexFile } from "./types";
+import { availableParks, loadCellPhotos, loadPark, loadRoads, loadSpeciesIndex } from "./data";
 import { MAX_SITES, planRoute, routerFor, type Mode, type PlanResult, type Site } from "./routing";
 import type { Place } from "./tour";
 
@@ -38,6 +38,14 @@ interface State {
   yearRange: [number, number];        // inclusive
   selectedCell: string | null;
   selectedSpecies: string | null;
+  speciesScope: "park" | "all";        // the species page: this park's list, or every park at once
+  setSpeciesScope: (s: "park" | "all") => void;
+  speciesIndex: SpeciesIndexFile | null;   // where each animal was seen, park by park; fetched on first need
+  speciesIndexError: string | null;
+  ensureSpeciesIndex: () => Promise<void>;
+  focusCell: { park: string; cell: string; lon: number; lat: number; res: number } | null;   // a hotspot to land on once that park's cells are in
+  clearFocusCell: () => void;
+  showSpeciesInPark: (park: string, scientific: string, hotspot: SpeciesHotspot | null) => void;
   reducedMotion: boolean;
   basemap: Basemap;
   terrain3d: boolean;
@@ -130,6 +138,26 @@ export const useStore = create<State>((set, get) => ({
   yearRange: [1900, 2100],
   selectedCell: null,
   selectedSpecies: null,
+  speciesScope: "park",
+  setSpeciesScope: (speciesScope) => { set({ speciesScope }); if (speciesScope === "all") void get().ensureSpeciesIndex(); },
+  speciesIndex: null,
+  speciesIndexError: null,
+  ensureSpeciesIndex: async () => {
+    if (get().speciesIndex) return;
+    try { set({ speciesIndex: await loadSpeciesIndex(), speciesIndexError: null }); }
+    catch (e) { set({ speciesIndexError: (e as Error).message }); }
+  },
+  focusCell: null,
+  clearFocusCell: () => set({ focusCell: null }),
+  // "Show in Yellowstone" from a species: that park's map, filtered to the
+  // species, landing on the cell where most of its sightings fall. Switching
+  // parks loads first; the map picks the hotspot up when the cells arrive.
+  showSpeciesInPark: (park, scientific, hotspot) => {
+    if (get().tour.active) get().endTour();
+    if (park !== get().park) get().setPark(park);
+    set({ page: "map", speciesFilter: scientific, selectedSpecies: null, selectedCell: null, selectedPlace: null,
+          focusCell: hotspot ? { park, cell: hotspot[3], lon: hotspot[0], lat: hotspot[1], res: hotspot[4] } : null });
+  },
   reducedMotion: prefersReduced,
   basemap: readBasemap(),
   terrain3d: !prefersReduced,        // relief on by default; off for people who asked the OS for less motion

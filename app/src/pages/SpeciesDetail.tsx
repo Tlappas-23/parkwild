@@ -1,6 +1,6 @@
-import { lazy, Suspense, useMemo } from "react";
+import { lazy, Suspense, useEffect, useMemo } from "react";
 import { ArrowLeft, MapPin } from "lucide-react";
-import type { Species } from "../types";
+import type { Species, SpeciesAcrossParks } from "../types";
 import { speciesPhotos } from "../photos";
 import PhotoCredit from "../PhotoCredit";
 import { useStore } from "../store";
@@ -8,8 +8,88 @@ import { useStore } from "../store";
 const Model3D = lazy(() => import("../Model3D"));
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-export default function SpeciesDetail({ species: s, onBack }: { species: Species; onBack: () => void }) {
-  const { reducedMotion, setSpeciesFilter, setPage, photosSpecies, species: all, parkName, showCameraPass } = useStore();
+// "Yellowstone National Park" is the badge; in a row or a button the word
+// everyone uses is enough.
+export function shortPark(name: string): string {
+  return name.replace(/ National Park( and Preserve)?$/, "").replace(/ National Parks$/, "");
+}
+
+// Where people see this animal, park by park, from the cross-park index: the
+// count, the busiest cell, and a button that opens that park's map on it. The
+// open park is marked; a park where the species is not mapped gets its count
+// and no button, a coarsened one says so.
+function WhereSeen({ entry }: { entry: SpeciesAcrossParks }) {
+  const { speciesIndex, park, showSpeciesInPark } = useStore();
+  const rows = Object.entries(entry.parks).sort((a, b) => b[1].s - a[1].s);
+  const max = Math.max(1, ...rows.map(([, p]) => p.s));
+  return (
+    <section className="where" aria-labelledby="where-h">
+      <h2 id="where-h">Where people see them, park by park</h2>
+      <p className="muted small">Sightings recorded in each park and its busiest cell. "Show in" opens that park's map filtered to this species, on that cell.</p>
+      <ol className="where-list">
+        {rows.map(([k, p]) => {
+          const name = shortPark(speciesIndex?.parks[k]?.name ?? k);
+          const top = p.top[0];
+          return (
+            <li key={k} className={"where-row" + (k === park ? " here" : "")}>
+              <div className="where-name"><strong>{name}</strong><span className="muted small">{speciesIndex?.parks[k]?.state ?? ""}{k === park ? " · open now" : ""}</span></div>
+              <div className="where-bar" aria-hidden="true"><div style={{ width: `${(100 * p.s) / max}%` }} /></div>
+              <div className="where-num">
+                <strong>{p.s.toLocaleString()}</strong>
+                <span className="muted small">{p.x === "exclude" ? "not mapped (sensitive)" : top ? `busiest cell ${top[2].toLocaleString()} · ${p.cells} cell${p.cells === 1 ? "" : "s"}${p.x === "coarsen" ? " · coarse" : ""}` : "no mapped cell"}</span>
+              </div>
+              {p.x === "exclude" || !top
+                ? <span className="muted small">counts only</span>
+                : <button className="ghost small" onClick={() => showSpeciesInPark(k, entry.n, top)}><MapPin className="ico" aria-hidden="true" /> Show in {name}</button>}
+            </li>
+          );
+        })}
+      </ol>
+    </section>
+  );
+}
+
+export default function SpeciesDetail({ species: s, entry, onBack }: { species: Species | null; entry: SpeciesAcrossParks | null; onBack: () => void }) {
+  const { ensureSpeciesIndex, speciesIndex, speciesIndexError, parkName } = useStore();
+  useEffect(() => { void ensureSpeciesIndex(); }, [ensureSpeciesIndex]);
+  const where = entry
+    ? <WhereSeen entry={entry} />
+    : speciesIndexError ? <p className="muted small">Other parks could not be loaded: {speciesIndexError}</p>
+    : !speciesIndex ? <p className="muted small">Loading other parks…</p> : null;
+  if (!s && entry) return <LightDetail entry={entry} onBack={onBack} parkName={parkName} where={where} />;
+  if (!s) return null;
+  return <FullDetail species={s} entry={entry} onBack={onBack} where={where} />;
+}
+
+// A species from another park: the index knows its names and where it is,
+// the photographs and months live with the park that recorded it.
+function LightDetail({ entry, onBack, parkName, where }: { entry: SpeciesAcrossParks; onBack: () => void; parkName: string; where: React.ReactNode }) {
+  const { speciesIndex } = useStore();
+  const parks = Object.entries(entry.parks).sort((a, b) => b[1].s - a[1].s);
+  const most = parks[0];
+  return (
+    <article className="page detail">
+      <button className="link back" onClick={onBack}><ArrowLeft className="ico" aria-hidden="true" /> All species</button>
+      <div className="hero">
+        <div className="hero-text">
+          <div className="eyebrow">{entry.k === "Aves" ? "Bird" : "Mammal"} · not recorded in {shortPark(parkName)}</div>
+          <h1>{entry.c ?? entry.n}</h1>
+          <p className="muted"><em>{entry.n}</em>{entry.other.length > 0 && <> · also recorded as {entry.other.slice(0, 4).join(", ")}</>}</p>
+          <div className="stats">
+            <div><strong>{entry.total.toLocaleString()}</strong><span>sightings, all parks</span></div>
+            <div><strong>{parks.length}</strong><span>park{parks.length === 1 ? "" : "s"}</span></div>
+            {most && <div><strong>{shortPark(speciesIndex?.parks[most[0]]?.name ?? most[0])}</strong><span>seen most</span></div>}
+          </div>
+          <p className="muted small">Photographs, months and the map come with the park that recorded it: pick one below.</p>
+        </div>
+      </div>
+      {where}
+    </article>
+  );
+}
+
+function FullDetail({ species: s, entry, onBack, where }: { species: Species; entry: SpeciesAcrossParks | null; onBack: () => void; where: React.ReactNode }) {
+  const { reducedMotion, setSpeciesFilter, setPage, photosSpecies, species: all, parkName, showCameraPass, park, showSpeciesInPark } = useStore();
   const photos = useMemo(() => speciesPhotos(photosSpecies, s.scientific_name), [photosSpecies, s.scientific_name]);
   const hero = photos[0];
   const max = Math.max(1, ...s.months);
@@ -70,10 +150,16 @@ export default function SpeciesDetail({ species: s, onBack }: { species: Species
             )}
           </div>
           {s.suppression?.action !== "exclude" && (
-            <button className="primary" onClick={() => { setSpeciesFilter(s.scientific_name); setPage("map"); }}><MapPin className="ico" aria-hidden="true" /> Show on the map</button>
+            <button className="primary" onClick={() => {
+              const here = entry?.parks[park];
+              if (here?.top[0]) showSpeciesInPark(park, s.scientific_name, here.top[0]);
+              else { setSpeciesFilter(s.scientific_name); setPage("map"); }
+            }}><MapPin className="ico" aria-hidden="true" /> Show in {shortPark(parkName)}</button>
           )}
         </div>
       </div>
+
+      {where}
 
       {s.model && (
         <section className="panel3d" aria-label="3D model">

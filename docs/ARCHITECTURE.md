@@ -38,7 +38,8 @@ Track B never blocks the app: a park with no imagery pass simply has no amber ce
 | `track_a.py landmarks --park K` | iNaturalist place, Overpass, Wikipedia, Commons, Mapillary | boundary, landmarks, manifest | yes | none |
 | `track_a.py roads --park K` | Overpass | roads.json, manifest | yes | none |
 | `track_a.py amenities --park K` | Overpass, roads.json | amenities.json, manifest | yes | none |
-| `track_a.py index` | parks.toml, seed, exports, Wikipedia, Commons | `app/public/data/parks.json` | yes | none |
+| `track_a.py species-index` | the shipped park folders | `app/public/data/species_index.json` | no | none |
+| `track_a.py index` | parks.toml, seed, exports, Wikipedia, Commons, species_index.json | `app/public/data/parks.json` (carries the species index hash) | yes | none |
 | `phase0.py pull / download / detect --corridor C` | Mapillary, SpeciesNet | images, downloads, predictions | yes | write |
 | `phase0.py sample / report`, `species-sample / species-report` | predictions, review CSVs | review galleries, numbers | no | write |
 | `track_b.py sightings --corridor C --park K` | predictions | `sightings` (source `mapillary_cv`) | no | write |
@@ -58,6 +59,7 @@ All files live in `app/public/data/<park>/` and are listed, with a SHA-256, in t
 | `landmarks.json`, `boundary.geojson` | OSM landmarks with Wikidata links, the ordered tour with Wikipedia summaries, near-stop Commons photographs and Mapillary look-around ids; the iNaturalist park polygon | with the park |
 | `roads.json` | Roads and trails as a graph: nodes, edges with length, kind, one-way flag, name, geometry | on first route or trail |
 | `amenities.json` | Campsites, lodging, trailheads, viewpoints, picnic sites, visitor centres, boat launches, named features; named trails summed from the graph | with the park |
+| `species_index.json` | Every species across the shipped parks: per park its sightings, verified and model counts, cell count and the three busiest cells with centres (coarse where the species is) | on first use of All parks or a species page, hash from parks.json |
 | `camera_pass.json` | Per corridor: frames scored, detections, sightings, named species, imagery months, Phase 0 precision with interval | with the park |
 | `bias.json` | Road and seasonal bias of a corridor's imagery against the park's sightings | with the park (Yellowstone only so far) |
 | `sightings.parquet` | Every canonical record with attribution, for anyone who wants the table | never by the app |

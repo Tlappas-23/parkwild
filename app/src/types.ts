@@ -130,7 +130,16 @@ export interface ParkCard {
   bbox?: [number, number, number, number]; center?: [number, number];
   species: number | null; sightings: number | null; cells: number | null; stops: number | null; tour_source: string | null; hero: ParkHero | null;
 }
-export interface ParksIndex { generated: string; attribution: string; parks: ParkCard[]; }
+export interface ParksIndex { generated: string; attribution: string; parks: ParkCard[]; species_index?: { sha256: string; bytes: number } | null; }
+
+// Where each animal was seen, park by park (parkwild/speciesindex.py): one
+// file for every shipped park, fetched on demand. A hotspot is
+// [lon, lat, sightings, cell id, H3 resolution]; the centre of a coarsened cell
+// is as vague as the cell.
+export type SpeciesHotspot = [number, number, number, string, number];
+export interface SpeciesParkStat { s: number; hv: number; mp: number; x: "exclude" | "coarsen" | null; cells: number; top: SpeciesHotspot[]; }
+export interface SpeciesAcrossParks { n: string; c: string | null; k: string | null; other: string[]; total: number; parks: Record<string, SpeciesParkStat>; }
+export interface SpeciesIndexFile { generated: string; parks: Record<string, { name: string; state: string | null }>; top_cells: number; species: SpeciesAcrossParks[]; notes: Record<string, string>; }
 
 // The roadside camera pass (Track B) per park: where it ran, what it found,
 // how well it did (parkwild/trackb_export.py). Numbers, never thumbnails.

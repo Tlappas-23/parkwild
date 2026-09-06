@@ -38,6 +38,7 @@ from parkwild.parksindex import build_index  # noqa: E402
 from parkwild.report import update_results_md  # noqa: E402
 from parkwild.roads import build_roads  # noqa: E402
 from parkwild.sightings import dedupe, ingest_gbif, ingest_inaturalist, park_summary  # noqa: E402
+from parkwild.speciesindex import APP_DATA_DIR, build_species_index  # noqa: E402
 from parkwild.storage import Store  # noqa: E402
 
 log = logging.getLogger("track_a")
@@ -127,6 +128,13 @@ def cmd_index(args):
     print(json.dumps(build_index(heroes=not args.no_heroes), indent=2))
 
 
+def cmd_species_index(args):
+    """species_index.json: where each animal was seen, park by park, rolled up
+    from the files the app ships (no network, no database). Run it after
+    app-data and before `index`, which bakes its hash into parks.json."""
+    print(json.dumps(build_species_index(Path(args.data_dir) if args.data_dir else APP_DATA_DIR), indent=2))
+
+
 def cmd_amenities(args):
     """Things to do around the park's places: OSM campsites, lodging,
     trailheads, viewpoints, picnic sites, visitor centres, boat launches,
@@ -195,6 +203,10 @@ def build_parser():
     p = sub.add_parser("amenities", help="amenities.json: things to do, camping, trails around the park's places (network, no database)")
     p.add_argument("--park", required=True)
     p.set_defaults(func=cmd_amenities)
+
+    p = sub.add_parser("species-index", help="species_index.json: every species across the shipped parks, with busiest cells (no network, no database)")
+    p.add_argument("--data-dir", default=None, help="park folders to roll up (default: app/public/data)")
+    p.set_defaults(func=cmd_species_index)
 
     p = sub.add_parser("index", help="app/public/data/parks.json: every park, counts, credited hero image (network, no database)")
     p.add_argument("--no-heroes", action="store_true")
