@@ -9,4 +9,4 @@ ipykernel
 pandas
 matplotlib
 ruff
-h3>=4
+h3>=4.5.0
