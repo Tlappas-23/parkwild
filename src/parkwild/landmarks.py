@@ -350,18 +350,27 @@ def auto_tour(landmarks: list[dict]) -> list[dict]:
     ordered as a nearest-neighbour chain from the westernmost, which is a
     fair stand-in for "drive through". Curated lists in config/parks.toml
     always win; this only fills the gap so every park has a tour."""
+    # Articles first; where a park's features rarely carry one (Acadia had two),
+    # the best-ranked landmarks without an article fill the tour, so every park
+    # gets a real drive rather than a two-stop one. Filling goes round the
+    # kinds in turn, so a park of peaks still shows a lake and a spring.
     with_article = [r for r in landmarks if r.get("url")]
+    without = [r for r in landmarks if not r.get("url")]
     picked: list[dict] = []
-    seen_kinds: set[str] = set()
-    for r in with_article:
-        if r["kind"] not in seen_kinds:
-            picked.append(r)
-            seen_kinds.add(r["kind"])
-    for r in with_article:
-        if len(picked) >= AUTO_TOUR_STOPS:
-            break
-        if r not in picked:
-            picked.append(r)
+
+    def take(pool: list[dict]) -> None:
+        by_kind: dict[str, list[dict]] = {}
+        for r in pool:
+            if r not in picked:
+                by_kind.setdefault(r["kind"], []).append(r)
+        while len(picked) < AUTO_TOUR_STOPS and any(by_kind.values()):
+            for kind in list(by_kind):
+                if by_kind[kind] and len(picked) < AUTO_TOUR_STOPS:
+                    picked.append(by_kind[kind].pop(0))
+
+    take(with_article)
+    if len(picked) < AUTO_TOUR_STOPS:
+        take(without)
     picked = picked[:AUTO_TOUR_STOPS]
     if not picked:
         return []

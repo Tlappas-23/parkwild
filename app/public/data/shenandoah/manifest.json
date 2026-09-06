@@ -1,5 +1,5 @@
 {
-  "built": "2026-09-06T06:47:48+00:00",
+  "built": "2026-09-06T06:56:21+00:00",
   "git_commit": "fa38be70aabf9dbd62e6c617618c3e6dd606f7c5",
   "files": {
     "cells.geojson": {
@@ -23,8 +23,8 @@
       "bytes": 218980
     },
     "landmarks.json": {
-      "sha256": "23d280bbfe9cea8644dbfc1a079c3dc6e68fbaaddedb435d481fe278612e4c18",
-      "bytes": 34893
+      "sha256": "29086d86707209b4e8bd860f3096342fb55e1bae8b437ab88202c97ba1c02c90",
+      "bytes": 30028
     },
     "boundary.geojson": {
       "sha256": "f2e0acd1cb50fe42d6a646dae1edc2dd6b5fd288c5ed70df381c82e0b2e3296f",

@@ -44,5 +44,11 @@ def test_auto_tour_prefers_articles_and_distinct_kinds_in_a_chain():
     lms.append(dict(_lm("node/51", "No Article Peak", "peak", 4), url=None, lon=-110.4))
     stops = auto_tour(lms)
     assert len(stops) == AUTO_TOUR_STOPS and stops[0]["lon"] == -110.9         # westernmost first, then the nearest each time
-    assert "Big Lake" in [s["name"] for s in stops] and "No Article Peak" not in [s["name"] for s in stops]
+    assert "Big Lake" in [s["name"] for s in stops] and "No Article Peak" not in [s["name"] for s in stops]   # enough articles: none without
+    # Too few articles: the rest fill from landmarks without one, round the kinds.
+    peaks = [dict(_lm(f"node/{i}", f"Peak {i}", "peak", 4), url=None, lon=-110.8 + 0.01 * i) for i in range(10, 20)]
+    lake = dict(_lm("node/30", "Quiet Lake", "lake", 5), url=None, lon=-110.6)
+    few = [dict(_lm("node/1", "Only Geyser"), url="https://en.wikipedia.org/wiki/G"), *peaks, lake]
+    filled = auto_tour(few)
+    assert len(filled) == AUTO_TOUR_STOPS and "Only Geyser" in [s["name"] for s in filled] and "Quiet Lake" in [s["name"] for s in filled]
     assert [s["tour"] for s in stops] == list(range(AUTO_TOUR_STOPS))

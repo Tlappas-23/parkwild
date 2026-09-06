@@ -245,6 +245,11 @@ Format: date, what, number, kept?, why, where it lives.
 - **Fixed on the way:** species matching now goes by distinctive words with plurals ("bison" → American Bison, "elk" → Wapiti, "bear" → both bears; a bare generic word only when unambiguous); the invention check ignores list numerals and citation markers and counts numbers of three or more digits; the model store falls back from Cache storage to the private file system to IndexedDB on quota refusals; storage failures read as one plain sentence.
 - **Unresolved:** made-up words pass the number check ("Trumpeter SQUARE"); a name check against the fact text is the next addition. The WebLLM chunk is 2.1 MB gzipped and loads only when Ask is enabled.
 
+### E-042: eight parks live, and a two-stop tour
+- **What:** the overnight chain (E-033) finished the batch-2 ingest at 02:43 and the publish job opened the data PR at 02:48; eleven parks are live. Counts: Grand Canyon 265 species / 19,321 sightings; Zion 200 / 9,243; Yosemite 267 / 47,623; Rocky Mountain 235 / 29,774; Glacier 273 / 15,537; Acadia 269 / 16,339; Olympic 331 / 42,086; Shenandoah 240 / 10,888. Every park has a hero photograph except Glacier (no reusable lead image).
+- **Found:** Acadia's automatic tour had two stops, because the automatic tour only took landmarks with a Wikipedia article and Acadia's OpenStreetMap features rarely carry one.
+- **Kept:** when articles run short the tour fills from the best-ranked landmarks without one, taking the kinds in turn so a park of peaks still shows a lake and a spring. Acadia: 8 stops (Bald Hill, Bald Mountain, Acadia Mountain, Bald Peak, Maple Spring, Jordan Pond, Cadillac Mountain, Eagle Lake). Curated lists in config/parks.toml still win and are the better answer for any park someone knows.
+
 ## Open questions with a planned experiment
 
 - **Q-1 SpeciesNet determinism.** Answered (E-013).
