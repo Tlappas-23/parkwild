@@ -103,6 +103,7 @@ def iter_observations(
     quality_grade: str = "research",
     d1: str | None = None,
     d2: str | None = None,
+    updated_since: str | None = None,
     per_page: int = PER_PAGE,
     max_records: int | None = None,
     session: requests.Session | None = None,
@@ -127,6 +128,8 @@ def iter_observations(
         params["d1"] = d1
     if d2:
         params["d2"] = d2
+    if updated_since:
+        params["updated_since"] = updated_since      # the fortnightly refresh: only what changed
     session = session or requests.Session()
     id_above = 0
     n = 0

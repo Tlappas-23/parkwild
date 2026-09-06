@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import WeatherChip from "./WeatherChip";
 import { ExternalLink, Plus, X } from "lucide-react";
 import PhotoCredit from "./PhotoCredit";
 import { useStore } from "../store/index";
@@ -28,6 +29,7 @@ export default function PlaceDetail() {
     setSpeciesFilter,
     setPage,
   } = useStore();
+  const climate = useStore((st) => st.climate);
   const [summary, setSummary] = useState<Summary | null | undefined>(undefined);
   const [photos, setPhotos] = useState<CommonsPhoto[] | undefined>(undefined);
 
@@ -89,6 +91,7 @@ export default function PlaceDetail() {
             {p.detail && !p.lengthM ? "" : ""}
           </div>
           <h2>{p.name}</h2>
+          <WeatherChip lat={p.lat} lon={p.lon} climate={climate} compact />
           {facts.length > 0 && <div className="muted small">{facts.join(" · ")}</div>}
         </div>
         <button className="icon-btn" onClick={() => selectPlace(null)} aria-label="Close">

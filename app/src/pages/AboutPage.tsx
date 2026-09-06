@@ -211,6 +211,14 @@ export default function AboutPage() {
           Images themselves are not redistributed; "look around" links open Mapillary.
         </li>
         <li>
+          Weather: live conditions and the next days from
+          <a href="https://open-meteo.com" target="_blank" rel="noreferrer">
+            Open-Meteo
+          </a>
+          , fetched by your browser when you look; typical weather by month from ten years of its archive (ERA5), CC BY
+          4.0.
+        </li>
+        <li>
           Basemap:{" "}
           <a href="https://openfreemap.org" target="_blank" rel="noreferrer">
             OpenFreeMap

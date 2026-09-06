@@ -41,6 +41,7 @@ import {
 } from "../lib/tour";
 import { routerFor } from "../lib/routing";
 import { esc } from "../lib/html";
+import WeatherChip from "../components/WeatherChip";
 import type { BoundaryFile, LandmarksFile, Ring } from "../data/types";
 import CellDetail from "../components/CellDetail";
 import PlaceDetail from "../components/PlaceDetail";
@@ -209,6 +210,13 @@ export default function MapPage() {
     driveMode,
     focusCell,
   } = useStore();
+  const climate = useStore((st) => st.climate);
+  const parkCard = PARKS_INDEX.parks.find((p) => p.key === park);
+  const weatherAt = climate
+    ? { lat: climate.lat, lon: climate.lon, at: climate.at }
+    : parkCard?.center
+      ? { lat: parkCard.center[1], lon: parkCard.center[0], at: undefined }
+      : null;
   // The amber swatch earns its place only where the camera pass found something.
   const hasModelCells = useMemo(() => (cells?.features ?? []).some((f) => f.properties.mp > 0), [cells]);
   const [query, setQuery] = useState("");
@@ -1233,6 +1241,7 @@ export default function MapPage() {
           </button>
         </div>
         <div className="control">
+          {weatherAt && <WeatherChip lat={weatherAt.lat} lon={weatherAt.lon} climate={climate} at={weatherAt.at} />}
           <label htmlFor="species-search">Species</label>
           {current ? (
             <div className="chip-row">

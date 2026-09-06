@@ -254,6 +254,27 @@ export interface PlacesFile {
   places: PlaceRec[];
 }
 
+// Typical weather by month at the park's busiest place (parkwild/climate.py):
+// ten years of daily weather from the Open-Meteo archive folded into normals.
+export interface ClimateMonth {
+  tmax: number | null;
+  tmin: number | null;
+  precip_mm: number;
+  snow_cm: number;
+  wet_days: number;
+}
+export interface ClimateFile {
+  park: string;
+  generated: string;
+  lat: number;
+  lon: number;
+  at: string;
+  elevation_m: number | null;
+  years: [number, number];
+  source: string;
+  months: ClimateMonth[];
+}
+
 export interface ParksIndex {
   generated: string;
   attribution: string;

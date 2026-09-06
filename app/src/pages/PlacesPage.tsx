@@ -16,6 +16,7 @@ import { useStore } from "../store/index";
 import type { LandmarkPhoto, PlaceRec } from "../data/types";
 import { commonsNear, wikiFind, wikiSummary, type CommonsPhoto, type Summary } from "../lib/wiki";
 import { shortPark } from "../lib/names";
+import WeatherChip from "../components/WeatherChip";
 
 // Every named trail, site, campground and facility in the park, sorted by how
 // many sightings people recorded within reach of it (the free proxy for
@@ -201,6 +202,7 @@ export default function PlacesPage() {
 function PlacePage({ place: p, onBack }: { place: PlaceRec; onBack: () => void }) {
   const { landmarks, species, photosSpecies, parkName, selectPlace, setPage, addSite, selectSpecies, places } =
     useStore();
+  const climate = useStore((st) => st.climate);
   const lm = useMemo(() => landmarks?.landmarks.find((l) => l.id === p.id) ?? null, [landmarks, p.id]);
   const [summary, setSummary] = useState<Summary | null | undefined>(
     lm?.summary?.extract ? { title: lm.name, extract: lm.summary.extract, url: lm.summary.url } : undefined,
@@ -282,6 +284,7 @@ function PlacePage({ place: p, onBack }: { place: PlaceRec; onBack: () => void }
             {p.length_m ? ` · ${(p.length_m / 1000).toFixed(1)} km` : ""}
           </div>
           <h1>{p.name}</h1>
+          <WeatherChip lat={p.lat} lon={p.lon} climate={climate} />
           {summary === undefined ? (
             <p className="muted">Looking up Wikipedia…</p>
           ) : summary ? (

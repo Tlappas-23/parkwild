@@ -28,7 +28,7 @@ for p in "$@"; do
     log "$p: sightings (iNaturalist + GBIF), dedupe, export"
     if ! $PY "$ROOT/scripts/track_a.py" all --park "$p" > "$ROOT/data/batch/$p.log" 2>&1; then log "$p: Track A failed (see data/batch/$p.log); skipped"; continue; fi
   fi
-  for step in landmarks:landmarks.json roads:roads.json amenities:amenities.json park-places:places.json; do
+  for step in landmarks:landmarks.json roads:roads.json amenities:amenities.json park-places:places.json climate:climate.json; do
     cmd=${step%%:*}; file=${step##*:}
     [ -f "$d/$file" ] && continue
     log "$p: $cmd"
