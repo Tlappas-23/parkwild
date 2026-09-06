@@ -20,8 +20,10 @@ import Tour from "./Tour";
 const STYLE = "https://tiles.openfreemap.org/styles/liberty";
 const USGS_IMAGERY = "https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}";
 const TERRAIN_TILES = "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png";
-// TERRAIN_EXAGGERATION — ARBITRARY (1 is true relief; a little more reads better at a 60° pitch)
+// TERRAIN_EXAGGERATION — ARBITRARY (1 is true relief; on the paper-style map a
+// little more reads better at a 60° pitch, on imagery it starts to look wrong)
 const TERRAIN_EXAGGERATION = 1.35;
+const TERRAIN_EXAGGERATION_SATELLITE = 1.12;
 // MAX_BOUNDS_PAD — ARBITRARY (how far past the boundary a visitor can pan, as a
 // fraction of the park's size; this is a map of the park, not of the state)
 const MAX_BOUNDS_PAD = 0.35;
@@ -105,7 +107,7 @@ export default function MapPage() {
   useEffect(() => {
     if (!container.current || mapRef.current) return;
     const map = new maplibregl.Map({
-      container: container.current, style: STYLE, center: [-110.5, 44.6], zoom: 7, maxPitch: 72,
+      container: container.current, style: STYLE, center: [-110.5, 44.6], zoom: 7, maxPitch: 78,
       attributionControl: { compact: true }, fadeDuration: reducedMotion ? 0 : 300,
       // Keeps the last frame in the drawing buffer so screenshots and "share"
       // captures show the map instead of a blank canvas. Small GPU cost.
@@ -317,8 +319,8 @@ export default function MapPage() {
 
   useEffect(() => {
     const map = mapRef.current;
-    if (ready && map) map.setTerrain(terrain3d ? { source: "dem", exaggeration: TERRAIN_EXAGGERATION } : null);
-  }, [ready, terrain3d]);
+    if (ready && map) map.setTerrain(terrain3d ? { source: "dem", exaggeration: basemap === "satellite" ? TERRAIN_EXAGGERATION_SATELLITE : TERRAIN_EXAGGERATION } : null);
+  }, [ready, terrain3d, basemap]);
 
   useEffect(() => {
     const map = mapRef.current;

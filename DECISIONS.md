@@ -376,3 +376,15 @@ branch or repository that CI writes and Pages serves alongside the app;
 (c) GitHub Releases assets fetched at runtime (CORS allows it) with the
 manifest still baked into the app. **Recommendation: (b)**, before the tenth
 park. Until decided, parks are added a few at a time.
+
+### O-10: sharper aerial imagery from a source whose terms are not clean (raised 2026-09-05)
+
+USGS imagery ends at zoom 16, which blurs in the pitched close-ups the tour
+uses. Esri's World Imagery serves to zoom 19 without a key, with CORS, but
+Esri's current terms expect an API key and attribution for use outside
+ArcGIS; the keyless endpoint is legacy and could close. Options: (a) stay
+with USGS and keep the camera above zoom 16; (b) Esri with attribution,
+accepting the terms risk and a possible sudden outage; (c) an Esri
+developer key (free tier, 2 million tiles a month), which puts a key in a
+public page. **Recommendation: (a)** until a public-domain source improves;
+revisit if the USDA NAIP service comes back.

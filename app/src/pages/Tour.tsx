@@ -92,7 +92,32 @@ export default function Tour() {
       <div className="tour-tabs" role="tablist" aria-label="Stop details">
         <button role="tab" aria-selected={tourTab === "wildlife"} className={tourTab === "wildlife" ? "on" : ""} onClick={() => setTourTab("wildlife")}>Wildlife</button>
         <button role="tab" aria-selected={tourTab === "todo"} className={tourTab === "todo" ? "on" : ""} onClick={() => setTourTab("todo")}>Things to do{things && things.total ? ` · ${things.total}` : ""}</button>
+        {((stop.photos?.length ?? 0) > 0 || stop.street) && (
+          <button role="tab" aria-selected={tourTab === "photos"} className={tourTab === "photos" ? "on" : ""} onClick={() => setTourTab("photos")}>Photos{stop.photos?.length ? ` · ${stop.photos.length}` : ""}</button>
+        )}
       </div>
+
+      {tourTab === "photos" && (
+        <div className="tour-photos">
+          {stop.street && (
+            <a className="street-link" href={stop.street.url} target="_blank" rel="noreferrer">
+              <span>◎ Look around from here on Mapillary</span>
+              <span className="muted small">{stop.street.is_pano ? "360° photo" : "street-level photo"} · {stop.street.dist_m} m away{stop.street.captured_at ? ` · ${stop.street.captured_at.slice(0, 4)}` : ""}{stop.street.username ? ` · © ${stop.street.username}` : ""} · {stop.street.license}</span>
+            </a>
+          )}
+          {(stop.photos?.length ?? 0) > 0 ? (
+            <div className="photo-grid">
+              {stop.photos!.map((p) => (
+                <figure key={p.url}>
+                  <a href={p.page} target="_blank" rel="noreferrer"><img src={p.url} alt={`${stop.name}, photographed by ${p.artist}`} loading="lazy" /></a>
+                  <figcaption className="credit compact">{p.artist} · {p.license} · {p.dist_m} m</figcaption>
+                </figure>
+              ))}
+            </div>
+          ) : <p className="muted small">No reusable photographs of this spot on Wikimedia Commons yet.</p>}
+          <p className="muted small tour-foot">Photographs from Wikimedia Commons under the licence printed on each; street-level imagery on Mapillary, CC BY-SA 4.0.</p>
+        </div>
+      )}
 
       {tourTab === "todo" && (
         <div className="tour-todo">

@@ -47,6 +47,21 @@ from .overpass import run_query
 log = logging.getLogger(__name__)
 
 INAT_PLACE_URL = "https://api.inaturalist.org/v1/places/{id}"
+# COMMONS_API — BORROWED (Wikimedia Commons Action API endpoint)
+COMMONS_API = "https://commons.wikimedia.org/w/api.php"
+
+# PHOTO_RADIUS_M — ASSUMED (a photograph taken within this of the stop shows
+# the stop; geysers and falls are photographed from their boardwalks and
+# overlooks, which sit a few hundred metres off the feature's own point)
+PHOTO_RADIUS_M = 400
+# PHOTOS_PER_STOP — ARBITRARY (a strip, not a gallery)
+PHOTOS_PER_STOP = 6
+# PHOTO_CANDIDATES — ARBITRARY (Commons returns nearest first; check this many licences)
+PHOTO_CANDIDATES = 16
+# PHOTO_WIDTH — ARBITRARY (two columns of a 300 px card on a 2x screen)
+PHOTO_WIDTH = 640
+# STREET_RADIUS_M — ASSUMED (a street-level image this close to the stop looks at it or from it)
+STREET_RADIUS_M = 300
 WIKIPEDIA_SUMMARY_URL = "https://en.wikipedia.org/api/rest_v1/page/summary/{title}"
 # Wikimedia asks for a User-Agent that identifies the project and a way to reach it.
 HEADERS = {"User-Agent": "parkwild/0.1 (wildlife side project; https://github.com/Tlappas-23/parkwild)"}
@@ -216,6 +231,78 @@ def wikipedia_summary(url: str, *, session: requests.Session | None = None) -> d
             "licence": "CC BY-SA 4.0", "attribution": "Wikipedia"}
 
 
+def commons_photos_near(lat: float, lon: float, *, session: requests.Session | None = None) -> list[dict]:
+    """Photographs on Wikimedia Commons taken within PHOTO_RADIUS_M, kept only
+    under licences that allow reuse with credit (same rule as the park cards,
+    ADR-0019), nearest first."""
+    from .parksindex import pick_licence
+    s = session or requests.Session()
+    r = s.get(COMMONS_API, params={"action": "query", "list": "geosearch", "gscoord": f"{lat}|{lon}", "gsradius": PHOTO_RADIUS_M,
+                                   "gsnamespace": 6, "gslimit": PHOTO_CANDIDATES, "format": "json"}, headers=HEADERS, timeout=30)
+    if r.status_code != 200:
+        return []
+    hits = [g for g in (r.json().get("query") or {}).get("geosearch", []) if g["title"].lower().endswith((".jpg", ".jpeg", ".png"))]
+    if not hits:
+        return []
+    q = s.get(COMMONS_API, params={"action": "query", "titles": "|".join(g["title"] for g in hits), "prop": "imageinfo",
+                                   "iiprop": "extmetadata|url|size", "iiurlwidth": PHOTO_WIDTH, "format": "json"}, headers=HEADERS, timeout=30)
+    if q.status_code != 200:
+        return []
+    pages = {p.get("title"): p for p in ((q.json().get("query") or {}).get("pages") or {}).values()}
+    out = []
+    for g in hits:
+        info = (pages.get(g["title"], {}).get("imageinfo") or [{}])[0]
+        lic = pick_licence(info.get("extmetadata") or {})
+        if lic is None or not info.get("thumburl"):
+            continue
+        out.append({"url": info["thumburl"], "page": info.get("descriptionurl", ""), "dist_m": round(g["dist"]),
+                    "width": info.get("thumbwidth"), "height": info.get("thumbheight"), **lic})
+        if len(out) >= PHOTOS_PER_STOP:
+            break
+    return out
+
+
+def nearest_street_image(lat: float, lon: float, *, client=None) -> dict | None:
+    """The closest Mapillary image to the stop (a panorama if one is as close),
+    kept as an id and a credit; the app links to Mapillary, it never copies
+    the picture. Needs the pipeline's token; without one, nothing."""
+    from .config import mapillary_token
+    from .geo import BBox, haversine_m
+    from .mapillary import MapillaryClient, image_page_url
+    try:
+        token = mapillary_token()
+    except Exception:
+        return None
+    if not token:
+        return None
+    c = client or MapillaryClient(token)
+    d = STREET_RADIUS_M / 111_320.0
+    box = BBox(lon - d, lat - d * 0.72, lon + d, lat + d * 0.72)
+    try:
+        recs = c.search_images(box, fields=("id", "captured_at", "is_pano", "creator", "computed_geometry", "geometry"), limit=100)
+    except Exception as exc:                                  # a stop without imagery is not an error
+        log.info("mapillary lookup failed at %.4f,%.4f: %s", lat, lon, exc)
+        return None
+    best = None
+    for rec in recs:
+        g = (rec.get("computed_geometry") or rec.get("geometry") or {}).get("coordinates")
+        if not g:
+            continue
+        dist = haversine_m(lon, lat, g[0], g[1])
+        if dist > STREET_RADIUS_M:
+            continue
+        score = dist - (150 if rec.get("is_pano") else 0)      # a panorama wins unless a flat frame is much closer
+        if best is None or score < best[0]:
+            creator = rec.get("creator") or {}
+            cap = rec.get("captured_at")
+            # The Graph API returns capture time as epoch milliseconds.
+            when = datetime.fromtimestamp(cap / 1000, UTC).date().isoformat() if isinstance(cap, (int, float)) else (str(cap)[:10] or None) if cap else None
+            best = (score, {"image_id": str(rec["id"]), "username": creator.get("username") if isinstance(creator, dict) else None,
+                            "captured_at": when, "is_pano": bool(rec.get("is_pano")),
+                            "dist_m": round(dist), "url": image_page_url(str(rec["id"])), "license": "CC BY-SA 4.0"})
+    return best[1] if best else None
+
+
 def match_tour(park: Park, landmarks: list[dict]) -> tuple[list[dict], list[str]]:
     """Curated stop names -> landmark records, in tour order. Exact name match
     first, then a landmark whose name starts with or contains the stop name;
@@ -307,6 +394,11 @@ def build_landmarks(park: Park, out_dir: Path, *, summaries: bool = True) -> dic
             if stop.get("url"):
                 stop["summary"] = wikipedia_summary(stop["url"], session=session)
                 time.sleep(1.0)     # Wikimedia etiquette: one request a second is plenty for a dozen stops
+            # What the place actually looks like: licensed photographs taken
+            # there, and the nearest street-level image to look around from.
+            stop["photos"] = commons_photos_near(stop["lat"], stop["lon"], session=session)
+            time.sleep(0.5)
+            stop["street"] = nearest_street_image(stop["lat"], stop["lon"])
     payload = {
         "park": park.key, "fetched": datetime.now(UTC).isoformat(timespec="seconds"),
         "attribution": {"landmarks": "© OpenStreetMap contributors, ODbL", "summaries": "Wikipedia, CC BY-SA 4.0",
@@ -321,5 +413,6 @@ def build_landmarks(park: Park, out_dir: Path, *, summaries: bool = True) -> dic
     (out_dir / "landmarks.json").write_text(json.dumps(payload, separators=(",", ":"), ensure_ascii=False))
     write_park_manifest(out_dir, park.key)
     return {"landmarks": len(landmarks), "stops": len(stops), "tour_source": "auto" if auto else "curated", "missing": missing, "osm": counts,
+            "stop_photos": sum(len(s.get("photos") or []) for s in stops), "stops_with_street": sum(1 for s in stops if s.get("street")),
             "boundary_bytes": (out_dir / "boundary.geojson").stat().st_size,
             "landmarks_bytes": (out_dir / "landmarks.json").stat().st_size}

@@ -217,6 +217,13 @@ Format: date, what, number, kept?, why, where it lives.
 - **Numbers:** Yellowstone 1,640 items (951 named features, 334 campsites, 103 lodgings, 96 viewpoints, 61 trailheads, 54 picnic sites, 37 visitor centres or ranger stations, 4 boat launches), 319 KB; Grand Teton 265 items, 98 trails; Great Smoky 1,050 items (375 lodgings, mostly Gatlinburg and Cherokee in the bbox), 211 trails. "Near" is 3 km for features, trails and facilities, 12 km for camping and lodging, at most six per group.
 - **Unresolved:** OSM's campsite coverage mixes backcountry sites ("4R1") with drive-in campgrounds; the `backcountry` tag separates them only when present. The NPS API (free key, public domain) would add reservations, seasons and official "things to do"; left as the next enrichment.
 
+### E-037: how photorealistic can a free 3D map of a park get?
+- **What:** the owner: "how do we get this to be a photo-realistic 3D map of what we are actually looking at". Measured what the free, keyless sources allow, then took what they give.
+- **Ceilings measured (2026-09-05, Old Faithful):** USGS The National Map imagery stops at zoom 16 (about 2.4 m per pixel at 44°N; zoom 17 and up return 404). The USDA NAIP image service did not answer. The AWS terrain tiles stop at zoom 15 (about 5 m). Esri's World Imagery answers keyless to zoom 19 with CORS, but its terms for third-party apps now ask for an API key; recorded as O-10, not used. Photogrammetry meshes of the Google Earth kind exist only from Google and Apple; Google is excluded by the brief and Apple has no web offering.
+- **Kept:** on imagery the terrain exaggeration drops to 1.12 (true relief reads right on photographs; 1.35 stays for the paper style), the pitch ceiling rises to 78°, and every tour stop gains what the aerial view cannot show: up to six photographs taken within 400 m from Wikimedia Commons under reusable licences (the park-card rule, ADR-0019), credited with artist, licence and distance, plus a "look around from here" link to the nearest Mapillary image within 300 m (a panorama when one is as close), linked by id with the contributor's name and CC BY-SA; the picture itself is never copied. The token is used in the pipeline only.
+- **Numbers:** printed per park by `track_a.py landmarks` (stop_photos, stops_with_street); Old Faithful: 6 photographs within 4 m, all CC BY-SA 3.0.
+- **Unresolved:** past zoom 16 the imagery blurs; a sharper free source would change the whole feel and none is clean today. Commons geosearch ranks by distance, not quality; a "quality image" filter would need a second query per file.
+
 ## Open questions with a planned experiment
 
 - **Q-1 SpeciesNet determinism.** Answered (E-013).

@@ -97,9 +97,14 @@ export type PhotoSize = "square" | "small" | "medium" | "large";
 // A landmark from OpenStreetMap; `tour` is the stop index when it is on the
 // curated route, and only stops carry a Wikipedia summary.
 export interface LandmarkSummary { extract: string | null; url: string; licence: string; attribution: string; }
+// A photograph of the place from Wikimedia Commons (reusable licence, credited) and
+// the nearest street-level image on Mapillary (linked by id, never copied).
+export interface LandmarkPhoto { url: string; page: string; dist_m: number; width: number | null; height: number | null; license: string; license_url: string; artist: string; }
+export interface StreetImage { image_id: string; username: string | null; captured_at: string | null; is_pano: boolean; dist_m: number; url: string; license: string; }
 export interface Landmark {
   id: string; name: string; kind: string; lon: number; lat: number; ele_m: number | null;
   wikidata: string | null; url: string | null; tour?: number; summary?: LandmarkSummary | null;
+  photos?: LandmarkPhoto[]; street?: StreetImage | null;
 }
 export interface LandmarksFile {
   park: string; fetched: string; attribution: Record<string, string>;
