@@ -1,0 +1,57 @@
+{
+  "built": "2026-09-06T20:42:10+00:00",
+  "git_commit": "74777f72d19d7261a82a618cf7b909cadc58e0ee",
+  "files": {
+    "cells.geojson": {
+      "sha256": "a20d42934f1866ce7c53004b3f669f312cab54fd862705d90e4bbf1fa6c1cb9e",
+      "bytes": 74633
+    },
+    "species.json": {
+      "sha256": "a4422532b2ae8196664f92bde284613480b81d060f1582e56b391c2dd5eb7a81",
+      "bytes": 52772
+    },
+    "sightings.parquet": {
+      "sha256": "2f63ef26762b7a87979957e2225990a414b3ec110504f5d7434cc05af4d56275",
+      "bytes": 106679
+    },
+    "photos_species.json": {
+      "sha256": "b5ced00679d45032a4da99458c0f19ae8849454106b06941aa80c69a8f621178",
+      "bytes": 43983
+    },
+    "photos_cells.json": {
+      "sha256": "cf03259c7cbb924f430e6923e57bf3a536133271e4d28b2618b54e486b33fb00",
+      "bytes": 32087
+    },
+    "places.json": {
+      "sha256": "4989604c441c8c10bfce95388ef91cde2d9256381c07a83ffccf8f19a65399c0",
+      "bytes": 21342
+    },
+    "climate.json": {
+      "sha256": "425480486619f253aebb33088fa464a4742787cdb64f286cb1cd0fe4efa0fbd7",
+      "bytes": 1026
+    },
+    "landmarks.json": {
+      "sha256": "2a159dcde53c82ac8edffe1931c73b344c3214fa4ecf4d3547066fd1f9377c6f",
+      "bytes": 4403
+    },
+    "boundary.geojson": {
+      "sha256": "6e90917a052c264bd0202ad8c904a245c7ce12f87996d55ee0f81fddba26b453",
+      "bytes": 6318
+    },
+    "roads.json": {
+      "sha256": "f43b8e4fba44b0d3fb6365854b27d0d362a090fe606a1820f409fd62acc758ea",
+      "bytes": 193211
+    },
+    "camera_pass.json": {
+      "sha256": "5e9f7f1e2b15df6d1bbf30006536a4ebc82211237508f8138f21da2000c855db",
+      "bytes": 442
+    },
+    "amenities.json": {
+      "sha256": "cd5d78e831913fcdaffb848247fb205a61a414ca635bb75024bc3f029d12b596",
+      "bytes": 13361
+    }
+  },
+  "park": "mammoth_cave",
+  "name": "Mammoth Cave National Park",
+  "state": "KY"
+}
