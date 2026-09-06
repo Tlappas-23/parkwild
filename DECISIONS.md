@@ -331,6 +331,27 @@ gets its initials on a plain card until an editor changes the article.
 
 ---
 
+## ADR-0020: The species-naming bar moves only on a measured number
+
+**Context.** Track B names a species only when the classifier scores 0.8
+or better (ADR-0014); at Lamar that named three animals. The owner wants
+the model to count for more.
+**Decision.** A second review, stratified by classifier score, measures
+species-label precision per band. `SPECIES_MIN_SCORE` is lowered to the
+lowest band boundary such that every band at or above it is right at least
+60% of the time on at least 15 judged boxes (`report.species_precision`).
+If no band qualifies, the bar stays. Whatever the outcome, the pass is
+presented on its own terms: where it ran, what it found, how good it was
+(`camera_pass.json`, the About page table, corridor boxes on the map).
+**Rejected.** Lowering the bar by feel (would put wrong animals on the map
+at a known ~44% rate); hiding the pass entirely (it is the project's own
+method and its numbers are part of the record); fine-tuning on the review
+set (too few labels; docs/finetuning-decision.md).
+**Consequence.** The owner reviews about 120 boxes. Named model sightings
+rise if and only if the numbers allow. Recall stays unmeasured.
+
+---
+
 ## Open decisions (owner's call; recorded here so nothing is decided by drift)
 
 | # | Decision | Default until decided | Where |

@@ -30,3 +30,11 @@ state = "TN"
 bbox  = [-83.86, 35.57, -83.75, 35.63]
 road  = "Cades Cove Loop Road (11 mi one-way loop)"
 notes = "White-tailed deer, black bear, wild turkey. Open meadows ringed by forest; very high visitor traffic, so probably the densest Mapillary coverage of the three."
+
+# Added 2026-09-05 so the imagery pass covers a second Yellowstone valley; the
+# Grand Loop crosses it and it is the park's other classic wildlife stretch.
+[hayden_valley]
+name  = "Hayden Valley, Yellowstone NP"
+park  = "Yellowstone National Park"
+state = "WY"
+bbox  = [-110.52, 44.58, -110.38, 44.72]

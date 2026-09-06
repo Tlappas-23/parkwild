@@ -48,6 +48,12 @@ log = logging.getLogger(__name__)
 #   precision-by-band curve suggests a different knee.
 BANDS = ((0.2, 0.5), (0.5, 0.8), (0.8, 1.01))
 
+# SPECIES_BANDS — DERIVED (classifier-score bands around the naming bar,
+# trackb.SPECIES_MIN_SCORE = 0.8; the review measures how often the species
+# label is right in each, which is what would justify moving the bar)
+# REVISIT IF: the review shows the knee somewhere else; then re-band and re-sample.
+SPECIES_BANDS = ((0.5, 0.6), (0.6, 0.7), (0.7, 0.8), (0.8, 1.01))
+
 REVIEW_COLUMNS = [
     # filled by the script
     "image_id", "variant", "det_idx", "band", "conf", "predicted", "prediction_score", "prediction_source",
@@ -149,6 +155,57 @@ def pick_sample(
     log_filter("review.sample", f"stratified: {per_band} per band over {len(BANDS)} bands, one box per frame, seed {seed}",
                len(candidates), len(sample), corridor=corridor, population=population, min_conf=min_conf,
                by_band={b: sum(1 for x in sample if x["band"] == b) for b, _ in ((band_of(lo), None) for lo, _ in BANDS)}, short=short)
+    return sample
+
+
+def species_band_of(score: float | None) -> str | None:
+    for lo, hi in SPECIES_BANDS:
+        if score is not None and lo <= score < hi:
+            return f"s{lo:.1f}-{min(hi, 1.0):.1f}"
+    return None
+
+
+def pick_species_sample(
+    store: Store,
+    corridors: list[str],
+    *,
+    population: str = "perspective",
+    per_band: int = 30,
+    min_conf: float = 0.5,
+    seed: int = 7,
+) -> list[dict]:
+    """The second review (E-033): boxes the map would already show (detector
+    conf >= min_conf, the Track B threshold), stratified by the classifier's
+    species score instead of the detector's confidence, equal allocation over
+    SPECIES_BANDS, one box per frame, across every corridor given. Labels the
+    ensemble calls human, vehicle or blank are left out as Track B leaves them
+    out. Shortfalls are reported, never back-filled."""
+    from .speciesnet_runner import split_label
+    from .trackb import EXCLUDED_LABELS
+    quota = {f"s{lo:.1f}-{min(hi, 1.0):.1f}": per_band for lo, hi in SPECIES_BANDS}
+    taken: set[str] = set()
+    sample: list[dict] = []
+    n_candidates = 0
+    for corridor in corridors:
+        for c in _candidates(store, corridor, population, min_conf, seed):
+            n_candidates += 1
+            parts = split_label(c["prediction"])
+            if (parts.get("raw") or parts.get("common_name") or "") in EXCLUDED_LABELS:
+                continue
+            band = species_band_of(c["prediction_score"])
+            if band is None or quota[band] == 0 or c["image_id"] in taken:
+                continue
+            c["band"] = band
+            c["corridor"] = corridor
+            sample.append(c)
+            quota[band] -= 1
+            taken.add(c["image_id"])
+    short = {b: q for b, q in quota.items() if q > 0}
+    if short:
+        log.warning("species bands short of their quota (not back-filled): %s", short)
+    rule = f"{per_band} per classifier-score band over {len(SPECIES_BANDS)} bands, detector conf >= {min_conf}, one box per frame, seed {seed}"
+    log_filter("review.species_sample", rule, n_candidates, len(sample), corridors=corridors, population=population,
+               by_band={b: sum(1 for x in sample if x["band"] == b) for b in quota}, short=short)
     return sample
 
 

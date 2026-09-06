@@ -125,3 +125,19 @@ export interface ParkCard {
   species: number | null; sightings: number | null; cells: number | null; stops: number | null; tour_source: string | null; hero: ParkHero | null;
 }
 export interface ParksIndex { generated: string; attribution: string; parks: ParkCard[]; }
+
+// The roadside camera pass (Track B) per park: where it ran, what it found,
+// how well it did (parkwild/trackb_export.py). Numbers, never thumbnails.
+export interface CameraPassBand { band: string; n: number; tp: number; precision: number | null; ci: [number, number] | null; }
+export interface CameraPassPrecision { reviewer: string; population: string; n: number; tp: number; precision: number | null; ci: [number, number] | null; bands: CameraPassBand[]; }
+export interface CameraPassCorridor {
+  key: string; name: string; bbox: [number, number, number, number]; status: "reviewed" | "unreviewed" | "planned";
+  images_indexed: number; frames_scored: number; frames_with_animal: number; sightings: number; named: number; unnamed: number;
+  species_named: Record<string, number>; imagery_years: [number, number] | null; imagery_months: number[]; contributors: number;
+  precision: CameraPassPrecision | null;
+}
+export interface CameraPassFile {
+  park: string; generated: string; model: string;
+  thresholds: { detection_min_conf: number; species_min_score: number; range_m: number };
+  corridors: CameraPassCorridor[]; notes: Record<string, string>;
+}

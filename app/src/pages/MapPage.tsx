@@ -80,7 +80,7 @@ export default function MapPage() {
   const [ready, setReady] = useState(false);
   const {
     cells, species, boundary, landmarks, speciesFilter, yearRange, setSpeciesFilter, setYearRange, selectCell, selectedCell,
-    reducedMotion, basemap, setBasemap, terrain3d, setTerrain3d, tour, startTour, tourGo, plan, location, openPlan, addSite, park,
+    reducedMotion, basemap, setBasemap, terrain3d, setTerrain3d, tour, startTour, tourGo, plan, location, openPlan, addSite, park, cameraPass,
   } = useStore();
   const [query, setQuery] = useState("");
   // Handlers are registered once on the map; refs keep them pointing at the live store actions.
@@ -128,6 +128,7 @@ export default function MapPage() {
       map.addSource("route", { type: "geojson", data: EMPTY });
       map.addSource("route-stops", { type: "geojson", data: EMPTY });
       map.addSource("me", { type: "geojson", data: EMPTY });
+      map.addSource("corridors", { type: "geojson", data: EMPTY });
 
       // Imagery sits right above the style's background so every road, river
       // and label stays on top of it; the hillshade goes under the lines.
@@ -135,6 +136,10 @@ export default function MapPage() {
       map.addLayer({ id: "hillshade", type: "hillshade", source: "dem",
         paint: { "hillshade-exaggeration": 0.55, "hillshade-shadow-color": "#4d4336", "hillshade-highlight-color": "#ffffff", "hillshade-accent-color": "#6e6a5f" } }, firstLine);
       map.addLayer({ id: "mask", type: "fill", source: "mask", paint: { "fill-color": "#f4f3ee", "fill-opacity": 0.7 } }, firstSymbol);
+      // Where the roadside camera pass ran (or is queued): dashed boxes in the
+      // model colour, labelled with what it found, so a zero has a place.
+      map.addLayer({ id: "corridor-box", type: "line", source: "corridors",
+        paint: { "line-color": "#b86e00", "line-width": 1.6, "line-dasharray": [1.5, 1.5], "line-opacity": ["case", ["==", ["get", "status"], "planned"], 0.5, 0.9] } }, firstSymbol);
       // The park outline: a light casing under a dark dashed line, so it reads
       // on imagery and on the paper-white style alike, at every zoom.
       map.addLayer({ id: "outline-casing", type: "line", source: "outline", paint: { "line-color": "#ffffff", "line-width": 5, "line-opacity": 0.75 } }, firstSymbol);
@@ -171,6 +176,9 @@ export default function MapPage() {
       });
       label("landmark-label-stops", true, 7);
       label("landmark-label", false, 10.5);
+      map.addLayer({ id: "corridor-label", type: "symbol", source: "corridors", minzoom: 8,
+        layout: { "text-field": ["get", "label"], "text-font": ["Noto Sans Regular"], "text-size": 10.5, "text-anchor": "bottom-left", "text-offset": [0.3, -0.3], "text-max-width": 14 },
+        paint: { "text-color": "#8a5200", "text-halo-color": "rgba(255,255,255,0.92)", "text-halo-width": 1.3 } });
       map.addLayer({ id: "route-stop-dot", type: "circle", source: "route-stops",
         paint: { "circle-radius": 11, "circle-color": "#c2410c", "circle-stroke-color": "#ffffff", "circle-stroke-width": 2 } });
       map.addLayer({ id: "route-stop-n", type: "symbol", source: "route-stops",
@@ -257,6 +265,20 @@ export default function MapPage() {
     const map = mapRef.current;
     if (ready && map) (map.getSource("landmarks") as GeoJSONSource).setData(landmarksFC(landmarks));
   }, [ready, landmarks]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!ready || !map) return;
+    const fc: FeatureCollection = {
+      type: "FeatureCollection",
+      features: (cameraPass?.corridors ?? []).map((c) => {
+        const [w, s, e, n] = c.bbox;
+        const label = c.status === "planned" ? `Camera pass queued · ${c.name.split(",")[0]}` : `Camera pass · ${c.name.split(",")[0]} · ${c.sightings} sighting${c.sightings === 1 ? "" : "s"}`;
+        return { type: "Feature", properties: { key: c.key, status: c.status, label }, geometry: { type: "Polygon", coordinates: [[[w, s], [e, s], [e, n], [w, n], [w, s]]] } };
+      }),
+    };
+    (map.getSource("corridors") as GeoJSONSource).setData(fc);
+  }, [ready, cameraPass]);
 
   // Terrain view keeps the vector landcover and shades it; satellite view hides
   // the fills so USGS imagery shows through, with roads and labels on top.
@@ -390,6 +412,7 @@ export default function MapPage() {
         <span><i className="swatch model" /> includes model-predicted</span>
         <span><i className="dot stop" /> tour stop</span>
         <span><i className="dot" /> landmark</span>
+        {cameraPass && cameraPass.corridors.length > 0 && <span><i className="swatch pass" /> camera pass area</span>}
         <span className="muted">Cells ~170 m; larger for sensitive species. Empty means nobody looked.</span>
       </div>
 

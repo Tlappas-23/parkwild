@@ -22,6 +22,7 @@ import argparse
 import json
 import logging
 import sys
+from collections import Counter
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -52,7 +53,7 @@ from parkwild.mapillary import (  # noqa: E402
 from parkwild.overpass import fetch_highways, summarize_length_km  # noqa: E402
 from parkwild.pano import slice_all, slices_dir_for  # noqa: E402
 from parkwild.report import dump_json, phase0_numbers, render_phase0_markdown, update_results_md  # noqa: E402
-from parkwild.review import load_review_csv, pick_sample, render_review_images, write_review_template  # noqa: E402
+from parkwild.review import load_review_csv, pick_sample, pick_species_sample, render_review_images, write_review_template  # noqa: E402
 from parkwild.speciesnet_runner import parse_predictions, run_speciesnet, speciesnet_env_info  # noqa: E402
 from parkwild.storage import Store  # noqa: E402
 
@@ -266,6 +267,33 @@ def cmd_sample(args: argparse.Namespace) -> None:
 
 # ---- report --------------------------------------------------------------------
 
+def cmd_species_sample(args: argparse.Namespace) -> None:
+    """The second review: boxes the map already shows, stratified by the
+    classifier's species score, across every corridor with detections."""
+    from parkwild.config import load_corridors
+    out_dir = REVIEW_DIR / "species" / args.population
+    with Store() as store:
+        corridors = args.corridor or [k for k in load_corridors() if store.count_images(k)]
+        sample = pick_species_sample(store, corridors, population=args.population, per_band=args.per_band, min_conf=args.min_conf, seed=args.seed)
+        render_review_images(store, sample, out_dir, min_conf=args.min_conf)
+        write_review_template(sample, out_dir / f"review_{args.reviewer}.csv")
+    print(json.dumps({"corridors": corridors, "boxes": len(sample), "by_band": dict(Counter(s["band"] for s in sample)),
+                      "csv": str(out_dir / f"review_{args.reviewer}.csv"), "gallery": str(out_dir)}, indent=2))
+    print_decision_summary()
+
+
+def cmd_species_report(args: argparse.Namespace) -> None:
+    from parkwild.report import render_species_markdown, species_precision
+    csv_path = REVIEW_DIR / "species" / args.population / f"review_{args.reviewer}.csv"
+    with Store() as store:
+        if csv_path.exists():
+            store.upsert_reviews(load_review_csv(csv_path, reviewer=args.reviewer))
+        n = species_precision(store, reviewer=args.reviewer, corridors=args.corridor or None, population=args.population)
+    print(render_species_markdown(n))
+    if args.json:
+        print(json.dumps(n, indent=2, default=str))
+
+
 def cmd_report(args: argparse.Namespace) -> None:
     """Import any filled review CSV, measure road length via Overpass, compute
     the Phase 0 numbers for one population, print them, optionally write them."""
@@ -358,6 +386,22 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--min-conf", type=float, default=0.2)
     p.add_argument("--seed", type=int, default=42)
     p.set_defaults(func=cmd_sample)
+
+    p = sub.add_parser("species-sample", help="second review: boxes on the map, stratified by the classifier's species score")
+    p.add_argument("--reviewer", default="me")
+    p.add_argument("--corridor", action="append", help="repeatable; default: every corridor with images")
+    p.add_argument("--population", choices=["perspective", "pano"], default="perspective")
+    p.add_argument("--per-band", type=int, default=30)
+    p.add_argument("--min-conf", type=float, default=0.5)
+    p.add_argument("--seed", type=int, default=7)
+    p.set_defaults(func=cmd_species_sample)
+
+    p = sub.add_parser("species-report", help="load the species review CSV and report precision by classifier-score band")
+    p.add_argument("--reviewer", default="me")
+    p.add_argument("--corridor", action="append")
+    p.add_argument("--population", choices=["perspective", "pano"], default="perspective")
+    p.add_argument("--json", action="store_true")
+    p.set_defaults(func=cmd_species_report)
 
     p = sub.add_parser("report", help="compute the Phase 0 numbers")
     p.add_argument("--corridor", required=True)
