@@ -1,307 +1,139 @@
 # parkwild
 
-Find animals in crowdsourced street-level photos of US national parks, identify
-them to species where the model can, and record where and when. The output is a
-queryable DuckDB dataset plus a map. Side project; zero budget; honest numbers.
+A free map of where people have seen wild animals in America's national parks.
 
-The full brief is in [PROJECT_BRIEF.md](PROJECT_BRIEF.md). Accuracy numbers, good
-or bad, go in [RESULTS.md](RESULTS.md).
+Every research-grade observation on iNaturalist and every GBIF record with
+its own review, for mammals and birds, gathered park by park, deduplicated,
+and drawn as hexagonal cells about 170 m across. On top of that: a virtual
+tour of each park's landmarks in 3D, species pages that show where an animal
+is seen most across all parks, a route planner over the park's real roads and
+trails, and an optional assistant that runs entirely in your browser. No
+server, no accounts, no tracking, no paid service anywhere in the chain.
 
-The build now follows [BUILD_SPEC.md](BUILD_SPEC.md): three decoupled tracks,
-Phase 0 routes instead of gating, and the app ships on reference data whatever
-detection turns out to be worth. Choices are logged in [DECISIONS.md](DECISIONS.md);
-the security model is in [SECURITY.md](SECURITY.md).
+Live site: https://tlappas-23.github.io/parkwild/
 
-**Status (2026-09-05):** Phase 0 read on both populations and routed:
-Track B is a supplementary layer (ADR-0013). Phase 1 done: 59,805 Yellowstone
-sightings exported. Phase 2 running at supplementary scope on Lamar Valley.
-The app renders the real export and deploys to GitHub Pages from `main`:
-https://tlappas-23.github.io/parkwild/ (first deploy on the next merge).
-See RESULTS.md for numbers, DECISIONS.md for why.
+## What the site does
 
-## Where to start
+- **Parks.** A map of all 63 national parks. Live parks open on click; the
+  rest show their status. Eleven are live today and the remaining 52 are
+  being added by an unattended pipeline (see Status).
+- **Map.** The park outline over relief or USGS imagery, with a 3D option.
+  Blue cells are places where people recorded animals; deeper blue means
+  more sightings. Tap a cell for its species, years, photographs and a link
+  to the same box on iNaturalist. Filter by species and by years.
+- **Tour.** Lands close over each landmark in satellite 3D, turns slowly
+  while you read, then follows the park's roads to the next stop. Each stop
+  lists the wildlife recorded within 2.5 km, things to do, and photographs.
+- **Species.** Search one park or all parks at once. Every species page shows
+  where people see the animal, park by park, with a button that opens that
+  park's map on the animal's busiest cell.
+- **Plan a visit.** Your location or any landmark as the start, the places
+  you want, drive or hike, and the best order over the real road and trail
+  graph, with turn-by-turn links.
+- **Ask.** A small language model that answers only from the site's own data
+  and cites every number. It downloads once, on request, and runs on your
+  device. Until you press Enable, no model is involved anywhere.
+- **About.** Per park: what the data is, what it cannot tell you, and where
+  a computer-vision pass ran (three roadside corridors in Yellowstone and
+  Grand Teton and Great Smoky Mountains) and how well it did.
 
-- `docs/ARCHITECTURE.md`: the map of the system, per-park data files, app modules, hosting.
-- `docs/USER-GUIDE.md`: how to use every part of the site, and the owner's loop.
-- `DECISIONS.md`, `EXPERIMENTS.md`: why, and what was measured.
+## What the numbers mean
 
-## Hard constraints
+Sightings are what people reported, not how many animals there are. An empty
+cell means nobody looked. Observations cluster on roads, trails and
+viewpoints and in summer. Sensitive species keep the coarse or hidden
+positions their sources gave them and are never sharpened. Model-predicted
+detections from street-level imagery are counted separately from
+human-verified records, drawn differently, and only shown where the pass
+actually ran. No recall figure is ever published because nobody has counted
+every animal. The full reasoning is in [DECISIONS.md](DECISIONS.md) and every
+measurement, including the failures, is in [EXPERIMENTS.md](EXPERIMENTS.md).
 
-1. **Zero cost.** No paid APIs, no cloud billing, nothing that wants a card.
-2. **No Google Maps / Street View.** Their terms forbid indexing object locations
-   from Street View and using Maps content for models. Not used, not worked around.
-3. **Respect obscured coordinates.** iNaturalist/GBIF fuzz sensitive species.
-   Those records get filtered out of precision-sensitive analysis, never de-obscured.
-4. **Attribution.** Every stored image row carries `image_id`, `creator_username`,
-   `license` (CC BY-SA 4.0) and `source_url`. Anything published also needs the
-   Mapillary logo and a link back (Mapillary terms, section 11).
+## How it is built
 
-## Stack
+Three tracks feed one static app.
 
-| Concern | Choice |
-|---|---|
-| Imagery + metadata | Mapillary Graph API v4 (free client token) |
-| Park boundaries | NPS shapefiles or OSM relations via Overpass (Phase 1) |
-| Road & trail geometry | Overpass API |
-| Animal detection | MegaDetector (bundled inside SpeciesNet) |
-| Species classification | SpeciesNet 5.x, Apache 2.0 |
-| Validation ground truth | iNaturalist API (Phase 4) |
-| Storage & spatial queries | DuckDB (+ spatial extension from Phase 3) |
-| Map output | MapLibre GL JS + OSM raster tiles (Phase 5) |
-| Compute | local M2 Pro (PyTorch MPS) or Kaggle free GPU |
-
-Nothing in the stack was substituted. See "Verified against live docs" below
-for the two API details that shaped the crawler.
-
-## Tracks
-
-| Track | What | Where |
+| Track | What it does | Code |
 |---|---|---|
-| A: reference data | iNaturalist + GBIF sightings, deduplicated, exported as H3 cells | `scripts/track_a.py`, `parkwild/{inaturalist,gbif,sightings,export}.py` |
-| B: detection | Mapillary crawl, SpeciesNet, Phase 0 numbers per population | `scripts/phase0.py`, `parkwild/{mapillary,download,pano,speciesnet_runner,review,report}.py` |
-| C: app | React + MapLibre + R3F, static files, no backend | `app/` (Phase 5, not started) |
+| A, reference data | iNaturalist and GBIF sightings per park into DuckDB, deduplicated across sources, exported as cells, species, photographs; OpenStreetMap landmarks with Wikipedia summaries and Commons photographs; the road and trail graph; things to do | `scripts/track_a.py`, `src/parkwild/{inaturalist,gbif,sightings,export,photos,landmarks,roads,amenities}.py` |
+| B, detection | Mapillary street-level imagery on chosen corridors, MegaDetector plus SpeciesNet on CPU, a stratified human review, precision with confidence intervals | `scripts/phase0.py`, `scripts/track_b.py`, `src/parkwild/{mapillary,download,pano,speciesnet_runner,review,report,trackb}.py` |
+| C, the app | React, MapLibre GL, Zustand; OpenFreeMap vector tiles, USGS imagery, AWS terrain tiles; WebLLM and Transformers.js for the on-device models; a service worker for offline shell and safe updates | `app/` |
 
-Both A and B write the same `sightings` schema with `source` and
-`confidence_basis`; the app reads only that.
+Every park's data is a folder of JSON files under `app/public/data/<park>/`
+with a manifest of SHA-256 hashes that is compiled into the app, so a file
+swapped on the server is refused. A cross-park species index and the park
+index sit beside the folders. Publishing is a data-only pull request that a
+script opens from a fresh git worktree, so the working tree is never
+touched. `docs/ARCHITECTURE.md` has the full map, file by file.
 
-## Layout
+## Repository layout
 
 ```
-.
-├── PROJECT_BRIEF.md          the brief, verbatim
-├── RESULTS.md                the numbers ledger (auto-blocks + hand-written verdicts)
-├── README.md                 this file
-├── BUILD_SPEC.md             the full build spec (supersedes the brief)
-├── DECISIONS.md              ADRs + the open-decisions table
-├── SECURITY.md               threat model and controls
-├── docs/
-│   ├── finetuning-decision.md   when (and when not) to fine-tune, and how to test it
-│   └── 3d-assets.md             Phase 6 sourcing sheet: species, candidates, license status
-├── config/parks.toml         parks: iNaturalist place id, bbox, corridors
-├── config/
-│   └── corridors.toml        candidate corridors: bbox, state, notes
-├── src/parkwild/             the library (pure batch code, no agents)
-│   ├── geo.py                bbox tiling under Mapillary's 0.01 deg^2 limit, haversine
-│   ├── config.py             paths, .env token, corridor loader
-│   ├── mapillary.py          Graph API client: throttle, backoff, tile-splitting crawl
-│   ├── overpass.py           road/trail km inside a bbox
-│   ├── storage.py            DuckDB schema + upserts
-│   ├── download.py           full-res image fetch with URL refresh + verification
-│   ├── speciesnet_runner.py  run SpeciesNet as a subprocess, parse its JSON
-│   ├── review.py             manual-inspection gallery + CSV
-│   └── report.py             the five Phase 0 numbers -> RESULTS.md
-│   ├── pano.py               equirectangular -> 4 horizon windows (fixes framing, not resolution)
-│   ├── inaturalist.py        iNat API v1 client + normaliser (obscured coords flagged, never recovered)
-│   ├── gbif.py               GBIF occurrence client + normaliser (iNat mirror skipped by dataset key)
-│   ├── sightings.py          Track A ingest orchestration + cross-source dedupe
-│   ├── export.py             cells.geojson (H3 r9), species.json, sightings.parquet, manifest.json
-│   ├── contracts.py          stage-boundary assertions (lon/lat, bbox, epoch units, conservation)
-│   └── decisionlog.py        reports/decision_log.jsonl writer
-├── scripts/phase0.py         Track B CLI: coverage | pull | download | slice | detect | sample | report
-├── scripts/track_a.py        Track A CLI: places | ingest | dedupe | export | summary | all
-├── scripts/smoke.py          end-to-end on fixtures, no network (CI, < 5 min)
-├── scripts/check_secrets.py  pre-commit + CI secret scan
-├── scripts/github_protect.sh branch protection for main via gh api
-├── notebooks/phase0_inspection.ipynb   narrative walkthrough of the manual review
-├── tests/                    offline tests (in-memory DuckDB, fake API client)
-├── data/                     gitignored: images, DuckDB file, model JSON, review galleries
-│   └── review/<corridor>/review.csv    tracked: my hand-entered verdicts
-├── Makefile                  setup / setup-ml / test / phase0 targets
-├── requirements.txt          light deps (no torch)
-└── requirements-ml.txt       speciesnet (torch, yolov5, weights)
+app/                     the site (Vite, React, MapLibre); app/scripts has the build helpers and the headless tour probe
+config/                  parks.toml (all 63 parks), corridors.toml, suppression.toml, taxonomy.toml
+docs/                    ARCHITECTURE.md, USER-GUIDE.md, data cards, the AI evaluation, 3D asset sourcing
+scripts/                 track_a.py, track_b.py, phase0.py, parks_batch.sh, publish_data.sh, ship.sh, check_secrets.py
+src/parkwild/            the Python library: pure batch code, no agents, one DuckDB writer
+tests/                   offline tests with fixtures; CI runs them on every push
+notebooks/               the narrative walkthroughs of the manual reviews
+reports/                 the decision log every filter writes to, and review samples
+data/                    gitignored: images, the DuckDB file, model output, exports, batch logs
+BUILD_SPEC.md            the build specification the project follows
+PROJECT_BRIEF.md         the original brief
+DECISIONS.md             architecture decision records and the open-decisions list
+EXPERIMENTS.md           the ledger: what was tried, what was measured, what failed
+RESULTS.md               the numbers, good or bad
+SECURITY.md              threat model and controls
 ```
 
-## Setup
+## Running it yourself
 
 ```bash
-make setup            # .venv from Anaconda's Python 3.12, light deps, editable install, Jupyter kernel
-make hooks            # pre-commit secret scan for this clone
-cp .env.example .env  # paste MAPILLARY_TOKEN from https://www.mapillary.com/dashboard/developers
-make test lint smoke  # offline; no token or model needed
-make setup-ml         # PyTorch + SpeciesNet. Several GB. Only when ready.
-make track-a PARK=yellowstone   # iNaturalist + GBIF -> DuckDB -> data/export/yellowstone/
+make setup                    # .venv with Python 3.12 and the light dependencies
+make hooks                    # pre-commit secret scan and pre-push checks
+cp .env.example .env          # MAPILLARY_TOKEN, only needed for Track B
+make test lint                # offline; no token, no model
+cd app && npm ci && npm run dev
 ```
 
-Why Anaconda's 3.12 and not Homebrew's 3.14: SpeciesNet declares
-`requires-python < 3.15` and pins `yolov5`, whose wheels lag new Python releases.
-3.12 is the safe choice on Apple silicon.
-
-## Phase 0 runbook
-
-Run in order. Every step is idempotent and resumable.
-
-| Step | Command | What it does | Output |
-|---|---|---|---|
-| 1 | `make coverage` | Counts images, sequences and date range in each candidate corridor using the cheapest fields. Picks nothing; tells me where the imagery is. | `data/coverage_<date>.json` |
-| 2 | `make pull CORRIDOR=lamar_valley` | Tiles the bbox, walks every tile, stores one row per image. Tiles that hit the 2000 cap get quartered. Progress per tile, so a rerun resumes. | `images`, `tiles` tables |
-| 3 | `make download CORRIDOR=...` | Picks 400 perspective frames spread across sequences (max 20 each), downloads the original resolution, verifies each file. `--population pano --limit 100` does the same for panoramas. | `data/images/<corridor>/`, `data/images/<corridor>_pano/`, `downloads` table |
-| 3b | `make slice CORRIDOR=...` | Cuts each downloaded panorama into four 90-degree horizon windows. Fixes framing, not resolution. | `data/images/<corridor>_pano_slices/` |
-| 4 | `make detect CORRIDOR=... POPULATION=perspective\|pano` | Runs the full SpeciesNet ensemble with `--country USA --admin1_region <state>` on CPU (MPS segfaults here, E-012), records the run and its backend, parses the JSON into the append-only raw tables. | `data/predictions/<corridor>_<population>.json`, `runs`, `predictions_raw`, `detections_raw` |
-| 5 | `make sample CORRIDOR=... POPULATION=...` | Stratified sample of 30 animal boxes across three confidence bands, one per frame, drawn and cropped, plus `review.csv`. | `data/review/<corridor>/<population>/` |
-| 6 | fill `review.csv` (or use the notebook) | `verdict` tp/fp/unsure, `true_species`, `species_agree` yes/rollup/no/na, `est_distance_m`. | |
-| 7 | `make report CORRIDOR=... POPULATION=...` | Imports the verdicts, asks Overpass for road km, computes the numbers with Wilson intervals and cluster counts, writes them into `RESULTS.md`. Recall is printed as unmeasured. | `RESULTS.md`, `data/phase0_<corridor>_<population>.json` |
-
-Then route per BUILD_SPEC.md and record the routing in `DECISIONS.md`. Track A
-and the app do not wait for this.
-
-## Track A runbook
+Bringing a park live, end to end (network, no token):
 
 ```bash
-make track-a PARK=yellowstone          # ingest iNaturalist + GBIF, dedupe, export, summary
-.venv/bin/python scripts/track_a.py ingest --park yellowstone --gbif-counts-only   # what GBIF holds, by dataset
-.venv/bin/python scripts/track_a.py ingest --park yellowstone --include-ebird      # only after ADR-0011 is decided
-.venv/bin/python scripts/track_a.py landmarks --park yellowstone   # park outline + OSM landmarks + tour stops (network, no DB)
-.venv/bin/python scripts/track_a.py roads --park yellowstone       # roads.json: OSM roads + trails graph for the route planner (network, no DB)
-.venv/bin/python scripts/track_a.py amenities --park yellowstone   # amenities.json: things to do, camping, trails around each place
-.venv/bin/python scripts/track_a.py index                          # app/public/data/parks.json: every park, counts, credited hero photo
-.venv/bin/python scripts/parks_seed.py                             # look up all 63 parks on iNaturalist -> config/parks.seed.toml
+scripts/parks_batch.sh arches bryce_canyon      # sightings, export, landmarks, roads, things to do, then a data PR
+scripts/publish_data.sh "title" arches          # publish an existing export on its own
+node app/scripts/tour-probe.mjs "https://tlappas-23.github.io/parkwild/?park=zion" /tmp/probe 44 8   # watch the tour camera headless
 ```
 
-### Adding a park
+Track B needs `make setup-ml` (PyTorch and SpeciesNet, several GB) and runs
+on CPU. The runbook is in `docs/USER-GUIDE.md` under "For the owner".
 
-1. `track_a.py places --query "Grand Teton"` for the iNaturalist place id; add
-   a `[key]` table to `config/parks.toml` with name, state, place id, bbox and
-   an ordered `tour` list (OSM feature names; `tour_fallback` gives a
-   coordinate and an `@wiki` article title for stops OSM cannot name).
-2. `make track-a PARK=key`, then `track_a.py landmarks --park key`,
-   `track_a.py roads --park key` and `track_a.py amenities --park key`, then
-   `make app-data PARK=key`. The app lists every park whose data folder was
-   baked in; `?park=key` opens it directly. Suppression and taxonomy rules
-   apply everywhere; the imagery track and bias figures are per corridor.
+## Data sources and licences
 
-Outputs land in `data/export/<park>/`: `cells.geojson` (H3 resolution 9, one
-feature per cell with a compact species list, open coordinates only,
-sensitive species excluded or coarsened per `config/suppression.toml`),
-`species.json` (counts, seasonality, obscured share, source mix, suppression
-treatment, the other common names a species has carried), `sightings.parquet`
-(full canonical records with attribution), `photos_*.json` (licensed
-iNaturalist photographs by species and by cell), `landmarks.json` and
-`boundary.geojson` (tour stops and the park outline) and `manifest.json`
-(SHA-256 per file, git commit, the park's display name). `make bias` adds the road and
-seasonal bias block to RESULTS.md. `make app-data` copies the exports into
-`app/public/data/<park>/`, where the app compiles the manifest in and refuses
-any data file whose hash does not match.
-
-## The app
-
-`app/` is React + Vite + MapLibre + React Three Fiber + Zustand, static files
-only. Photographs from iNaturalist observations are the evidence layer
-(ADR-0015): card art and hero per species, a "seen here" strip per cell,
-each credited to its observer with its licence and a link. `make app` installs, builds and enforces the JS budget (entry chunk
-under 200 KB gzipped; the map and 3D libraries are lazy chunks with their own
-caps). Pages: a map of the park (OpenFreeMap vector basemap under a hillshade and
-3D terrain from the AWS terrain tiles, a USGS imagery toggle, everything
-outside the iNaturalist park polygon washed out) with H3 cells, species and
-year filters, landmarks, a guided tour that flies stop to stop and lists the
-species recorded within 2.5 km of each, a route planner that orders the sites
-you tick from your position over the park's own road and trail graph
-(ADR-0018), and a cell panel that follows the species filter and links the
-same box on iNaturalist; species grid and detail
-with month histogram and a lazy 3D viewer; About with methods, limitations,
-suppression and licensing; a home page with a card per park (counts, a
-credited Commons photograph, ADR-0019) that opens each park's map with an
-animated arrival on the whole outline (ADR-0017); and an Ask page where a
-language model and an image model run on the visitor's device, opt-in, and
-may only write from the site's own facts (ADR-0021, docs/ai-eval.md). Deploy target is
-Cloudflare Pages with `app/public/_headers` for CSP.
-
-Rough cost on this machine: steps 1 to 3 are a few minutes of API calls and
-about 1 to 2 GB of JPEGs. Step 4 is the slow one: MegaDetector on 400 original
-frames is on the order of 15 to 30 minutes on the M2 Pro's GPU via MPS. If that
-turns out painful, the same JSON can be produced on a Kaggle notebook and loaded
-with `phase0.py detect --parse-only`.
-
-## Verified against live docs (2026-09-05)
-
-Mapillary Graph API, from the developer documentation page:
-
-- bbox searches against `/images` must cover **less than 0.01 deg²**. The
-  changelog dates this to January 16, 2026. `geo.tile_bbox` uses 0.05 × 0.05
-  deg tiles (0.0025 deg², a 4× margin).
-- **Pagination only works together with `creator_username`.** A plain bbox
-  search returns at most 2000 rows and there is no page two. So a tile that
-  comes back with exactly 2000 rows is quartered and re-queried; that is what
-  `MapillaryClient.crawl` does, down to a 0.002 deg floor.
-- Field names used: `id, geometry, computed_geometry, captured_at (ms epoch),
-  compass_angle, computed_compass_angle, camera_type, is_pano, make, model,
-  width, height, quality_score, sequence, creator{id,username},
-  thumb_1024_url, thumb_2048_url, thumb_original_url`.
-- Auth: `Authorization: OAuth <token>` header. Search rate limit 10,000/min
-  per app; the client sleeps 150 ms between calls anyway and backs off on 429.
-
-Two behaviours that are **not** in the docs, measured on 2026-09-05:
-
-- **The 2000 cap is fuzzy.** Lamar Valley tiles that returned 1879 to 1973
-  rows were truncated (their quarters summed to 2500 to 3400), while tiles at
-  1849 and below were complete. The crawler treats any tile returning 1500 or
-  more rows as capped and splits it.
-- **Dense tiles return HTTP 500**, not a truncated list. Two 0.05 deg tiles in
-  Cades Cove errored at any `limit`, and their quarters answered normally. The
-  crawler treats a repeated 5xx on a splittable tile as "too heavy" and splits
-  it; only a tile at the minimum size is recorded as an error and retried on
-  the next run.
-- License: CC BY-SA 4.0 (terms section 3b); logo + link back on published
-  output (section 11).
-
-SpeciesNet, from the `google/cameratrapai` repository at version 5.0.5:
-
-- CLI: `python -m speciesnet.scripts.run_model --folders ... --predictions_json
-  ... --country USA --admin1_region WY --batch_size 8 --bypass_prompts`.
-  Re-running with an existing `--predictions_json` resumes automatically.
-- Device selection is `cuda`, then `mps`, then `cpu`, so Apple silicon is used.
-- The detector returns every box down to 0.01 confidence; thresholding is
-  mine, at query time.
-- Its loader applies the EXIF orientation tag (`ImageOps.exif_transpose`)
-  before inference, so box coordinates refer to the upright image. 13 of the
-  400 Lamar frames carry a 180-degree tag; the review renderer applies the
-  same transpose so the boxes I inspect sit where the model put them.
-- Output per image: `classifications{classes[5], scores[5]}`, `detections[{category
-  '1'|'2'|'3', label, conf, bbox[x_min,y_min,w,h] normalised}]`, `prediction`,
-  `prediction_score`, `prediction_source`, `model_version`.
-
-Overpass, measured the same day: the main instance answers HTTP 406 to
-python-requests' default User-Agent and 200 to the same query with a named
-one. The client sends `parkwild/<version>` and tries the lz4 mirror first.
-
-One optional addition, not a substitution: `phase0.py pull --with-mapillary-detections`
-also stores Mapillary's own segmentation labels (`detections.value`, e.g.
-`animal--ground-animal`). It is a free, in-domain pre-filter worth measuring
-against MegaDetector, and it costs one extra field in the query.
-
-## How the code is written (the narrative standard)
-
-Every module opens with what problem it solves, what was tried first, why
-that failed, what it does now, and what is unresolved. Every constant carries
-a provenance tag (`MEASURED`, `DERIVED`, `BORROWED`, `ASSUMED`, `ARBITRARY`)
-and says what would change it; `scripts/provenance_report.py --strict` runs
-in CI and fails on an untagged one. Replaced methods stay in the code as
-`_v1` with a docstring giving the evidence and a test that reproduces the
-comparison (`is_capped_v1`, `images_pending_download_v1`,
-`cluster_detections_v1`, `pick_sample_uniform_v1`). Every filter logs rows
-in and out to `reports/decision_log.jsonl`, and every script ends with a
-decision summary. Samples are pinned in `reports/samples/*.json` with their
-seeds. `EXPERIMENTS.md` is the ledger, failures included; `DECISIONS.md` the
-ADRs; `docs/data-cards/` one page per source.
-
-## Data model (DuckDB)
-
-| Table | Key | Purpose |
+| Source | Used for | Terms |
 |---|---|---|
-| `images` | `image_id` | crawl index with attribution columns, both raw and SfM positions, thumbnail URLs, raw JSON |
-| `tiles` | `tile_id` | crawl progress: done / split / capped |
-| `downloads` | `image_id` | local path, size kind, dimensions, sha256, or the error |
-| `predictions_raw` | `(image_id, model_version)` | SpeciesNet's ensemble output, untouched |
-| `detections_raw` | `(image_id, model_version, det_idx)` | every box, untouched |
-| `manual_review` | `(image_id, det_idx, reviewer)` | my verdicts; the only table humans write |
+| iNaturalist | research-grade observations, photographs, common names | each record and photograph under the licence its observer chose; shown beside every image |
+| GBIF | occurrence datasets with their own review | per dataset; the iNaturalist mirror is skipped by dataset key |
+| OpenStreetMap via Overpass | park boundaries, landmarks, roads, trails, amenities | ODbL |
+| Wikipedia and Wikimedia Commons | landmark summaries and photographs | CC BY-SA and the licence printed on each photograph; only reusable licences pass |
+| Mapillary | street-level imagery for the detection track | CC BY-SA 4.0; image id, contributor and licence stored with every row |
+| OpenFreeMap, USGS The National Map, AWS Terrain Tiles | base map, imagery, relief | open; attributed on the map |
+| SpeciesNet, MegaDetector, Qwen2.5 via WebLLM, CLIP via Transformers.js | detection, classification, the assistant, the photo helper | Apache 2.0 and MIT; models run locally |
 
-Raw model tables are never updated by corrections. Accuracy is always a join
-between `*_raw` and `manual_review`, so it can be recomputed later or against a
-different model version.
+Google Maps and Street View are not used anywhere, by design.
 
-## Working rules
+## Security
 
-- Ask before installing anything large or restructuring the layout.
-- Commit at the end of each phase; the message says what was verified.
-- Numbers go in `RESULTS.md` as they are produced, including bad ones.
-- Boring batch code. No agent loops. LLM calls only for genuinely ambiguous
-  species adjudication, and those get marked lower-confidence than model output.
+Reads are public. Everything that can change what is published is locked to
+one account: a protected `main` branch, pull requests with required checks,
+a secret scan in the pre-commit hook and in CI, no token in the app, a strict
+Content Security Policy with no third-party scripts, and hashed data files.
+[SECURITY.md](SECURITY.md) has the threat model.
+
+## Status
+
+Eleven parks live: Yellowstone, Grand Teton, Great Smoky Mountains, Grand
+Canyon, Zion, Yosemite, Rocky Mountain, Glacier, Acadia, Olympic and
+Shenandoah. The other 52 are in a batch that runs unattended and opens a
+data pull request after every six parks; the home page shows each park's
+status. Open questions and the reasoning behind every choice are in
+[DECISIONS.md](DECISIONS.md).

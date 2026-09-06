@@ -3,6 +3,7 @@ import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { addParksLayers, liveBounds, setParksData } from "../parksOverlay";
 import { useStore } from "../store";
+import { esc } from "../html";
 import type { ParkCard } from "../types";
 
 // The country with every park on it. A live park opens on click; the rest
@@ -29,7 +30,7 @@ export default function HomeMap({ parks }: { parks: ParkCard[] }) {
         const p = f.properties as { key: string; live: boolean; name: string; status: string };
         if (p.live) { enterRef.current(p.key); return; }
         new maplibregl.Popup({ closeButton: false, offset: 10 }).setLngLat(e.lngLat)
-          .setHTML(`<strong>${p.name}</strong><br><span class="muted">${p.status === "planned" ? "sightings are being gathered" : "not started yet"}</span>`).addTo(map);
+          .setHTML(`<strong>${esc(p.name)}</strong><br><span class="muted">${p.status === "planned" ? "sightings are being gathered" : "not started yet"}</span>`).addTo(map);
       });
       map.on("mouseenter", "parks-dot", () => (map.getCanvas().style.cursor = "pointer"));
       map.on("mouseleave", "parks-dot", () => (map.getCanvas().style.cursor = ""));

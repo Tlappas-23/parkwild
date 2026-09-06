@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useState } from "react";
+import { shortPark } from "./names";
 import { RefreshCw } from "lucide-react";
 import { hardReload, stripFreshParam } from "./data";
 import { useStore } from "./store";
@@ -53,7 +54,7 @@ export default function App() {
           {/* The current park; the home page is where parks are chosen. */}
           {page !== "home" && (
             <button className="park-link" onClick={() => setPage("home")} title="Choose another park">
-              <span className="park">{parkName}</span><span className="muted small"> · change</span>
+              <span className="park park-full">{parkName}</span><span className="park park-short">{shortPark(parkName)}</span><span className="muted small change"> · change</span>
             </button>
           )}
         </div>

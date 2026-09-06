@@ -8,6 +8,7 @@ import type { FeatureCollection } from "geojson";
 import { filteredFeatures, speciesMatches, useStore } from "../store";
 import { cruisePitch, cruiseZoom, DRIVE_LOOKAHEAD_MIN_M, DRIVE_LOOKAHEAD_PX, DRIVE_MIN_LEG_M, headingAt, legDurationMs, metersPerPixel, ORBIT_DEG_PER_S, ORBIT_PAUSE_MS, placeOf, placeOfLandmark, pointAt, resample, STOP_PITCH, STOP_ZOOM, stopBearing, thingsNear, tourStops, trailLines, type Place } from "../tour";
 import { routerFor } from "../routing";
+import { esc } from "../html";
 import type { BoundaryFile, LandmarksFile, Ring } from "../types";
 import CellDetail from "./CellDetail";
 import PlaceDetail from "./PlaceDetail";
@@ -79,7 +80,6 @@ function landmarksFC(l: LandmarksFile | null): FeatureCollection {
     })),
   };
 }
-function esc(s: string): string { return s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c] as string)); }
 
 export default function MapPage() {
   const container = useRef<HTMLDivElement>(null);
