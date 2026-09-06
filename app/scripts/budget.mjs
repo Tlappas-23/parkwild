@@ -6,6 +6,8 @@ import { join } from "node:path";
 
 const dist = join(process.cwd(), "dist", "assets");
 const ENTRY_BUDGET = 200 * 1024;
+// Lazy chunks (the map) are reported but not counted against the entry
+const CHUNK_BUDGET = { maplibre: 300 * 1024 };
 let failed = false;
 const rows = [];
 for (const f of readdirSync(dist)) {
