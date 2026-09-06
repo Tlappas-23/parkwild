@@ -16,10 +16,10 @@ export const TOUR_DWELL_MS = 14000;
 // stop: the first version sat at 12.4 / 60°, which the owner read as too far)
 export const STOP_ZOOM = 13.3;
 export const STOP_PITCH = 64;
-// ORBIT_DEG / ORBIT_MS — ARBITRARY (a slow part-turn around the stop while the
-// narration runs, so the map moves during the tour; a drag stops it)
-export const ORBIT_DEG = 45;
-export const ORBIT_MS = TOUR_DWELL_MS;
+// ORBIT_DEG_PER_S — ARBITRARY (a slow turn around the stop for as long as the
+// tour runs; about a quarter turn per dwell. The first version was one
+// 45° animation that any tap on the map cancelled for good, E-044)
+export const ORBIT_DEG_PER_S = 3.2;
 
 const EARTH_R = 6371000;
 

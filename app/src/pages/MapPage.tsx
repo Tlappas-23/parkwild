@@ -6,7 +6,7 @@ import { PARKS_INDEX } from "../parksIndex";
 import { addParksLayers, liveBounds, setParksData } from "../parksOverlay";
 import type { FeatureCollection } from "geojson";
 import { filteredFeatures, speciesMatches, useStore } from "../store";
-import { ORBIT_DEG, ORBIT_MS, placeOf, placeOfLandmark, STOP_PITCH, STOP_ZOOM, stopBearing, thingsNear, tourStops, trailLines, type Place } from "../tour";
+import { ORBIT_DEG_PER_S, placeOf, placeOfLandmark, STOP_PITCH, STOP_ZOOM, stopBearing, thingsNear, tourStops, trailLines, type Place } from "../tour";
 import type { BoundaryFile, LandmarksFile, Ring } from "../types";
 import CellDetail from "./CellDetail";
 import PlaceDetail from "./PlaceDetail";
@@ -446,15 +446,26 @@ export default function MapPage() {
     const padding = side ? { top: 0, left: 0, right: (panel?.offsetWidth ?? 300) + 28, bottom: 0 } : { top: 0, left: 0, right: 0, bottom: (panel?.offsetHeight ?? 120) + 24 };
     map.flyTo({ center: [stop.lon, stop.lat], zoom: STOP_ZOOM, pitch: STOP_PITCH, bearing: stopBearing(stops, tour.stop),
                 duration: reducedMotion ? 0 : 3000, curve: 1.5, essential: true, padding });
-    // Then a slow part-turn around the stop while the narration runs. The next
-    // flight, a drag, or leaving the tour ends it.
-    if (!reducedMotion) {
-      map.once("moveend", () => {
-        const t = useStore.getState().tour;
-        if (t.active && t.stop === tour.stop) map.easeTo({ bearing: map.getBearing() + ORBIT_DEG, duration: ORBIT_MS, easing: (x) => x });
-      });
-    }
   }, [ready, tour.active, tour.stop, stops, reducedMotion]);
+
+  // The turn around the stop: a frame loop that nudges the bearing whenever
+  // the map is not already moving, so it waits for the flight in, yields to
+  // a drag or a scroll, and picks up again on its own afterwards. Tapping a
+  // cell or a landmark never stops it (E-044).
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!ready || !map || !tour.active || reducedMotion) return;
+    let raf = 0;
+    let last = performance.now();
+    const tick = (now: number) => {
+      const dt = Math.min(now - last, 100);
+      last = now;
+      if (!map.isMoving()) map.setBearing(map.getBearing() + (ORBIT_DEG_PER_S * dt) / 1000);
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [ready, tour.active, reducedMotion]);
 
   const options = useMemo(() => {
     const list = (species?.species ?? []).filter((s) => s.suppression?.action !== "exclude");
