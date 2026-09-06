@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Bed, ChevronLeft, ChevronRight, Compass, Eye, Footprints, Info, Maximize2, Minimize2, Minus, Mountain, Pause, Play, Plus, RotateCcw, Sailboat, Signpost, Tent, UtensilsCrossed, X } from "lucide-react";
+import { Bed, Car, ChevronLeft, ChevronRight, Compass, Eye, Footprints, Info, Maximize2, Minimize2, Minus, Mountain, Pause, Play, Plane, Plus, RotateCcw, Sailboat, Signpost, Tent, UtensilsCrossed, X } from "lucide-react";
 import PhotoCredit from "../PhotoCredit";
 import { useStore } from "../store";
 import { nearbySpecies, photoNear, placeOf, thingsNear, TOUR_DWELL_MS, TOUR_RADIUS_M, tourStops, type NearItem } from "../tour";
@@ -13,7 +13,7 @@ import { nearbySpecies, photoNear, placeOf, thingsNear, TOUR_DWELL_MS, TOUR_RADI
 // always see the map". It is now a slim bar with a "Details" toggle for the
 // full text and larger photographs.
 export default function Tour() {
-  const { tour, landmarks, cells, photosSpecies, photosCells, ensureCellPhotos, tourGo, tourNext, tourPrev, tourPlay, endTour, selectSpecies, addSite, amenities, tourTab, setTourTab, selectPlace, tourDrive } = useStore();
+  const { tour, landmarks, cells, photosSpecies, photosCells, ensureCellPhotos, tourGo, tourNext, tourPrev, tourPlay, endTour, selectSpecies, addSite, amenities, tourTab, setTourTab, selectPlace, tourDrive, driveMode, setDriveMode } = useStore();
   const [expanded, setExpanded] = useState(false);
   const [minimised, setMinimised] = useState(false);   // a one-line strip: name and arrows, nothing else
   const stops = useMemo(() => tourStops(landmarks), [landmarks]);
@@ -176,6 +176,7 @@ export default function Tour() {
         <button className="primary" onClick={() => tourPlay(!tour.playing)} aria-pressed={tour.playing}>{tour.playing ? <Pause className="ico" aria-hidden="true" /> : <Play className="ico" aria-hidden="true" />}{tour.playing ? "Pause" : last ? "Replay" : "Play"}</button>
         <button className="icon-btn" onClick={last ? () => tourGo(0) : tourNext} aria-label={last ? "Back to the first stop" : "Next stop"}>{last ? <RotateCcw className="ico" aria-hidden="true" /> : <ChevronRight className="ico" aria-hidden="true" />}</button>
         <button className="icon-btn" onClick={() => setExpanded((v) => !v)} aria-expanded={expanded} aria-label={expanded ? "Less detail" : "More detail"} title={expanded ? "Less" : "Details"}>{expanded ? <Minimize2 className="ico" aria-hidden="true" /> : <Maximize2 className="ico" aria-hidden="true" />}</button>
+        <button className={"icon-btn" + (driveMode ? " on" : "")} onClick={() => setDriveMode(!driveMode)} aria-pressed={driveMode} aria-label={driveMode ? "Between stops: drive the road (tap to fly instead)" : "Between stops: fly (tap to drive the road)"} title={driveMode ? "Driving the road between stops" : "Flying between stops"}>{driveMode ? <Car className="ico" aria-hidden="true" /> : <Plane className="ico" aria-hidden="true" />}</button>
         <button className="icon-btn" onClick={() => setMinimised(true)} aria-label="Shrink to a strip" title="Minimise"><Minus className="ico" aria-hidden="true" /></button>
         <button className="icon-btn" onClick={() => addSite({ id: stop.id, label: stop.name, lon: stop.lon, lat: stop.lat, kind: "stop" })} aria-label="Add this stop to a route" title="Add to route"><Plus className="ico" aria-hidden="true" /></button>
         <button className="icon-btn" onClick={endTour} aria-label="Exit tour" title="Exit tour"><X className="ico" aria-hidden="true" /></button>

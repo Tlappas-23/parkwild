@@ -14,12 +14,13 @@ You arrive on the whole park outline. Blue hexagons are places where people reco
 - **Species** search: type "elk", "bison", a scientific name or an old name; the map keeps only cells with that species and the counts switch to that species.
 - **Years** two sliders bound the span.
 - **Tap a hexagon** for its drawer: sightings and years, the photographs taken in that cell (credited), and a link that opens the same box on iNaturalist so you can check it yourself. With a species filter on, the drawer leads with that species and folds the rest away. "Add this spot to a route" sends it to the planner.
+- **Rotate and tilt** with the four buttons above the zoom control, or a right-drag (two fingers on a phone). The compass resets north.
 - **All parks** zooms out to the country; click another park's dot to glide into it.
 - The panel folds with the chevron; the "Filters" pill brings it back. It folds on its own when a tour starts.
 
 ## Tour
 
-"Take the tour" flies from stop to stop in satellite 3D, facing the next stop, and turns slowly while you read. The card in the corner has three tabs:
+"Take the tour" lands close over each stop in satellite 3D and turns slowly while you read; turn or tilt the map yourself and it waits ten seconds before taking over again. On Next the camera drops onto the road and drives the shortest road path to the next stop from a driver's height, then settles over it; the car/plane button on the card switches to a straight flight instead, and the choice is remembered. The card in the corner has three tabs:
 
 - **Wildlife**: the species recorded within 2.5 km, each with a photograph taken near that stop when one exists ("near here").
 - **Things to do**: key features, hikes with lengths, camping and lodging with the fees and reservation rules OpenStreetMap carries, and facilities; a plus on each adds it to a route; the same items appear on the map while the tab is open.

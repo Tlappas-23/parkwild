@@ -19,13 +19,26 @@ export const STOP_PITCH = 62;
 // DRIVE_* — ARBITRARY (the road between stops from a driver's height: low
 // zoom, steep pitch, distance compressed so a 20 km leg takes about ten
 // seconds and a short one never less than four)
-export const DRIVE_ZOOM = 15.4;
-export const DRIVE_PITCH = 72;
+export const DRIVE_ZOOM = 14.8;
+export const DRIVE_PITCH = 64;
 export const DRIVE_SPEED_MS = 2200;      // virtual metres per second
 export const DRIVE_MIN_MS = 4000;
 export const DRIVE_MAX_MS = 14000;
 // DRIVE_LOOKAHEAD_M — ARBITRARY (the camera faces this far up the road; shorter jitters on bends)
 export const DRIVE_LOOKAHEAD_M = 120;
+// DRIVE_MIN_LEG_M — ARBITRARY (a leg shorter than this is a hop, not a drive)
+export const DRIVE_MIN_LEG_M = 250;
+
+// The heading of the road at distance d: toward a point ahead, or, in the last
+// stretch where nothing is ahead, from a point behind. The first version
+// looked "ahead" to the end point itself and spun toward north on arrival.
+export function headingAt(rs: Resampled, d: number, lookM: number): number {
+  const ahead = Math.min(rs.total, d + lookM);
+  if (ahead - d > 5) return bearingDeg(pointAt(rs, d), pointAt(rs, ahead));
+  return bearingDeg(pointAt(rs, Math.max(0, d - lookM)), pointAt(rs, rs.total));
+}
+// ORBIT_PAUSE_MS — ARBITRARY (after the visitor turns the map, the tour keeps its hands off this long)
+export const ORBIT_PAUSE_MS = 10000;
 // ORBIT_DEG_PER_S — ARBITRARY (a slow turn around the stop for as long as the
 // tour runs; about a quarter turn per dwell. The first version was one
 // 45° animation that any tap on the map cancelled for good, E-044)
@@ -231,28 +244,31 @@ export function speciesNearLines(cells: CellsFile | null, lines: number[][][], b
 // A polyline resampled to even steps, with cumulative distance, so the drive
 // can place the camera at any distance along it.
 export interface Resampled { pts: number[][]; cum: number[]; total: number; }
+// Points every stepM metres along a line, with their distance from the start.
+// One running distance for the whole line. resample_v1 kept a per-segment
+// "carry" and added it back at every vertex, so on an OSM road with a vertex
+// every 10 to 50 m the distance table drifted by half a step per vertex; the
+// camera driven off it crawled, then jumped, and its heading whipped around
+// (the "map gets all messed up" report on the first drive, E-047).
 export function resample(coords: number[][], stepM: number): Resampled {
   const pts: number[][] = [coords[0]];
   const cum: number[] = [0];
-  let carry = 0, total = 0;
+  let segStart = 0;          // distance from the start to the current vertex
+  let next = stepM;          // distance of the next sample to place
   for (let i = 1; i < coords.length; i++) {
     const [ax, ay] = coords[i - 1], [bx, by] = coords[i];
     const seg = haversineM(ax, ay, bx, by);
     if (seg === 0) continue;
-    let d = stepM - carry;
-    while (d <= seg) {
-      const f = d / seg;
+    while (next <= segStart + seg) {
+      const f = (next - segStart) / seg;
       pts.push([ax + (bx - ax) * f, ay + (by - ay) * f]);
-      total += stepM;
-      cum.push(total);
-      d += stepM;
+      cum.push(next);
+      next += stepM;
     }
-    carry = seg - (d - stepM);
-    total = cum[cum.length - 1] + carry;
+    segStart += seg;
   }
-  const lastTotal = cum[cum.length - 1] + carry;
-  pts.push(coords[coords.length - 1]); cum.push(lastTotal);
-  return { pts, cum, total: lastTotal };
+  pts.push(coords[coords.length - 1]); cum.push(segStart);
+  return { pts, cum, total: segStart };
 }
 export function pointAt(rs: Resampled, d: number): [number, number] {
   if (d <= 0) return rs.pts[0] as [number, number];
