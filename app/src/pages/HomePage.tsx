@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useStore } from "../store";
 import type { ParkCard, ParksIndex } from "../types";
 
@@ -12,8 +13,10 @@ function initials(name: string): string {
 
 export default function HomePage() {
   const { enterPark, park } = useStore();
-  const live = index.parks.filter((p) => p.status === "live");
-  const planned = index.parks.filter((p) => p.status !== "live");
+  const [q, setQ] = useState("");
+  const match = (p: ParkCard) => !q.trim() || `${p.name} ${p.state}`.toLowerCase().includes(q.trim().toLowerCase());
+  const live = index.parks.filter((p) => p.status === "live" && match(p));
+  const planned = index.parks.filter((p) => p.status !== "live" && match(p));
 
   const card = (p: ParkCard) => (
     <button key={p.key} className={"park-card" + (p.status !== "live" ? " planned" : "") + (p.key === park ? " current" : "")}
@@ -47,7 +50,11 @@ export default function HomePage() {
           Every recorded sighting in America's national parks, from people who were there, on a 3D map you can tour, filter by species, and plan a route through.
           Pick a park.
         </p>
+        <div className="search home-search">
+          <input type="search" placeholder="Find a park…" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Find a park" autoComplete="off" autoFocus />
+        </div>
       </div>
+      {live.length === 0 && planned.length === 0 && <p className="muted">No park matches "{q}".</p>}
       <div className="park-grid">{live.map(card)}</div>
       {planned.length > 0 && (
         <>

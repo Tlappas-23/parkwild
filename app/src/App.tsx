@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { hardReload, stripFreshParam } from "./data";
 import { useStore } from "./store";
 import SpeciesPage from "./pages/SpeciesPage";
@@ -18,9 +18,26 @@ function nudgeWaitingWorker(): void {
   } catch { /* no worker support */ }
 }
 
+// RELOAD_GRACE_MS — ARBITRARY (a controller change this soon after load is
+// the update the page was waiting for, not something the visitor is doing)
+const RELOAD_GRACE_MS = 30_000;
+
 export default function App() {
   const { page, setPage, load, error, species, parkName } = useStore();
+  const [updateReady, setUpdateReady] = useState(false);
   useEffect(() => { stripFreshParam(); nudgeWaitingWorker(); void load(); }, [load]);
+  // When a new worker takes over: reload at once if the page just opened,
+  // otherwise offer it, so a tour or a plan is never yanked away (E-034).
+  useEffect(() => {
+    const started = Date.now();
+    let hadController = !!navigator.serviceWorker?.controller;
+    const onChange = () => {
+      if (!hadController) { hadController = true; return; }     // first install, nothing to swap
+      if (Date.now() - started < RELOAD_GRACE_MS) window.location.reload(); else setUpdateReady(true);
+    };
+    try { navigator.serviceWorker?.addEventListener("controllerchange", onChange); } catch { /* no worker support */ }
+    return () => { try { navigator.serviceWorker?.removeEventListener("controllerchange", onChange); } catch { /* ignore */ } };
+  }, []);
 
   return (
     <div className="app">
@@ -45,6 +62,11 @@ export default function App() {
           ))}
         </nav>
       </header>
+      {updateReady && (
+        <div className="update-pill" role="status">
+          A newer version is ready. <button className="primary small-btn" onClick={() => window.location.reload()}>Reload</button>
+        </div>
+      )}
       <main className={page === "map" ? "main-map" : ""}>
         {page === "home" && <HomePage />}
         {page !== "home" && error && (
