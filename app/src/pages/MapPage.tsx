@@ -3,7 +3,7 @@ import maplibregl, { type GeoJSONSource, type LngLatBoundsLike, type Map as MLMa
 import "maplibre-gl/dist/maplibre-gl.css";
 import type { FeatureCollection } from "geojson";
 import { filteredFeatures, speciesMatches, useStore } from "../store";
-import { ORBIT_DEG, ORBIT_MS, STOP_PITCH, STOP_ZOOM, stopBearing, tourStops } from "../tour";
+import { ORBIT_DEG, ORBIT_MS, STOP_PITCH, STOP_ZOOM, stopBearing, thingsNear, tourStops } from "../tour";
 import type { BoundaryFile, LandmarksFile, Ring } from "../types";
 import CellDetail from "./CellDetail";
 import PlanPanel from "./PlanPanel";
@@ -81,6 +81,7 @@ export default function MapPage() {
   const {
     cells, species, boundary, landmarks, speciesFilter, yearRange, setSpeciesFilter, setYearRange, selectCell, selectedCell,
     reducedMotion, basemap, setBasemap, terrain3d, setTerrain3d, tour, startTour, tourGo, plan, location, openPlan, addSite, park, cameraPass,
+    amenities, tourTab,
   } = useStore();
   const [query, setQuery] = useState("");
   // Handlers are registered once on the map; refs keep them pointing at the live store actions.
@@ -129,6 +130,7 @@ export default function MapPage() {
       map.addSource("route-stops", { type: "geojson", data: EMPTY });
       map.addSource("me", { type: "geojson", data: EMPTY });
       map.addSource("corridors", { type: "geojson", data: EMPTY });
+      map.addSource("things", { type: "geojson", data: EMPTY });
 
       // Imagery sits right above the style's background so every road, river
       // and label stays on top of it; the hillshade goes under the lines.
@@ -179,6 +181,13 @@ export default function MapPage() {
       map.addLayer({ id: "corridor-label", type: "symbol", source: "corridors", minzoom: 8,
         layout: { "text-field": ["get", "label"], "text-font": ["Noto Sans Regular"], "text-size": 10.5, "text-anchor": "bottom-left", "text-offset": [0.3, -0.3], "text-max-width": 14 },
         paint: { "text-color": "#8a5200", "text-halo-color": "rgba(255,255,255,0.92)", "text-halo-width": 1.3 } });
+      // Things to do around the current stop, coloured by kind, while that tab is open.
+      map.addLayer({ id: "things-dot", type: "circle", source: "things",
+        paint: { "circle-radius": 5.5, "circle-stroke-color": "#ffffff", "circle-stroke-width": 1.5,
+                 "circle-color": ["match", ["get", "kind"], "camp", "#15803d", "stay", "#0f766e", "trail", "#7c2d12", "trailhead", "#9a3412", "feature", "#6d28d9", "#0369a1"] } });
+      map.addLayer({ id: "things-label", type: "symbol", source: "things", minzoom: 11,
+        layout: { "text-field": ["get", "label"], "text-font": ["Noto Sans Regular"], "text-size": 10.5, "text-offset": [0, 0.8], "text-anchor": "top", "text-optional": true, "text-max-width": 10 },
+        paint: { "text-color": "#1f2937", "text-halo-color": "rgba(255,255,255,0.92)", "text-halo-width": 1.2 } });
       map.addLayer({ id: "route-stop-dot", type: "circle", source: "route-stops",
         paint: { "circle-radius": 11, "circle-color": "#c2410c", "circle-stroke-color": "#ffffff", "circle-stroke-width": 2 } });
       map.addLayer({ id: "route-stop-n", type: "symbol", source: "route-stops",
@@ -192,9 +201,18 @@ export default function MapPage() {
                    "horizon-fog-blend": 0.8, "sky-horizon-blend": 0.6, "atmosphere-blend": ["interpolate", ["linear"], ["zoom"], 0, 1, 10, 1, 12, 0] });
 
       // One click handler: a landmark wins over the cell under it.
-      const hitLayers = ["landmark-dot", "cells-fill", "cells-coarse"];
+      const hitLayers = ["things-dot", "landmark-dot", "cells-fill", "cells-coarse"];
       map.on("click", (e) => {
         const hits = map.queryRenderedFeatures(e.point, { layers: hitLayers });
+        const th = hits.find((f) => f.layer.id === "things-dot");
+        if (th) {
+          const p = th.properties as { label: string; detail: string; kind: string; lon: number; lat: number };
+          new maplibregl.Popup({ closeButton: false, offset: 10, maxWidth: "260px" }).setLngLat(e.lngLat)
+            .setHTML(`<strong>${esc(p.label)}</strong><br><span class="muted">${esc(p.detail)}</span>`
+              + `<br><button class="popup-add small-btn" data-lon="${p.lon}" data-lat="${p.lat}" data-label="${esc(p.label)}">+ Add to route</button>`)
+            .addTo(map);
+          return;
+        }
         const lm = hits.find((f) => f.layer.id === "landmark-dot");
         if (lm) {
           const p = lm.properties as { name: string; kind: string; tour: number; url: string };
@@ -218,6 +236,10 @@ export default function MapPage() {
     const onDocClick = (ev: MouseEvent) => {
       const btn = (ev.target as HTMLElement | null)?.closest?.(".popup-add") as HTMLElement | null;
       if (!btn) return;
+      if (btn.dataset.lon && btn.dataset.lat && btn.dataset.label) {
+        addSiteRef.current({ id: `pt:${btn.dataset.lon},${btn.dataset.lat}`, label: btn.dataset.label, lon: +btn.dataset.lon, lat: +btn.dataset.lat, kind: "landmark" });
+        return;
+      }
       const l = landmarksRef.current?.landmarks.find((x) => x.id === btn.dataset.id);
       if (l) addSiteRef.current({ id: l.id, label: l.name, lon: l.lon, lat: l.lat, kind: l.tour !== undefined ? "stop" : "landmark" });
     };
@@ -321,6 +343,17 @@ export default function MapPage() {
     const map = mapRef.current;
     if (ready && map) (map.getSource("me") as GeoJSONSource).setData(location ? { type: "FeatureCollection", features: [{ type: "Feature", properties: {}, geometry: { type: "Point", coordinates: [location.lon, location.lat] } }] } : EMPTY);
   }, [ready, location]);
+
+  // Markers for the things-to-do tab: the current stop's items, nothing else.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!ready || !map) return;
+    const stop = tour.active && tourTab === "todo" ? stops[tour.stop] : undefined;
+    const th = stop ? thingsNear(amenities, stop.lon, stop.lat) : null;
+    const all = th ? [...th.features, ...th.trails, ...th.hike, ...th.camp, ...th.stay, ...th.facilities] : [];
+    (map.getSource("things") as GeoJSONSource).setData({ type: "FeatureCollection", features: all.map((it) => ({
+      type: "Feature", properties: { label: it.label, detail: it.detail, kind: it.kind, lon: it.lon, lat: it.lat }, geometry: { type: "Point", coordinates: [it.lon, it.lat] } })) });
+  }, [ready, tour.active, tour.stop, tourTab, stops, amenities]);
 
   // The tour camera: fly to the stop, pitched, facing the next stop. Leaving
   // the tour eases back to the whole park.

@@ -10,13 +10,18 @@ import type { Landmark } from "../types";
 // driving or walking, and the router orders them and draws the way. Every
 // leg links to OpenStreetMap's directions page for turn-by-turn on the road.
 export default function PlanPanel() {
-  const { plan, landmarks, cells, speciesFilter, location, locationError, locate, closePlan, addSite, removeSite, setPlanStart, setPlanMode, computePlan, clearPlan } = useStore();
+  const { plan, landmarks, cells, speciesFilter, location, locationError, locate, closePlan, addSite, removeSite, setPlanStart, setPlanMode, computePlan, clearPlan, amenities } = useStore();
   const [q, setQ] = useState("");
   const stops = useMemo(() => tourStops(landmarks), [landmarks]);
+  // Landmarks first, then named campsites, trailheads, visitor centres and features.
   const found = useMemo(() => {
     const n = q.trim().toLowerCase();
-    return n ? (landmarks?.landmarks ?? []).filter((l) => l.name.toLowerCase().includes(n)).slice(0, 8) : [];
-  }, [landmarks, q]);
+    type Found = { id: string; name: string; kind: string; lon: number; lat: number; tour?: number };
+    if (!n) return [] as Found[];
+    const lm: Found[] = (landmarks?.landmarks ?? []).filter((l) => l.name.toLowerCase().includes(n)).map((l) => ({ id: l.id, name: l.name, kind: l.kind, lon: l.lon, lat: l.lat, tour: l.tour }));
+    const am: Found[] = (amenities?.items ?? []).filter((i) => i.named && i.name.toLowerCase().includes(n)).map((i) => ({ id: i.id, name: i.name, kind: i.kind === "info" ? "visitor centre" : i.sub, lon: i.lon, lat: i.lat }));
+    return [...lm, ...am].slice(0, 10);
+  }, [landmarks, amenities, q]);
   // The filtered species' three busiest open cells, as places to go and look.
   const hotspots = useMemo<Site[]>(() => {
     if (!cells || !speciesFilter) return [];
@@ -73,7 +78,7 @@ export default function PlanPanel() {
           <ul className="suggest" role="listbox">
             {found.map((l) => (
               <li key={l.id} role="option" aria-selected="false">
-                <button onClick={() => { addSite(siteOf(l)); setQ(""); }}><span>{l.name}</span><span className="muted small">{l.kind}</span></button>
+                <button onClick={() => { addSite({ id: l.id, label: l.name, lon: l.lon, lat: l.lat, kind: l.tour !== undefined ? "stop" : "landmark" }); setQ(""); }}><span>{l.name}</span><span className="muted small">{l.kind}</span></button>
               </li>
             ))}
           </ul>

@@ -146,6 +146,7 @@ make track-a PARK=yellowstone          # ingest iNaturalist + GBIF, dedupe, expo
 .venv/bin/python scripts/track_a.py ingest --park yellowstone --include-ebird      # only after ADR-0011 is decided
 .venv/bin/python scripts/track_a.py landmarks --park yellowstone   # park outline + OSM landmarks + tour stops (network, no DB)
 .venv/bin/python scripts/track_a.py roads --park yellowstone       # roads.json: OSM roads + trails graph for the route planner (network, no DB)
+.venv/bin/python scripts/track_a.py amenities --park yellowstone   # amenities.json: things to do, camping, trails around each place
 .venv/bin/python scripts/track_a.py index                          # app/public/data/parks.json: every park, counts, credited hero photo
 .venv/bin/python scripts/parks_seed.py                             # look up all 63 parks on iNaturalist -> config/parks.seed.toml
 ```
@@ -156,8 +157,9 @@ make track-a PARK=yellowstone          # ingest iNaturalist + GBIF, dedupe, expo
    a `[key]` table to `config/parks.toml` with name, state, place id, bbox and
    an ordered `tour` list (OSM feature names; `tour_fallback` gives a
    coordinate and an `@wiki` article title for stops OSM cannot name).
-2. `make track-a PARK=key`, then `track_a.py landmarks --park key` and
-   `track_a.py roads --park key`, then `make app-data PARK=key`. The app lists every park whose data folder was
+2. `make track-a PARK=key`, then `track_a.py landmarks --park key`,
+   `track_a.py roads --park key` and `track_a.py amenities --park key`, then
+   `make app-data PARK=key`. The app lists every park whose data folder was
    baked in; `?park=key` opens it directly. Suppression and taxonomy rules
    apply everywhere; the imagery track and bias figures are per corridor.
 

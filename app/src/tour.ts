@@ -2,7 +2,7 @@
 // and which way the camera should face. Pure functions; the map page and the
 // tour panel both use them.
 import { cellPhotos, speciesPhotos, type Photo } from "./photos";
-import type { CellsFile, Landmark, LandmarksFile, PhotosCellsFile, PhotosSpeciesFile } from "./types";
+import type { AmenitiesFile, AmenityItem, CellsFile, Landmark, LandmarksFile, PhotosCellsFile, PhotosSpeciesFile, TrailItem } from "./types";
 
 // TOUR_RADIUS_M — ASSUMED (a valley-scale neighbourhood around a viewpoint)
 // Sightings within this distance of a stop count as "recorded here". 2.5 km
@@ -101,4 +101,51 @@ export function photoNear(species: string, cellIds: string[], photosCells: Photo
   const g = gallery.find((p) => p.cell !== null && near.has(p.cell));
   if (g) return { photo: g, near: true };
   return gallery[0] ? { photo: gallery[0], near: false } : null;
+}
+
+
+// NEAR_M / CAMP_M — ASSUMED (what counts as "around here": features, trails and
+// facilities within a short walk or drive; a campground or lodge is a longer
+// drive away and there are few of them, so the net is wider)
+export const NEAR_M = 3000;
+export const CAMP_M = 12000;
+// PER_GROUP — ARBITRARY (a card, not a directory)
+export const PER_GROUP = 6;
+
+export interface NearItem { id: string; kind: string; label: string; detail: string; lon: number; lat: number; distM: number; }
+export interface Things { features: NearItem[]; trails: NearItem[]; hike: NearItem[]; camp: NearItem[]; stay: NearItem[]; facilities: NearItem[]; total: number; }
+
+function campDetail(it: AmenityItem, distM: number): string {
+  const t = it.tags;
+  const bits = [fmtDist(distM)];
+  if (t.backcountry === "yes") bits.push("backcountry");
+  if (t.capacity) bits.push(`${t.capacity} sites`);
+  if (t.fee) bits.push(t.fee === "no" ? "free" : "fee");
+  if (t.reservation) bits.push(t.reservation === "no" ? "first come" : `reservation ${t.reservation}`);
+  if (t.seasonal && t.seasonal !== "no") bits.push("seasonal");
+  return bits.join(" · ");
+}
+export function fmtDist(m: number): string { return m < 950 ? `${Math.round(m / 50) * 50} m` : `${(m / 1000).toFixed(1)} km`; }
+
+// Everything worth doing around a point, grouped, nearest first (trails by
+// length), capped per group. Items keep their coordinates so the map can mark
+// them and the planner can add them.
+export function thingsNear(a: AmenitiesFile | null, lon: number, lat: number): Things {
+  const empty: Things = { features: [], trails: [], hike: [], camp: [], stay: [], facilities: [], total: 0 };
+  if (!a) return empty;
+  const near = <T extends AmenityItem | TrailItem>(list: T[], radius: number) =>
+    list.map((it) => ({ it, d: haversineM(lon, lat, it.lon, it.lat) })).filter((x) => x.d <= radius).sort((x, y) => x.d - y.d);
+  const item = (it: AmenityItem, d: number, detail?: string): NearItem =>
+    ({ id: it.id, kind: it.kind, label: it.name, detail: detail ?? `${it.sub}${it.tags.ele ? ` · ${Math.round(+it.tags.ele).toLocaleString()} m` : ""} · ${fmtDist(d)}`, lon: it.lon, lat: it.lat, distM: d });
+  const items = a.items;
+  const features = near(items.filter((i) => i.kind === "feature"), NEAR_M).slice(0, PER_GROUP).map(({ it, d }) => item(it, d));
+  const hike = near(items.filter((i) => i.kind === "trailhead"), NEAR_M).slice(0, PER_GROUP).map(({ it, d }) => item(it, d, `trailhead · ${fmtDist(d)}`));
+  const trails = near(a.trails, NEAR_M).sort((x, y) => y.it.length_m - x.it.length_m).slice(0, PER_GROUP)
+    .map(({ it, d }) => ({ id: it.id, kind: "trail", label: it.name, detail: `${(it.length_m / 1000).toFixed(1)} km of trail · ${fmtDist(d)} away`, lon: it.lon, lat: it.lat, distM: d }));
+  const camp = near(items.filter((i) => i.kind === "camp"), CAMP_M).slice(0, PER_GROUP).map(({ it, d }) => item(it, d, campDetail(it, d)));
+  const stay = near(items.filter((i) => i.kind === "stay"), CAMP_M).slice(0, 3).map(({ it, d }) => item(it, d, `${it.sub} · ${fmtDist(d)}`));
+  const facilities = near(items.filter((i) => ["viewpoint", "picnic", "info", "boat"].includes(i.kind)), NEAR_M).slice(0, PER_GROUP)
+    .map(({ it, d }) => item(it, d, `${it.kind === "info" ? "visitor centre" : it.sub} · ${fmtDist(d)}`));
+  const total = features.length + trails.length + hike.length + camp.length + stay.length + facilities.length;
+  return { features, trails, hike, camp, stay, facilities, total };
 }

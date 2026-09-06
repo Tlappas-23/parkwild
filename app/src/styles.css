@@ -288,8 +288,20 @@ table.pass th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05
 @media (min-width: 900px) {
   .legend { left: auto; right: 14px; bottom: 132px; max-width: 320px; }
 }
-@media (max-width: 899px) {
-  .map-page.touring .legend { display: none; }
-}
+/* the legend explains the cells; during a tour the card is the guide */
+.map-page.touring .legend { display: none; }
 .tour-card .thumb { position: relative; display: block; }
 .near-tag { position: absolute; left: 4px; bottom: 4px; background: rgba(15,23,42,0.72); color: #fff; font-size: 9px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; padding: 2px 5px; border-radius: 999px; }
+
+
+/* things to do */
+.tour-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); }
+.tour-tabs button { font: inherit; font-size: 12.5px; font-weight: 600; background: none; border: 0; border-bottom: 2px solid transparent; padding: 4px 8px 6px; color: var(--muted); cursor: pointer; }
+.tour-tabs button.on { color: var(--fg); border-bottom-color: var(--fg); }
+.tour-todo { display: grid; gap: 8px; max-height: 38vh; overflow: auto; scrollbar-width: thin; padding-right: 2px; }
+.todo-group .eyebrow { margin-bottom: 3px; }
+.todo-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.todo-list li { display: grid; grid-template-columns: 10px 1fr auto; gap: 8px; align-items: center; font-size: 12.5px; line-height: 1.25; }
+.todo-dot { width: 9px; height: 9px; border-radius: 50%; background: #0369a1; border: 1.5px solid #fff; box-shadow: 0 0 0 1px rgba(0,0,0,0.12); }
+.todo-dot.camp { background: #15803d; } .todo-dot.stay { background: #0f766e; } .todo-dot.trail { background: #7c2d12; } .todo-dot.trailhead { background: #9a3412; } .todo-dot.feature { background: #6d28d9; }
+.chip-x.add { border: 1px solid var(--line); border-radius: 999px; width: 22px; height: 22px; font-size: 14px; line-height: 1; display: grid; place-items: center; }

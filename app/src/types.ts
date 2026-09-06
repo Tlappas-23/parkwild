@@ -141,3 +141,10 @@ export interface CameraPassFile {
   thresholds: { detection_min_conf: number; species_min_score: number; range_m: number };
   corridors: CameraPassCorridor[]; notes: Record<string, string>;
 }
+
+// Things to do around a place (parkwild/amenities.py): OSM items by kind, and
+// named trails summed from the routing graph.
+export type AmenityKind = "feature" | "trailhead" | "viewpoint" | "picnic" | "info" | "boat" | "camp" | "stay";
+export interface AmenityItem { id: string; kind: AmenityKind; sub: string; name: string; named: boolean; lon: number; lat: number; tags: Record<string, string>; }
+export interface TrailItem { id: string; kind: "trail"; name: string; length_m: number; pieces: number; lon: number; lat: number; }
+export interface AmenitiesFile { park: string; fetched: string; attribution: string; kinds: string[]; items: AmenityItem[]; trails: TrailItem[]; }
