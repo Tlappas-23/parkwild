@@ -1,0 +1,53 @@
+{
+  "built": "2026-09-06T20:07:32+00:00",
+  "git_commit": "74777f72d19d7261a82a618cf7b909cadc58e0ee",
+  "files": {
+    "cells.geojson": {
+      "sha256": "2ffacbee55afec5ed5af5b0fed067c0e3f9a8cf6f0e9d0b8a914ff9fdca4cb64",
+      "bytes": 176910
+    },
+    "species.json": {
+      "sha256": "bb669a4aa38d72fcdc998551d95155de3525d536e771ddfd0fd54509c2bbad5e",
+      "bytes": 45861
+    },
+    "sightings.parquet": {
+      "sha256": "9cebe6535565fe2e690fea67cfb9426a001fbfdf9ed5e901f3024887b6b6ce16",
+      "bytes": 223354
+    },
+    "photos_species.json": {
+      "sha256": "16464396bfee0e4225ddb4063de893387e530e3f09501bba4e9642fd3e24e3d6",
+      "bytes": 52405
+    },
+    "photos_cells.json": {
+      "sha256": "db172a8aa38863a1383f6daeed9c4b19964c95d6ae1dcee161ba17a073351e66",
+      "bytes": 83646
+    },
+    "places.json": {
+      "sha256": "1d69be6a9357ce14791eed1502359edeb7e047a1db1aa668cf5040685569af62",
+      "bytes": 44603
+    },
+    "landmarks.json": {
+      "sha256": "791b64cacdb921a39a10839cc45de159cdca5584506164a6aec8f8704b4ec631",
+      "bytes": 23719
+    },
+    "boundary.geojson": {
+      "sha256": "e82f9d38020a38835c4f3fe85e366f285b9aee75748f997ecd97a98d736e18cc",
+      "bytes": 1447
+    },
+    "roads.json": {
+      "sha256": "1eda6b68f551902f25cccdfbc681557a462e5130194cafed94eac28297ec6b91",
+      "bytes": 174724
+    },
+    "camera_pass.json": {
+      "sha256": "51b0f695773251f76011aace784375afeb64e4b0d5bdd9cf5c08ba08cfdb32a2",
+      "bytes": 441
+    },
+    "amenities.json": {
+      "sha256": "932d64dd26a6b25b022bb589ba0145375a00e4afe9c5fa5fe8b750488cc091c5",
+      "bytes": 23686
+    }
+  },
+  "park": "crater_lake",
+  "name": "Crater Lake National Park",
+  "state": "OR"
+}

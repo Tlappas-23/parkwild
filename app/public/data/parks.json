@@ -1,9 +1,9 @@
 {
- "generated": "2026-09-06T19:54:03+00:00",
+ "generated": "2026-09-06T20:33:26+00:00",
  "attribution": "Park photographs: Wikimedia Commons, each under the licence printed on its card",
  "species_index": {
-  "sha256": "efcda73d3161a383ca58d4d905591a29f366ded7cf0bd8fcf9c5ba7959984dd3",
-  "bytes": 985049
+  "sha256": "26387a7a35d612062a3c213abcac8e3cb2de6e9604dd7522c73566cb1c101b8b",
+  "bytes": 1112313
  },
  "parks": [
   {
@@ -670,7 +670,7 @@
    "key": "canyonlands",
    "name": "Canyonlands National Park",
    "state": "UT",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -110.2352,
     37.9599,
@@ -681,11 +681,11 @@
     -109.9496,
     38.234
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 119,
+   "sightings": 1286,
+   "cells": 406,
+   "stops": 8,
+   "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Green_River_Overlook_Ekker_Butte.jpg/1280px-Green_River_Overlook_Ekker_Butte.jpg",
     "page": "https://commons.wikimedia.org/wiki/File:Green_River_Overlook_Ekker_Butte.jpg",
@@ -699,7 +699,7 @@
    "key": "capitol_reef",
    "name": "Capitol Reef National Park",
    "state": "UT",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -111.4233,
     37.5986,
@@ -710,11 +710,11 @@
     -111.1427,
     38.0665
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 132,
+   "sightings": 1382,
+   "cells": 253,
+   "stops": 6,
+   "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Capitol_Reef_National_Park.jpg/1280px-Capitol_Reef_National_Park.jpg",
     "page": "https://commons.wikimedia.org/wiki/File:Capitol_Reef_National_Park.jpg",
@@ -728,7 +728,7 @@
    "key": "crater_lake",
    "name": "Crater Lake National Park",
    "state": "OR",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -122.3025,
     42.7686,
@@ -739,11 +739,11 @@
     -122.1343,
     42.9287
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 109,
+   "sightings": 3108,
+   "cells": 419,
+   "stops": 8,
+   "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Above_Crater_Lake_%28cropped%29.jpg/1280px-Above_Crater_Lake_%28cropped%29.jpg",
     "page": "https://commons.wikimedia.org/wiki/File:Above_Crater_Lake_(cropped).jpg",
@@ -757,7 +757,7 @@
    "key": "badlands",
    "name": "Badlands National Park",
    "state": "SD",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -102.8981,
     43.4767,
@@ -768,11 +768,11 @@
     -102.3939,
     43.6995
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 136,
+   "sightings": 6713,
+   "cells": 953,
+   "stops": 0,
+   "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/MK00609_Badlands.jpg/1280px-MK00609_Badlands.jpg",
     "page": "https://commons.wikimedia.org/wiki/File:MK00609_Badlands.jpg",
@@ -786,7 +786,7 @@
    "key": "theodore_roosevelt",
    "name": "Theodore Roosevelt National Park",
    "state": "ND",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -103.6308,
     46.8883,
@@ -797,11 +797,11 @@
     -103.4369,
     47.26
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 146,
+   "sightings": 4165,
+   "cells": 698,
+   "stops": 0,
+   "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/View_of_Theodore_Roosevelt_National_Park.jpg/1280px-View_of_Theodore_Roosevelt_National_Park.jpg",
     "page": "https://commons.wikimedia.org/wiki/File:View_of_Theodore_Roosevelt_National_Park.jpg",
@@ -815,7 +815,7 @@
    "key": "new_river_gorge",
    "name": "New River Gorge National Park and Preserve",
    "state": "WV",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -81.1565,
     37.6742,
@@ -826,11 +826,11 @@
     -81.0063,
     37.8965
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 155,
+   "sightings": 1371,
+   "cells": 340,
+   "stops": 8,
+   "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Grandview_Overlook%2C_New_River.jpg/1280px-Grandview_Overlook%2C_New_River.jpg",
     "page": "https://commons.wikimedia.org/wiki/File:Grandview_Overlook,_New_River.jpg",

@@ -1,0 +1,53 @@
+{
+  "built": "2026-09-06T20:19:53+00:00",
+  "git_commit": "74777f72d19d7261a82a618cf7b909cadc58e0ee",
+  "files": {
+    "cells.geojson": {
+      "sha256": "6ffbb8a416f23759b272f0231e62bd429085c32f1db0d1d1ff992143125f04cd",
+      "bytes": 388959
+    },
+    "species.json": {
+      "sha256": "545fcde30443ea89a716f8630102cf855eec18f41c5e56199f5ca5dfac943f0d",
+      "bytes": 57059
+    },
+    "sightings.parquet": {
+      "sha256": "52c928ca9e6bf847f51781bf69e814d06deeb555ae182d805f35c972f832be95",
+      "bytes": 440471
+    },
+    "photos_species.json": {
+      "sha256": "2317cd27f6f3170e53032c7b2b6a965eb8f7ee9ab552385283bf8e4b2b09e876",
+      "bytes": 65873
+    },
+    "photos_cells.json": {
+      "sha256": "dfac850ce0af39fc485c27d75231cccdd1881a532ae12c59d6d738ec03b885ec",
+      "bytes": 163300
+    },
+    "places.json": {
+      "sha256": "febfae18984d3fbabf8da4f9e185168b6eb481de252f3ae0323d2a72b02c06a3",
+      "bytes": 20835
+    },
+    "landmarks.json": {
+      "sha256": "82926181589913564c7723fbdcbc4ba0c9c081003d97a9ec76b11d31d4d463b0",
+      "bytes": 263
+    },
+    "boundary.geojson": {
+      "sha256": "e0e36af156495336eb0d28dbd9c729a3d5c894bb6a0785e59b3c2606005836a0",
+      "bytes": 4761
+    },
+    "roads.json": {
+      "sha256": "ff2df3b228af2416bcf52a624310cfe61f23d3d10742a6a23049fb6fd4a9f5d0",
+      "bytes": 194558
+    },
+    "camera_pass.json": {
+      "sha256": "304ea93285365f393981df9b924c70556ff62b4d56ea8a3bf83f811b24840026",
+      "bytes": 438
+    },
+    "amenities.json": {
+      "sha256": "9237089c2640af83b2d0d0cc6b93e910e5009c3c1ce5cb1629e55c52c89f5430",
+      "bytes": 11424
+    }
+  },
+  "park": "badlands",
+  "name": "Badlands National Park",
+  "state": "SD"
+}

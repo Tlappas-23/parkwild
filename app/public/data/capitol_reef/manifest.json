@@ -1,0 +1,53 @@
+{
+  "built": "2026-09-06T20:01:11+00:00",
+  "git_commit": "a9617339daa4a1be67801a0feeb458aa80e9fcea",
+  "files": {
+    "cells.geojson": {
+      "sha256": "411a094b898c5fa41411c14087fee24a0cdab4ef958859ea603854a294574174",
+      "bytes": 107739
+    },
+    "species.json": {
+      "sha256": "81c0c7e576a6ec7cb833ca8b53da3b0068f762f17ea00380a52108e0b6798a3d",
+      "bytes": 55231
+    },
+    "sightings.parquet": {
+      "sha256": "632c050a2944aa4eb5605836ce68443add2c4e45e87fb567af1bfd782a98917b",
+      "bytes": 114661
+    },
+    "photos_species.json": {
+      "sha256": "75b2989472e9f5209eab9e07c0d2f084a1c8d50748f9999ea87492f217c31447",
+      "bytes": 50793
+    },
+    "photos_cells.json": {
+      "sha256": "e71573793bc094e80ded26f0dc0f7086fbbaf4a0febae7dcb9dee22a26f8c8fb",
+      "bytes": 38648
+    },
+    "places.json": {
+      "sha256": "bd62a8b49eab890098bcf654cc38cbbf749f4c17c0315bd5e0aa7d79b7d111c6",
+      "bytes": 44661
+    },
+    "landmarks.json": {
+      "sha256": "eb6da447b5099d06822ea0ce69e862892cff827fbaa67cd667dbc5759a65a620",
+      "bytes": 9892
+    },
+    "boundary.geojson": {
+      "sha256": "94b8e671d8d0cd4e7bf4a66bb36f4b0f92556243345af822631f6269ae1a66e7",
+      "bytes": 3851
+    },
+    "roads.json": {
+      "sha256": "c2ea8749f4f4e099881dcb806d7d74ebca196553428d33452af151d742176f5e",
+      "bytes": 319153
+    },
+    "camera_pass.json": {
+      "sha256": "980d2e55d8a2d572adc893f0a4fb8105296400bc2086aa8fd086865c37dcc99a",
+      "bytes": 442
+    },
+    "amenities.json": {
+      "sha256": "f47898eb6874121e0ff231c866df7a41dadf39eccaaed5468319f46f65c3781f",
+      "bytes": 30966
+    }
+  },
+  "park": "capitol_reef",
+  "name": "Capitol Reef National Park",
+  "state": "UT"
+}

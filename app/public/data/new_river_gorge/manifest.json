@@ -1,0 +1,53 @@
+{
+  "built": "2026-09-06T20:33:22+00:00",
+  "git_commit": "766ac3ec79d73e3098a34d9f376bb8fea137582a",
+  "files": {
+    "cells.geojson": {
+      "sha256": "fb27d698c22e3634f9691e7cc1eb04c0d079672d52a2d07c682184f866d1fd39",
+      "bytes": 144054
+    },
+    "species.json": {
+      "sha256": "e3dc0a0bbb24a2410f9839cbceb5afc940d1fab32bff56b4b4e3a93faf89981f",
+      "bytes": 64073
+    },
+    "sightings.parquet": {
+      "sha256": "63324c1ca9506aeb687897a22ca55e299f02914eadf705620deb05a6237abd25",
+      "bytes": 106668
+    },
+    "photos_species.json": {
+      "sha256": "abea4c3cc804c2237aec281ff17cc83be0db8a7081d6522beaeccac995051745",
+      "bytes": 71706
+    },
+    "photos_cells.json": {
+      "sha256": "c76d6cf7e48fdd7ba9016ca109c04fddab4bf14d3d2be04f0f4ebf3db44e95d9",
+      "bytes": 62894
+    },
+    "places.json": {
+      "sha256": "8694c6653b38004029a36d316574e7d3fda44d646f273aa7046cc12c38c11c48",
+      "bytes": 49963
+    },
+    "landmarks.json": {
+      "sha256": "7e9423220230a3e16691986594d92c630ca91af751983d4349617ee8bddc649a",
+      "bytes": 11430
+    },
+    "boundary.geojson": {
+      "sha256": "62501638102f1c9ff79ea63e90b0535a0e0750202ca40266a022669271ae8041",
+      "bytes": 8842
+    },
+    "roads.json": {
+      "sha256": "d1213e843076f8e30618696d299b7b38dbefb3091e3d9ea3ca87c352697f7215",
+      "bytes": 473281
+    },
+    "camera_pass.json": {
+      "sha256": "c7873144b6d63cb0ab41fc95618acd244714f4285f862678045a4050f4f1daea",
+      "bytes": 445
+    },
+    "amenities.json": {
+      "sha256": "064037e00664edd47800ff37622d34a2a9e09fac041a3509269fc2986c305820",
+      "bytes": 24726
+    }
+  },
+  "park": "new_river_gorge",
+  "name": "New River Gorge National Park and Preserve",
+  "state": "WV"
+}
