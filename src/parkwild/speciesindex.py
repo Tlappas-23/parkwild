@@ -1,7 +1,7 @@
 """Where each animal has been seen, park by park: species_index.json.
 
 The species page searched one park at a time, because every park's files are
-separate. The owner asked to search an animal and see where in each park it
+separate. I wanted to search an animal and see where in each park it
 turns up most, and to jump there. Doing that at query time would mean pulling
 every park's cells (a few MB each), so this module rolls the files the app
 ships into one small index at publish time: for each species, the parks it

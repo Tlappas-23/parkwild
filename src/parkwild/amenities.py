@@ -1,6 +1,6 @@
 """Things to do around a place: features, trails, camping, facilities.
 
-PROBLEM: a tour stop names a place and the animals seen there; the owner
+PROBLEM: a tour stop names a place and the animals seen there; I
 wants what a visitor does next: the key features around it, where to hike,
 where to camp.
 

@@ -95,7 +95,7 @@ excluded on purpose (see above).
 Stratified review of 20 boxes (10 / 9 / 1 per band; the top band has one
 box in the whole population, so it cannot be judged). Verdicts are in
 `data/review/lamar_valley/perspective/review_claude.csv`; a second pass by
-the owner goes in `review.csv` under reviewer `me` and is reported separately.
+me goes in `review.csv` under reviewer `me` and is reported separately.
 
 - **Hit rate:** 33 of 400 frames have an animal box at 0.2, 8.2% (95% CI 6 to 11%).
 - **Precision:** 42% (95% CI 23 to 64%, n=19). By band: 0.2 to 0.5 33% (95% CI 12 to 65%, n=9); 0.5 to 0.8 44% (95% CI 19 to 73%, n=9); 0.8+ 100% (95% CI 21 to 100%, n=1).
@@ -122,7 +122,7 @@ review of 17 boxes (10 low band, 7 mid band, none above 0.8).
 ### Routing decision
 
 **Supplementary layer for perspective frames; panoramas excluded until the
-camera rig is masked and re-measured.** Confirmed by the owner 2026-09-05
+camera rig is masked and re-measured.** Confirmed 2026-09-05
 (ADR-0013). Phase 2 runs at that scope on Lamar Valley.
 
 ### Auto-generated numbers
@@ -277,7 +277,7 @@ model colour. Frames are the perspective frames downloaded, capped at 6,000.
 
 The species review sample over all four corridors (120 boxes, 30 per
 classifier band) is in `data/review/species/perspective/review_me.csv`,
-waiting for the owner; ADR-0020 says the naming bar moves only on that
+waiting for my review; ADR-0020 says the naming bar moves only on that
 number.
 
 ## Phase 1: Track A reference data

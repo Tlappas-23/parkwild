@@ -3,7 +3,7 @@ import { useStore } from "../store/index";
 // This page is not optional (BUILD_SPEC.md). Methods, limitations, licensing,
 // and the bias figures in plain language, for the park that is open. It says
 // where a computer model is involved and, more often, where it is not: the
-// owner's rule is that the page never claims a model that did not run here.
+// rule is that the page never claims a model that did not run here.
 export default function AboutPage() {
   const { species, manifest, cells, bias, parkName, landmarks, cameraPass } = useStore();
   const named = (list: string[]) =>

@@ -95,18 +95,18 @@ accuracy is a join against `manual_review` for any version.
 
 ## ADR-0008: Security model: single writer, public reader, optional read gate
 
-**Context.** Owner asked for "authentication for web and app" and "tight
+**Context.** I asked for authentication for web and app and "tight
 security so no one can write over what I build." The spec says the app is
 publicly reachable with no auth and no backend.
-**Decision.** Lock every write path to the owner (private repo, protected
+**Decision.** Lock every write path to me (private repo, protected
 `main`, CI-only deploys, secret scanning, append-only raw data, hashed
 artifacts). Keep reads public by default. Document Cloudflare Access (free, up
-to 50 users) as the one-toggle read gate if the owner wants a private preview
+to 50 users) as the one-toggle read gate if I want a private preview
 or a private launch.
 **Rejected.** A backend with user accounts: costs money at scale, adds a write
 surface, and the spec forbids it. A paid auth service: forbidden by budget.
 **Consequence.** SECURITY.md is the checklist. Whether to enable the read gate
-is an open decision for the owner.
+is an open decision for me.
 
 ## ADR-0009: No recall figure; precision with a Wilson interval
 
@@ -139,7 +139,7 @@ which 421,940 are eBird checklists and 16,280 the iNaturalist mirror.
 **Decision.** Skip the iNaturalist dataset in GBIF outright: it is an exact
 copy of what the direct iNaturalist ingest already stores, and skipping it by
 dataset key is more reliable than fuzzy deduplication. Ingest every other
-dataset for both classes. Do not ingest eBird until the owner decides whether
+dataset for both classes. Do not ingest eBird until I decide whether
 birds at that volume are in scope; the code supports it (`--include-ebird`,
 year-split paging past GBIF's 100,000-offset cap).
 **Rejected.** Ingesting eBird by default: 421,940 rows would be 90% of the
@@ -167,7 +167,7 @@ project's problem to fix, and the cost is minutes per corridor, not hours.
 of ten minutes. Revisit when torch or speciesnet changes version; the
 determinism script is the test.
 
-## ADR-0013: Phase 0 routing for Track B: supplementary layer (confirmed by owner 2026-09-05)
+## ADR-0013: Phase 0 routing for Track B: supplementary layer (confirmed 2026-09-05)
 
 **Context.** Lamar Valley, 400 perspective frames, SpeciesNet 4.0.3a on CPU,
 stratified review of 20 boxes by one reviewer. Hit rate 8.2% (CI 6 to 11%).
@@ -194,7 +194,7 @@ cheap filters address.
 **Consequence.** Phase 2 scoped to corridors with Lamar-like coverage;
 panorama population still to be read; a second reviewer's pass changes the
 interval, not the band, unless it disagrees on more than three boxes.
-**Status.** Confirmed by the owner on 2026-09-05 after both populations were
+**Status.** Confirmed on 2026-09-05 after both populations were
 read. Phase 2 proceeds at supplementary scope: Lamar Valley perspective
 frames in full, human/vehicle ensemble labels filtered out of the animal
 layer, species shown as "unidentified large mammal (model)" unless the
@@ -226,7 +226,7 @@ module with the counts behind them and move only with a bigger review.
 
 ## ADR-0015: Photographs are the evidence, under strict licence rules
 
-**Context.** The owner's review of the first live app: aggregated hexagons
+**Context.** My review of the first live app: aggregated hexagons
 and monogram tiles show neither the animal nor proof of the place. Every
 iNaturalist record's raw JSON is stored, and 89,238 photographs come with
 per-photo licences.
@@ -253,7 +253,7 @@ every image by one component, PhotoCredit.
 
 ## ADR-0016: The map is of the park: free relief, imagery, an outline and a guided tour
 
-**Context.** The owner's review (2026-09-05): "get the map better rendered
+**Context.** My review (2026-09-05): "get the map better rendered
 so it looks like a real map… just of the parks… a virtual walk through with
 major landmarks and where animals are sited". The hard constraints still
 hold: zero cost, no key, never Google.
@@ -297,7 +297,7 @@ pulled.
 ## ADR-0018: Directions are computed in the browser from the park's own road graph
 
 **Context.** "Based on current location, click which sites and get the best
-route" (owner, 2026-09-05). Zero cost, no backend, no key in a public page.
+route" (2026-09-05). Zero cost, no backend, no key in a public page.
 **Decision.** Each park's OpenStreetMap roads and trails become a graph
 (`roads.json`, hashed into the manifest like every data file); the browser
 snaps start and sites to it, runs Dijkstra per site, orders the visit
@@ -334,7 +334,7 @@ gets its initials on a plain card until an editor changes the article.
 ## ADR-0020: The species-naming bar moves only on a measured number
 
 **Context.** Track B names a species only when the classifier scores 0.8
-or better (ADR-0014); at Lamar that named three animals. The owner wants
+or better (ADR-0014); at Lamar that named three animals. I want
 the model to count for more.
 **Decision.** A second review, stratified by classifier score, measures
 species-label precision per band. `SPECIES_MIN_SCORE` is lowered to the
@@ -347,14 +347,14 @@ presented on its own terms: where it ran, what it found, how good it was
 at a known ~44% rate); hiding the pass entirely (it is the project's own
 method and its numbers are part of the record); fine-tuning on the review
 set (too few labels; docs/finetuning-decision.md).
-**Consequence.** The owner reviews about 120 boxes. Named model sightings
+**Consequence.** I review about 120 boxes. Named model sightings
 rise if and only if the numbers allow. Recall stays unmeasured.
 
 ---
 
 ## ADR-0021: AI runs on the visitor's device and may only write from the record
 
-**Context.** The owner wants the site to "incorporate AI" and stay free.
+**Context.** I want the site to incorporate AI and stay free.
 Hosted models cost money or need a key; a key in a static site is public;
 and a model that knows things is a model that invents things.
 **Decision.** Two models run in the browser after an explicit download:
@@ -407,7 +407,7 @@ Weight and maintenance for nothing.
 park-by-park section. Nothing visible changes. Shipped species.json files
 keep a `"model": null` key until their next export; the app ignores it.
 
-## Open decisions (owner's call; recorded here so nothing is decided by drift)
+## Open decisions (my call; recorded here so nothing is decided by drift)
 
 | # | Decision | Default until decided | Where |
 |---|---|---|---|
@@ -462,5 +462,5 @@ own Content Security Policy still governs scripts, connections, images and
 workers, which is the surface that matters for a site with no write path.
 Options: (a) stay, accept that the site can be framed; (b) move the deploy
 to Cloudflare Pages, free, which reads `_headers` and adds a CDN; the build
-and the data flow do not change. **Recommendation: (b)** when the owner has
+and the data flow do not change. **Recommendation: (b)** when I have
 a Cloudflare account; nothing in the app depends on the host.

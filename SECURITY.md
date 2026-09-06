@@ -1,9 +1,8 @@
 # Security model
 
-The requirement, in the owner's words: "tight security so no one can write over
-what I build." Reads of the finished app are public by design (BUILD_SPEC.md:
+The requirement: tight security, so that nobody can write over what I build. Reads of the finished app are public by design (BUILD_SPEC.md:
 "publicly reachable", "no auth"). Everything that can *change* what is
-published is locked to one person. A free read gate exists if the owner wants
+published is locked to one person. A free read gate exists if I want
 it; see the last section.
 
 ## What is protected, from what
@@ -19,7 +18,7 @@ it; see the last section.
 
 ## Source control
 
-- Repo is public (decision O-7, 2026-09-05): that is what makes server-side branch protection free. Only the owner's account has write access; nothing secret is in it, and history was checked for the token before the flip.
+- Repo is public (decision O-7, 2026-09-05): that is what makes server-side branch protection free. Only my account has write access; nothing secret is in it, and history was checked for the token before the flip.
 - 2FA on the GitHub account (Settings > Password and authentication).
 - Server-side protection of `main` (status checks required, no force-push, no
   deletion) is applied with `make protect REPO=owner/name`. **GitHub does not
@@ -28,7 +27,7 @@ it; see the last section.
   Applied on 2026-09-05 once the repo went public. The local `pre-push` hook
   (`make hooks`) stays as a second layer: it refuses non-fast-forward pushes
   to `main` and any push when lint, tests, smoke or the secret scan fail.
-- `.github/CODEOWNERS` names the owner for every path.
+- `.github/CODEOWNERS` names me for every path.
 - Commit signing is recommended, not required: `git config commit.gpgsign true`
   with an SSH or GPG key registered on GitHub.
 
@@ -74,7 +73,7 @@ Cloudflare Access (Zero Trust free plan, up to 50 users) can sit in front of the
 Pages site with no code changes. Viewers sign in with an emailed one-time code,
 GitHub, or Google. The installed PWA keeps working offline from cache; fresh
 data fetches need a session. This contradicts "publicly reachable" in the spec,
-so it is a decision for the owner (DECISIONS.md, ADR-0008), off by default.
+so it is my decision (DECISIONS.md, ADR-0008), off by default.
 
 ## Not covered
 
@@ -92,14 +91,14 @@ branch protection is free.
 | Layer | Control | State |
 |---|---|---|
 | `main` | protected: required checks `test` (Python) and `app` (typecheck, tests, lint, format, build), strict up-to-date, linear history, conversation resolution, no force-push, no deletion, rules enforced for admins | on |
-| Account | two-factor authentication; only the owner has write access; `CODEOWNERS` names the owner for every path | on |
+| Account | two-factor authentication; only my account has write access; `CODEOWNERS` names me for every path | on |
 | Secrets | `.env` gitignored; pre-commit and CI secret scan; GitHub secret scanning with push protection and non-provider patterns | on |
 | Dependencies | Dependabot security updates; weekly Dependabot pull requests for npm, pip and Actions; `npm audit` clean | on |
 | Code scanning | CodeQL default setup for TypeScript and Python on every pull request | on |
 | Actions | every action pinned to a commit SHA; workflow token read-only by default; the Pages job alone gets `pages: write` and `id-token: write` | on |
 | Reporting | private vulnerability reporting on the repository; `/.well-known/security.txt` on the site points to it | on |
 | Runtime | no server, no write path, no accounts, no third-party scripts; Content Security Policy in the page; every data file hash-checked against a manifest compiled into the app; geolocation only on a tap | on |
-| Signed commits | not required yet: the owner has no signing key registered. Once one is added on GitHub, `required_signatures` on `main` is one API call (`make protect`) | off |
+| Signed commits | not required yet: I have no signing key registered. Once one is added on GitHub, `required_signatures` on `main` is one API call (`make protect`) | off |
 
 What a static host cannot do: GitHub Pages sends no custom response
 headers, so `frame-ancestors`, `Cross-Origin-Opener-Policy` and

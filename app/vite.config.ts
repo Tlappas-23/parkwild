@@ -38,7 +38,7 @@ export default defineConfig({
         cleanupOutdatedCaches: true,
         // "autoUpdate" alone only skips waiting on a message the old shell
         // never sends, so a new worker sat in "waiting" for as long as any tab
-        // stayed open and the owner kept seeing a build from days before
+        // stayed open and I kept seeing a build from days before
         // (E-034). Take over at install, claim open pages, and let the app
         // reload on the controller change.
         skipWaiting: true,

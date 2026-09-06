@@ -53,7 +53,7 @@ Press Enable to download a small language model once (about 1 GB) and run it on 
 
 Per park: what the hexagons mean, what the map cannot tell you, sensitive species, exactly where a model is involved and where it is not, road and seasonal bias where measured, sources and licences, and links to these documents.
 
-## For the owner
+## Maintaining the site
 
 - **Keep the data fresh:** `scripts/refresh.sh` runs from cron on the 1st and 15th at 03:00: for every live park it pulls only the sightings that changed since the last run, re-exports, rebuilds the places, refreshes the climate normals when they are older than a season, and opens one data PR. It refuses to start while the park batch holds the database. `SINCE=2026-08-01 scripts/refresh.sh` forces a window.
 - **Bring parks live unattended:** `nohup scripts/parks_batch.sh arches bryce_canyon ... > data/batch/batch.log 2>&1 &` runs sightings, export, landmarks, roads and things to do per park and opens a data PR after every six (`GROUP=` to change). `scripts/publish_data.sh "title" park ...` publishes exports on their own. Neither touches the working tree: the PR is built in a fresh worktree.
