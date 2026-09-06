@@ -1188,6 +1188,11 @@ export default function MapPage() {
           {current ? <span className="pill-chip">{current.common_name ?? current.scientific_name}</span> : null}
           {plan.open ? <span className="pill-chip">route</span> : null}
         </button>
+        {!controlsOpen && weatherAt && (
+          <div className="weather-pill" aria-label="Weather now">
+            <WeatherChip lat={weatherAt.lat} lon={weatherAt.lon} compact />
+          </div>
+        )}
       )}
       <div className="controls" role="group" aria-label="Filters" hidden={!controlsOpen}>
         <button

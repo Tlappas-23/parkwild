@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import WeatherChip from "./WeatherChip";
 import {
   Bed,
   Car,
@@ -68,6 +69,7 @@ export default function Tour() {
     driveMode,
     setDriveMode,
   } = useStore();
+  const climate = useStore((st) => st.climate);
   const [expanded, setExpanded] = useState(false);
   const [minimised, setMinimised] = useState(false); // a one-line strip: name and arrows, nothing else
   const stops = useMemo(() => tourStops(landmarks), [landmarks]);
@@ -220,6 +222,7 @@ export default function Tour() {
               : `${tour.stop + 1}/${stops.length} · ${stop.kind}${stop.ele_m ? ` · ${Math.round(stop.ele_m).toLocaleString()} m` : ""}`}
           </span>
           <h2>{stop.name}</h2>
+          <WeatherChip lat={stop.lat} lon={stop.lon} climate={climate} compact />
         </div>
         {stop.summary?.extract ? (
           <p className="tour-text">
