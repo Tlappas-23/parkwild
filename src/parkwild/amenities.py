@@ -53,6 +53,7 @@ AMENITY_KINDS: list[tuple[str, str, str, bool, bool]] = [
     ("natural", "geyser|hot_spring|spring|waterfall|peak|volcano|cave_entrance|arch", "feature", True, True),
     ("waterway", "waterfall", "feature", True, True),
 ]
+# INFO_TYPES — BORROWED (OSM wiki, Key:information; the two that mean a staffed place)
 INFO_TYPES = {"visitor_centre", "office"}
 
 # TRAIL_MIN_M — ARBITRARY (a named trail shorter than this is a spur or a data slip)
