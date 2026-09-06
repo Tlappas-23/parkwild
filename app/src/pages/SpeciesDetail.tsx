@@ -8,11 +8,32 @@ const Model3D = lazy(() => import("../Model3D"));
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 export default function SpeciesDetail({ species: s, onBack }: { species: Species; onBack: () => void }) {
-  const { reducedMotion, setSpeciesFilter, setPage, photosSpecies } = useStore();
+  const { reducedMotion, setSpeciesFilter, setPage, photosSpecies, species: all, parkName } = useStore();
   const photos = useMemo(() => speciesPhotos(photosSpecies, s.scientific_name), [photosSpecies, s.scientific_name]);
   const hero = photos[0];
   const max = Math.max(1, ...s.months);
   const peak = s.months.indexOf(max);
+  // Everyone's months are the park's observation effort. Two thirds of all
+  // sightings fall in June to August, so the busiest month of nearly every
+  // species is June or July (E-031). Dividing this species' share of a month
+  // by everyone's share shows when it is seen more than usual: elk in the
+  // rut, bison on winter range, ground squirrels emerging in April.
+  const effort = useMemo(() => {
+    const t = new Array<number>(12).fill(0);
+    for (const x of all?.species ?? []) x.months.forEach((m, i) => { t[i] += m; });
+    return t;
+  }, [all]);
+  const effortTotal = effort.reduce((a, b) => a + b, 0);
+  const total = s.months.reduce((a, b) => a + b, 0);
+  // MIN_FOR_RELATIVE — ARBITRARY (a handful of records makes any month look special)
+  const MIN_FOR_RELATIVE = 30;
+  const rel = s.months.map((m, i) => (total >= MIN_FOR_RELATIVE && effort[i] ? (m / total) / (effort[i] / effortTotal) : 0));
+  const relMax = Math.max(...rel);
+  const relPeak = relMax > 0 ? rel.indexOf(relMax) : -1;
+  const summerShare = effortTotal ? Math.round((100 * (effort[5] + effort[6] + effort[7])) / effortTotal) : 0;
+  // The imagery pass (Track B) ran on one Yellowstone corridor; elsewhere a
+  // "model 0" badge would only raise the question it cannot answer.
+  const parkHasModel = (all?.species ?? []).some((x) => x.confidence_basis.model_predicted > 0);
   return (
     <article className="page detail">
       <button className="link back" onClick={onBack}>← All species</button>
@@ -33,11 +54,19 @@ export default function SpeciesDetail({ species: s, onBack }: { species: Species
           <div className="stats">
             <div><strong>{s.sightings.toLocaleString()}</strong><span>sightings</span></div>
             <div><strong>{s.first?.slice(0, 4)}–{s.last?.slice(0, 4)}</strong><span>years seen</span></div>
-            <div><strong>{MONTHS[peak]}</strong><span>peak month</span></div>
+            <div><strong>{MONTHS[peak]}</strong><span>busiest month</span></div>
+            <div>
+              <strong>{relPeak >= 0 ? `${MONTHS[relPeak]} ×${relMax.toFixed(1)}` : "—"}</strong>
+              <span title="This species' share of the month divided by everyone's share of it">seen more than usual</span>
+            </div>
           </div>
           <div className="badges">
             <span className="badge human">verified {s.confidence_basis.human_verified.toLocaleString()}</span>
-            <span className="badge model">model {s.confidence_basis.model_predicted.toLocaleString()}</span>
+            {parkHasModel ? (
+              <span className="badge model" title="Computer-vision detections in street-level imagery; that pass covered one road corridor">model {s.confidence_basis.model_predicted.toLocaleString()}</span>
+            ) : (
+              <span className="muted small">no imagery pass in {parkName} yet</span>
+            )}
           </div>
           {s.suppression?.action !== "exclude" && (
             <button className="primary" onClick={() => { setSpeciesFilter(s.scientific_name); setPage("map"); }}>Show on the map</button>
@@ -65,7 +94,19 @@ export default function SpeciesDetail({ species: s, onBack }: { species: Species
               </div>
             ))}
           </div>
-          <p className="muted small">Reflects when people looked as much as when animals were there.</p>
+          {relPeak >= 0 && (
+            <div className="bars rel" role="img" aria-label={`Relative to all sightings by month: ${rel.map((r) => r.toFixed(2)).join(", ")}`}>
+              {rel.map((r, i) => (
+                <div key={i} className="bar-col">
+                  <div className={"bar" + (i === relPeak ? " peak" : "") + (r >= 1 ? " above" : "")} style={{ height: `${(100 * r) / relMax}%` }} title={`${MONTHS[i]}: ×${r.toFixed(2)} vs. everyone`} />
+                </div>
+              ))}
+            </div>
+          )}
+          <p className="muted small">
+            Top: sightings by month, which reflects when people looked as much as when animals were there ({summerShare}% of all {parkName} sightings fall in June to August).
+            {relPeak >= 0 ? " Bottom: this species' share of each month divided by everyone's; above 1 (darker) means it is seen more than usual then." : ""}
+          </p>
         </div>
         <div>
           <h2>Where the records come from</h2>
