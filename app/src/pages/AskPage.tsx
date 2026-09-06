@@ -375,7 +375,7 @@ export default function AskPage() {
         </div>
         {photo && (
           <div className="photo-result">
-            <img src={photo} alt="Your photo" />
+            <img src={photo.startsWith("blob:") ? photo : undefined} alt="Your photo" />
             <div>
               {photoBusy && clip.state !== "loading" ? (
                 <p className="muted small">Looking…</p>

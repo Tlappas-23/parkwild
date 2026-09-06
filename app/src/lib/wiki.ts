@@ -34,11 +34,11 @@ const REUSABLE = ["public domain", "pd", "cc0", "cc by"];
 // PHOTO_RADIUS_M — ASSUMED (a photograph within this shows the place; boardwalks and overlooks sit a few hundred metres off)
 export const PHOTO_RADIUS_M = 400;
 
+// The browser's own parser turns the API's HTML into text; a regex that
+// strips tags can leave "<script" behind after one pass (CodeQL js/incomplete-multi-character-sanitization).
 function text(html: string | undefined): string {
-  return (html ?? "")
-    .replace(/<[^>]+>/g, "")
-    .replace(/\s+/g, " ")
-    .trim();
+  const doc = new DOMParser().parseFromString(html ?? "", "text/html");
+  return (doc.body.textContent ?? "").replace(/\s+/g, " ").trim();
 }
 
 export function wikiSummary(title: string): Promise<Summary | null> {
