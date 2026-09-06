@@ -15,3 +15,13 @@
 - **Notability is a Wikidata tag.** A landmark without a Wikidata item does not exist here; a geyser with one does. Per-kind caps (20) keep Yellowstone from being a map of geysers.
 - **Matching is by name.** "Old Faithful" is a geyser node in OSM; "Norris Geyser Basin" is not a feature at all. `missing_stops` in the output lists what did not match; fix the config, do not guess.
 - **Excerpts are not curated.** The Lamar Valley article is about the river. A per-stop `@wiki` title in config points at a better article where one exists.
+
+## Runtime lookups (place drawer, E-039)
+
+When a place is opened, the browser asks Wikipedia's REST summary endpoint
+for the tagged article (or searches by name and accepts a hit only if its
+title carries the place's name) and Wikimedia Commons for photographs within
+400 m, keeping those whose licence allows reuse with credit. Both are free,
+keyless and answer cross-origin; only a title or a coordinate leaves the
+browser; answers are cached for the session. Text is CC BY-SA 4.0 and each
+excerpt names its article; photographs print artist and licence.

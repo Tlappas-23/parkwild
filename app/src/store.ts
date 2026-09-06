@@ -4,6 +4,7 @@ import { create } from "zustand";
 import type { AmenitiesFile, BiasFile, BoundaryFile, CameraPassFile, CellFeature, CellsFile, LandmarksFile, Manifest, PhotosCellsFile, PhotosSpeciesFile, RoadsFile, SpeciesFile } from "./types";
 import { availableParks, loadCellPhotos, loadPark, loadRoads } from "./data";
 import { MAX_SITES, planRoute, routerFor, type Mode, type PlanResult, type Site } from "./routing";
+import type { Place } from "./tour";
 
 export type Page = "home" | "map" | "species" | "about";
 export type Basemap = "terrain" | "satellite";
@@ -27,6 +28,8 @@ interface State {
   tourTab: "wildlife" | "todo" | "photos";
   setTourTab: (t: "wildlife" | "todo" | "photos") => void;
   controlsOpen: boolean;               // the left panel; folds away during a tour and on request
+  selectedPlace: Place | null;         // a trail, feature or campsite open in the drawer
+  selectPlace: (p: Place | null) => void;
   controlsBeforeTour: boolean;
   setControlsOpen: (open: boolean) => void;
   manifest: Manifest | null;
@@ -114,6 +117,8 @@ export const useStore = create<State>((set, get) => ({
   setTourTab: (tourTab) => set({ tourTab }),
   controlsOpen: true,
   controlsBeforeTour: true,
+  selectedPlace: null,
+  selectPlace: (selectedPlace) => { set({ selectedPlace, selectedCell: selectedPlace ? null : get().selectedCell }); if (selectedPlace) { void get().ensureCellPhotos(); if (selectedPlace.kind === "trail") void get().ensureRoads(); } },
   setControlsOpen: (controlsOpen) => set({ controlsOpen }),
   manifest: null,
   error: null,
@@ -135,7 +140,7 @@ export const useStore = create<State>((set, get) => ({
   showCameraPass: () => { set({ page: "about" }); setTimeout(() => document.getElementById("camera-pass")?.scrollIntoView({ behavior: "smooth", block: "start" }), 60); },
   setSpeciesFilter: (speciesFilter) => set({ speciesFilter }),
   setYearRange: (yearRange) => set({ yearRange }),
-  selectCell: (selectedCell) => { set({ selectedCell }); if (selectedCell) void get().ensureCellPhotos(); },
+  selectCell: (selectedCell) => { set({ selectedCell, selectedPlace: selectedCell ? null : get().selectedPlace }); if (selectedCell) void get().ensureCellPhotos(); },
   selectSpecies: (selectedSpecies) => set({ selectedSpecies, page: "species" }),
   // Switching parks drops everything loaded, resets every filter, rewrites the
   // URL so the link is shareable, and loads again.
@@ -143,7 +148,7 @@ export const useStore = create<State>((set, get) => ({
     if (park === get().park || !PARKS.some((p) => p.key === park)) return;
     set({ park, parkName: nameOf(park), cells: null, species: null, bias: null, photosSpecies: null, photosCells: null,
           landmarks: null, boundary: null, cameraPass: null, amenities: null, manifest: null, error: null, speciesFilter: null, selectedCell: null,
-          selectedSpecies: null, tour: NO_TOUR, roads: null, plan: { ...NO_PLAN, start: get().plan.start?.kind === "me" ? get().plan.start : null } });
+          selectedSpecies: null, selectedPlace: null, tour: NO_TOUR, roads: null, plan: { ...NO_PLAN, start: get().plan.start?.kind === "me" ? get().plan.start : null } });
     try { const u = new URL(window.location.href); u.searchParams.set("park", park); window.history.replaceState(null, "", u.toString()); } catch { /* ignore */ }
     void get().load();
   },

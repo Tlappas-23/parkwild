@@ -228,6 +228,12 @@ Format: date, what, number, kept?, why, where it lives.
 - **What:** the owner: "can we hide the left panel as well".
 - **Kept:** a collapse button on the panel and a "Filters" pill in the corner that reopens it and shows the active species and whether a route is being planned; the panel folds on its own when a tour starts and returns when it ends, so a tour is map, card, nothing else.
 
+### E-039: every place opens
+- **What:** the owner: "there should be details for the trails, pictures etc. so when you click on it you can see which animals, how long the trail is, site summary and history".
+- **Kept:** a place drawer for any trail, feature, campsite, lodge, viewpoint or landmark, opened from the tour's things-to-do list, from its marker on the map, or from a landmark dot. It shows the facts OSM has (trail length from the routing graph, elevation, capacity, fee, reservation, difficulty, surface), a summary from Wikipedia (the tagged article, or a search restricted to hits that carry the place's own name, or an honest "no article"), the animals recorded there with a near-here photograph each (along the whole trail within 300 m of its line, using the trail's geometry from roads.json; within 1 km of a point), a one-click filter of the map to the top species, and licensed photographs of the place within 400 m from Wikimedia Commons. The two lookups run in the browser at click time against free, cross-origin endpoints; only a title or a coordinate leaves the browser. The trail is drawn whole on the map and the view frames it.
+- **Numbers:** 108 of Yellowstone's 1,640 places carry a Wikipedia tag; the rest go through the name search. Species along a trail come from the cells its line passes through, so a 10 km trail is tens of cells, not one.
+- **Unresolved:** the name search can miss (a trail named after a creek lands on the creek's article, which is usually what a reader wants) or decline; both are shown as they are. Photographs are nearest-first, not best-first.
+
 ## Open questions with a planned experiment
 
 - **Q-1 SpeciesNet determinism.** Answered (E-013).

@@ -61,7 +61,7 @@ TRAIL_MIN_M = 500
 
 # COPIED_TAGS — BORROWED (OSM tags worth carrying to the card, copied verbatim)
 COPIED_TAGS = ("capacity", "fee", "reservation", "backcountry", "opening_hours", "website", "ele", "description",
-               "drinking_water", "toilets", "operator", "phone", "seasonal")
+               "drinking_water", "toilets", "operator", "phone", "seasonal", "wikipedia", "wikidata", "sac_scale", "surface")
 
 
 def _query(park: Park, timeout_s: int) -> str:
