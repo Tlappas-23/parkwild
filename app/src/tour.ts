@@ -16,18 +16,56 @@ export const TOUR_DWELL_MS = 14000;
 // to see the place: 12.4 / 60° then 13.3 read as too far; imagery is sharp to 16)
 export const STOP_ZOOM = 14.4;
 export const STOP_PITCH = 62;
-// DRIVE_* — ARBITRARY (the road between stops from a driver's height: low
-// zoom, steep pitch, distance compressed so a 20 km leg takes about ten
-// seconds and a short one never less than four)
-export const DRIVE_ZOOM = 14.8;
-export const DRIVE_PITCH = 64;
-export const DRIVE_SPEED_MS = 2200;      // virtual metres per second
-export const DRIVE_MIN_MS = 4000;
-export const DRIVE_MAX_MS = 14000;
-// DRIVE_LOOKAHEAD_M — ARBITRARY (the camera faces this far up the road; shorter jitters on bends)
-export const DRIVE_LOOKAHEAD_M = 120;
+// The road between stops. drive_v1 (E-046) held one low camera (zoom 15.4,
+// pitch 72) and squeezed every leg into 4 to 14 s: a 46 km leg crossed the
+// screen several times a second, no tile ever finished loading, and the
+// heading swung 40° every half second (E-047, E-048). The camera now climbs
+// as high as the leg needs for the ground to pass at a readable pace, faces a
+// fixed distance up the road in screen terms, and lands close again.
+// DRIVE_PX_PER_S — ARBITRARY (how fast the ground slides across the screen on the road; slow
+// enough for imagery to load ahead of the camera)
+export const DRIVE_PX_PER_S = 110;
+// DRIVE_MIN_MS / DRIVE_MAX_MS — ARBITRARY (time on the road per leg)
+export const DRIVE_MIN_MS = 4500;
+export const DRIVE_MAX_MS = 16000;
+// DRIVE_MS_PER_M — ARBITRARY (a leg takes 3 s plus this per metre, inside the bounds above)
+export const DRIVE_MS_PER_M = 1 / 3.5;
+// DRIVE_ZOOM_MIN / DRIVE_ZOOM_MAX — ARBITRARY (the cruise never climbs above the first or dips below the second)
+export const DRIVE_ZOOM_MIN = 11.5;
+export const DRIVE_ZOOM_MAX = 15.2;
+// DRIVE_PITCH_HIGH / DRIVE_PITCH_LOW — ARBITRARY (flatter view from altitude, steeper near the road)
+export const DRIVE_PITCH_HIGH = 48;
+export const DRIVE_PITCH_LOW = 64;
+// DRIVE_LOOKAHEAD_PX — ARBITRARY (the camera faces this many screen pixels up the road, so bends
+// turn the view at the same visual rate at any altitude)
+export const DRIVE_LOOKAHEAD_PX = 260;
+// DRIVE_LOOKAHEAD_MIN_M — ARBITRARY (never look less than this far ahead; shorter jitters)
+export const DRIVE_LOOKAHEAD_MIN_M = 120;
 // DRIVE_MIN_LEG_M — ARBITRARY (a leg shorter than this is a hop, not a drive)
 export const DRIVE_MIN_LEG_M = 250;
+// MERCATOR_M_PER_PX_Z0 — MEASURED (Web Mercator ground metres per screen pixel at zoom 0 on the
+// equator, 256 px tiles: Earth's circumference / 256)
+export const MERCATOR_M_PER_PX_Z0 = 156543.03;
+
+export function metersPerPixel(zoom: number, lat: number): number {
+  return (MERCATOR_M_PER_PX_Z0 * Math.cos((lat * Math.PI) / 180)) / Math.pow(2, zoom);
+}
+export function legDurationMs(totalM: number): number {
+  return Math.max(DRIVE_MIN_MS, Math.min(DRIVE_MAX_MS, 3000 + totalM * DRIVE_MS_PER_M));
+}
+// The zoom at which totalM metres, covered in ms milliseconds, slide across
+// the screen at DRIVE_PX_PER_S: a short hop stays low, a 46 km leg climbs to
+// about zoom 12 where the whole valley is in view and tiles keep up.
+export function cruiseZoom(totalM: number, ms: number, lat: number): number {
+  const speed = totalM / (ms / 1000);
+  const mpp = speed / DRIVE_PX_PER_S;
+  const z = Math.log2((MERCATOR_M_PER_PX_Z0 * Math.cos((lat * Math.PI) / 180)) / mpp);
+  return Math.max(DRIVE_ZOOM_MIN, Math.min(DRIVE_ZOOM_MAX, z));
+}
+export function cruisePitch(zoom: number): number {
+  const f = (zoom - DRIVE_ZOOM_MIN) / (DRIVE_ZOOM_MAX - DRIVE_ZOOM_MIN);
+  return DRIVE_PITCH_HIGH + (DRIVE_PITCH_LOW - DRIVE_PITCH_HIGH) * Math.max(0, Math.min(1, f));
+}
 
 // The heading of the road at distance d: toward a point ahead, or, in the last
 // stretch where nothing is ahead, from a point behind. The first version
