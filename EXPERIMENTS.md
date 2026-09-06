@@ -259,6 +259,10 @@ Format: date, what, number, kept?, why, where it lives.
 - **Why:** the turn around each stop was one 45° `easeTo`, and MapLibre cancels any running camera animation on a pointer-down; nothing restarted it.
 - **Kept:** a frame loop for the life of the tour that nudges the bearing (3.2° per second) whenever the map is not already moving: it waits for the flight in, yields to a drag or a scroll, and resumes by itself. A tap on a cell or a landmark opens its drawer and the map keeps turning. Off under reduced motion.
 
+### E-045: the About page says where a model is, and is not
+- **What:** the owner, reviewing: "on the about page don't say I am using a model if it's not really being used".
+- **Kept:** the page is now written per park. Where no camera pass ran it says so in one sentence and that every count comes from people; where one ran, the table. The Ask section says no language model is involved anywhere until Enable is pressed, and what the tour text, the numbers and the routes actually are. The 3D section says no models are used unless a species has one. Road and seasonal bias says "not measured here" outside Yellowstone. Two documents were added for the review the owner asked for: `docs/ARCHITECTURE.md` and `docs/USER-GUIDE.md`, linked from the About page and the README.
+
 ## Open questions with a planned experiment
 
 - **Q-1 SpeciesNet determinism.** Answered (E-013).

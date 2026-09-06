@@ -19,6 +19,12 @@ The app renders the real export and deploys to GitHub Pages from `main`:
 https://tlappas-23.github.io/parkwild/ (first deploy on the next merge).
 See RESULTS.md for numbers, DECISIONS.md for why.
 
+## Where to start
+
+- `docs/ARCHITECTURE.md`: the map of the system, per-park data files, app modules, hosting.
+- `docs/USER-GUIDE.md`: how to use every part of the site, and the owner's loop.
+- `DECISIONS.md`, `EXPERIMENTS.md`: why, and what was measured.
+
 ## Hard constraints
 
 1. **Zero cost.** No paid APIs, no cloud billing, nothing that wants a card.
