@@ -216,6 +216,9 @@ export function planRoute(router: Router, start: Site, sites: Site[], mode: Mode
            distanceM: legs.reduce((a, l) => a + l.distanceM, 0), seconds: legs.reduce((a, l) => a + l.seconds, 0), unreachable, snapM };
 }
 
+// Exposed for automated checks in a real browser; not part of the UI.
+if (typeof window !== "undefined") (window as unknown as { __parkwildRoute?: unknown }).__parkwildRoute = { routerFor, planRoute };
+
 export function fmtKm(m: number): string { return m < 950 ? `${Math.round(m / 10) * 10} m` : `${(m / 1000).toFixed(m < 10_000 ? 1 : 0)} km`; }
 export function fmtTime(s: number): string {
   const min = Math.round(s / 60);

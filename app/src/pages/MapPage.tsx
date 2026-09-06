@@ -6,7 +6,8 @@ import { PARKS_INDEX } from "../parksIndex";
 import { addParksLayers, liveBounds, setParksData } from "../parksOverlay";
 import type { FeatureCollection } from "geojson";
 import { filteredFeatures, speciesMatches, useStore } from "../store";
-import { ORBIT_DEG_PER_S, placeOf, placeOfLandmark, STOP_PITCH, STOP_ZOOM, stopBearing, thingsNear, tourStops, trailLines, type Place } from "../tour";
+import { bearingDeg, DRIVE_LOOKAHEAD_M, DRIVE_MAX_MS, DRIVE_MIN_MS, DRIVE_PITCH, DRIVE_SPEED_MS, DRIVE_ZOOM, ORBIT_DEG_PER_S, placeOf, placeOfLandmark, pointAt, resample, STOP_PITCH, STOP_ZOOM, stopBearing, thingsNear, tourStops, trailLines, type Place } from "../tour";
+import { routerFor } from "../routing";
 import type { BoundaryFile, LandmarksFile, Ring } from "../types";
 import CellDetail from "./CellDetail";
 import PlaceDetail from "./PlaceDetail";
@@ -82,6 +83,8 @@ export default function MapPage() {
   const fillIds = useRef<string[]>([]);          // the style's own fill layers, hidden under imagery
   const boundsRef = useRef<[[number, number], [number, number]] | null>(null);
   const wasTouring = useRef(false);
+  const prevStop = useRef<number | null>(null);          // where the last flight ended, for the drive
+  const driving = useRef(false);                          // the orbit yields while the camera is on the road
   const fittedPark = useRef<string | null>(null);      // which park the view was last framed on
   const [ready, setReady] = useState(false);
   const [overview, setOverview] = useState(false);          // zoomed out to every park
@@ -423,8 +426,11 @@ export default function MapPage() {
     }
   }, [ready, selectedPlace, roads, reducedMotion]);
 
-  // The tour camera: fly to the stop, pitched, facing the next stop. Leaving
-  // the tour eases back to the whole park.
+  // The tour camera. First stop: fly in and settle close above the place.
+  // Every stop after: drive there along the park's own roads from a driver's
+  // height, facing the way the road turns, then settle. Leaving the tour eases
+  // back to the whole park. Without a road path (a stop off the network, roads
+  // not loaded, reduced motion) it flies instead.
   useEffect(() => {
     const map = mapRef.current;
     if (!ready || !map) return;
@@ -434,18 +440,65 @@ export default function MapPage() {
         map.fitBounds(boundsRef.current, { padding: 36, pitch: 0, bearing: 0, duration: reducedMotion ? 0 : 1200 });
       }
       wasTouring.current = false;
+      prevStop.current = null;
       return;
     }
     wasTouring.current = true;
     const stop = stops[tour.stop];
     if (!stop) return;
+    const from = prevStop.current !== null && prevStop.current !== tour.stop ? stops[prevStop.current] : null;
+    prevStop.current = tour.stop;
     // The stop lands in the map area the tour panel leaves free: beside it on
     // a wide screen, above it on a phone, whatever the panel's size.
     const panel = document.querySelector<HTMLElement>(".tour");
     const side = window.innerWidth >= 900;
     const padding = side ? { top: 0, left: 0, right: (panel?.offsetWidth ?? 300) + 28, bottom: 0 } : { top: 0, left: 0, right: 0, bottom: (panel?.offsetHeight ?? 120) + 24 };
-    map.flyTo({ center: [stop.lon, stop.lat], zoom: STOP_ZOOM, pitch: STOP_PITCH, bearing: stopBearing(stops, tour.stop),
-                duration: reducedMotion ? 0 : 3000, curve: 1.5, essential: true, padding });
+    const arrive = (bearing: number, ms: number) => map.flyTo({ center: [stop.lon, stop.lat], zoom: STOP_ZOOM, pitch: STOP_PITCH, bearing,
+      duration: reducedMotion ? 0 : ms, curve: 1.4, essential: true, padding });
+    if (!from || reducedMotion) { arrive(stopBearing(stops, tour.stop), 3000); return; }
+
+    let cancelled = false;
+    let raf = 0;
+    const setDrive = useStore.getState().setTourDrive;
+    (async () => {
+      await useStore.getState().ensureRoads();
+      const roads = useStore.getState().roads;
+      if (cancelled) return;
+      const r = roads ? routerFor(roads) : null;
+      const a = r?.snap(from.lon, from.lat, "drive"), b = r?.snap(stop.lon, stop.lat, "drive");
+      if (!r || !a || !b || a.node < 0 || b.node < 0 || a.node === b.node) { arrive(stopBearing(stops, tour.stop), 2200); return; }
+      const s = r.shortest(a.node, "drive");
+      if (s.dist[b.node] === Infinity) { arrive(stopBearing(stops, tour.stop), 2200); return; }
+      const coords = r.path(s, b.node);
+      if (coords.length < 2) { arrive(stopBearing(stops, tour.stop), 2200); return; }
+      const rs = resample(coords, 25);
+      const duration = Math.max(DRIVE_MIN_MS, Math.min(DRIVE_MAX_MS, (rs.total / DRIVE_SPEED_MS) * 1000));
+      setDrive({ to: stop.name, distanceM: rs.total });
+      driving.current = true;
+      map.stop();
+      // Down onto the road first, then along it.
+      let heading = bearingDeg(rs.pts[0] as [number, number], pointAt(rs, Math.min(rs.total, DRIVE_LOOKAHEAD_M)));
+      await new Promise<void>((res) => { map.once("moveend", () => res()); map.flyTo({ center: rs.pts[0] as [number, number], zoom: DRIVE_ZOOM, pitch: DRIVE_PITCH, bearing: heading, duration: 1400, essential: true, padding }); });
+      if (cancelled) return;
+      const t0 = performance.now();
+      const frame = (now: number) => {
+        if (cancelled) return;
+        const t = Math.min(1, (now - t0) / duration);
+        const e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;      // ease in, ease out
+        const d = e * rs.total;
+        const p = pointAt(rs, d);
+        const target = bearingDeg(p, pointAt(rs, Math.min(rs.total, d + DRIVE_LOOKAHEAD_M)));
+        const diff = ((target - heading + 540) % 360) - 180;                 // turn the short way, smoothly
+        heading = heading + diff * 0.12;
+        map.jumpTo({ center: p, bearing: heading, pitch: DRIVE_PITCH, zoom: DRIVE_ZOOM, padding });
+        if (t < 1) { raf = requestAnimationFrame(frame); return; }
+        driving.current = false;
+        setDrive(null);
+        arrive(heading, 1800);
+      };
+      raf = requestAnimationFrame(frame);
+    })();
+    return () => { cancelled = true; if (raf) cancelAnimationFrame(raf); driving.current = false; setDrive(null); };
   }, [ready, tour.active, tour.stop, stops, reducedMotion]);
 
   // The turn around the stop: a frame loop that nudges the bearing whenever
@@ -460,7 +513,7 @@ export default function MapPage() {
     const tick = (now: number) => {
       const dt = Math.min(now - last, 100);
       last = now;
-      if (!map.isMoving()) map.setBearing(map.getBearing() + (ORBIT_DEG_PER_S * dt) / 1000);
+      if (!driving.current && !map.isMoving()) map.setBearing(map.getBearing() + (ORBIT_DEG_PER_S * dt) / 1000);
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);

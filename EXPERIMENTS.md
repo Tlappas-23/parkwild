@@ -263,6 +263,11 @@ Format: date, what, number, kept?, why, where it lives.
 - **What:** the owner, reviewing: "on the about page don't say I am using a model if it's not really being used".
 - **Kept:** the page is now written per park. Where no camera pass ran it says so in one sentence and that every count comes from people; where one ran, the table. The Ask section says no language model is involved anywhere until Enable is pressed, and what the tour text, the numbers and the routes actually are. The 3D section says no models are used unless a species has one. Road and seasonal bias says "not measured here" outside Yellowstone. Two documents were added for the review the owner asked for: `docs/ARCHITECTURE.md` and `docs/USER-GUIDE.md`, linked from the About page and the README.
 
+### E-046: the tour drives the road between stops
+- **What:** the owner, on Zion: "when I am here I want to be zoomed in and when we hit next I want it to take me from a road perspective and zoom me to the next spot".
+- **Kept:** stops land closer (zoom 14.4, pitch 62°; imagery stays sharp to 16). On Next the camera drops onto the road at the previous stop and travels the shortest road path to the next one from a driver's height (zoom 15.4, pitch 72°), facing 120 m up the road so bends turn the view, with distance compressed so a leg takes four to fourteen seconds, then settles above the new stop keeping the arrival heading. The path comes from the same road graph the planner uses; a stop off the network, roads not yet loaded, or reduced motion fall back to the flight. The card reads "On the road · 8.4 km to" during the drive, the autoplay dwell waits for arrival, and the slow turn yields while driving.
+- **Unresolved:** the road path snaps each stop to the nearest road node, so a peak reached on foot is approached by road and then flown to; the trail part is not walked yet.
+
 ## Open questions with a planned experiment
 
 - **Q-1 SpeciesNet determinism.** Answered (E-013).
