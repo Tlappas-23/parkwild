@@ -504,10 +504,10 @@ export async function ask(question: string, onToken?: (partial: string) => void)
   );
   // Numbers the model wrote that appear in no fact: the honesty check the eval reads.
   const clean = (n: string) => n.replace(/[.,]+$/, "");
-  const factNums = new Set((factText.match(/\d[\d,\.]*/g) ?? []).map(clean));
+  const factNums = new Set((factText.match(/\d[\d,\\.]*/g) ?? []).map(clean));
   // Numbers of three or more digits that no fact contains; list numerals and
   // citation markers are not numbers the model asserted.
-  const uncited_numbers = [...new Set((text.replace(/\[\d+\]/g, "").match(/\d[\d,\.]*/g) ?? []).map(clean))].filter(
+  const uncited_numbers = [...new Set((text.replace(/\[\d+\]/g, "").match(/\d[\d,\\.]*/g) ?? []).map(clean))].filter(
     (n) => !factNums.has(n) && n.replace(/[^\d]/g, "").length >= 3,
   );
   return { text, facts: g.facts, cited, uncited_numbers, ms: Math.round(performance.now() - t0), grounding: g };
