@@ -1,7 +1,7 @@
 // One store for UI state. Data is loaded once per park; filters are applied
 // in selectors so the map and the species pages agree on what "filtered" means.
 import { create } from "zustand";
-import type { BiasFile, BoundaryFile, CellFeature, CellsFile, LandmarksFile, Manifest, PhotosCellsFile, PhotosSpeciesFile, RoadsFile, SpeciesFile } from "./types";
+import type { BiasFile, BoundaryFile, CameraPassFile, CellFeature, CellsFile, LandmarksFile, Manifest, PhotosCellsFile, PhotosSpeciesFile, RoadsFile, SpeciesFile } from "./types";
 import { availableParks, loadCellPhotos, loadPark, loadRoads } from "./data";
 import { MAX_SITES, planRoute, routerFor, type Mode, type PlanResult, type Site } from "./routing";
 
@@ -22,6 +22,7 @@ interface State {
   photosCells: PhotosCellsFile | null;
   landmarks: LandmarksFile | null;
   boundary: BoundaryFile | null;
+  cameraPass: CameraPassFile | null;   // Track B per corridor; null where it never ran
   manifest: Manifest | null;
   error: string | null;
   speciesFilter: string | null;      // scientific name, or null for all
@@ -38,6 +39,7 @@ interface State {
   roads: RoadsFile | null;           // loaded on the first route request
   plan: PlanState;
   setPage: (p: Page) => void;
+  showCameraPass: () => void;
   setSpeciesFilter: (s: string | null) => void;
   setYearRange: (r: [number, number]) => void;
   selectCell: (c: string | null) => void;
@@ -100,6 +102,7 @@ export const useStore = create<State>((set, get) => ({
   photosCells: null,
   landmarks: null,
   boundary: null,
+  cameraPass: null,
   manifest: null,
   error: null,
   speciesFilter: null,
@@ -116,6 +119,8 @@ export const useStore = create<State>((set, get) => ({
   roads: null,
   plan: NO_PLAN,
   setPage: (page) => set({ page, selectedSpecies: page === "species" ? get().selectedSpecies : null }),
+  // "How the camera pass works" links land on that section of the About page.
+  showCameraPass: () => { set({ page: "about" }); setTimeout(() => document.getElementById("camera-pass")?.scrollIntoView({ behavior: "smooth", block: "start" }), 60); },
   setSpeciesFilter: (speciesFilter) => set({ speciesFilter }),
   setYearRange: (yearRange) => set({ yearRange }),
   selectCell: (selectedCell) => { set({ selectedCell }); if (selectedCell) void get().ensureCellPhotos(); },
@@ -125,7 +130,7 @@ export const useStore = create<State>((set, get) => ({
   setPark: (park) => {
     if (park === get().park || !PARKS.some((p) => p.key === park)) return;
     set({ park, parkName: nameOf(park), cells: null, species: null, bias: null, photosSpecies: null, photosCells: null,
-          landmarks: null, boundary: null, manifest: null, error: null, speciesFilter: null, selectedCell: null,
+          landmarks: null, boundary: null, cameraPass: null, manifest: null, error: null, speciesFilter: null, selectedCell: null,
           selectedSpecies: null, tour: NO_TOUR, roads: null, plan: { ...NO_PLAN, start: get().plan.start?.kind === "me" ? get().plan.start : null } });
     try { const u = new URL(window.location.href); u.searchParams.set("park", park); window.history.replaceState(null, "", u.toString()); } catch { /* ignore */ }
     void get().load();
@@ -198,14 +203,14 @@ export const useStore = create<State>((set, get) => ({
   load: async () => {
     const park = get().park;
     try {
-      const { cells, species, bias, photosSpecies, landmarks, boundary, manifest } = await loadPark(park);
+      const { cells, species, bias, photosSpecies, landmarks, boundary, cameraPass, manifest } = await loadPark(park);
       if (get().park !== park) return;         // the visitor switched parks while this one was loading
       let lo = 2100, hi = 1900;
       for (const f of cells.features) {
         if (f.properties.y0 !== null) lo = Math.min(lo, f.properties.y0);
         if (f.properties.y1 !== null) hi = Math.max(hi, f.properties.y1);
       }
-      set({ cells, species, bias, photosSpecies, landmarks, boundary, manifest, error: null, yearRange: lo <= hi ? [lo, hi] : [1900, 2100] });
+      set({ cells, species, bias, photosSpecies, landmarks, boundary, cameraPass, manifest, error: null, yearRange: lo <= hi ? [lo, hi] : [1900, 2100] });
     } catch (e) {
       if (get().park === park) set({ error: (e as Error).message });
     }

@@ -436,3 +436,79 @@ def update_results_md(path: Path, key: str, block: str, *, heading: str | None =
 
 def dump_json(n: dict) -> str:
     return json.dumps(n, indent=2, default=str)
+
+
+# ---- the second review: is the species label right? -----------------------
+
+# SPECIES_TARGET / SPECIES_MIN_N — ASSUMED (a name is worth printing when it is
+# right at least 60% of the time, the same bar Phase 0 used for "primary", and
+# 15 reviewed boxes is the least that can show it; owner's call, E-033)
+SPECIES_TARGET = 0.6
+SPECIES_MIN_N = 15
+
+
+def species_precision(store: Store, *, reviewer: str, corridors: list[str] | None = None, population: str = "perspective") -> dict:
+    """Per classifier-score band: how many reviewed true-positive boxes carried
+    a species label the reviewer agreed with. `yes` is exact, `rollup` means
+    the model stopped at a correct coarser taxon, `no` is wrong. Also the
+    animal precision of the same bands, since a wrong species on a rock is two
+    errors. Ends with the lowest bar the numbers support."""
+    from .review import SPECIES_BANDS
+    vf = VARIANT_FILTER[population]
+    cor_sql = "" if not corridors else "AND i.corridor IN (" + ",".join("?" * len(corridors)) + ")"
+    rows = store.sql(
+        f"""
+        WITH score AS (SELECT image_id, variant, max(prediction_score) AS s FROM predictions_raw GROUP BY 1, 2)
+        SELECT m.verdict, m.species_agree, sc.s, i.corridor
+        FROM manual_review m
+        JOIN images i USING (image_id)
+        LEFT JOIN score sc ON sc.image_id = m.image_id AND sc.variant = m.variant
+        WHERE m.reviewer = ? AND m.{vf} {cor_sql}
+        """,
+        [reviewer] + (corridors or []),
+    )
+    out: dict = {"reviewer": reviewer, "corridors": corridors, "population": population, "n_reviewed": len(rows), "bands": []}
+    for lo, hi in SPECIES_BANDS:
+        band = [r for r in rows if r[2] is not None and lo <= r[2] < hi]
+        tp = [r for r in band if r[0] == "tp"]
+        fp = sum(r[0] == "fp" for r in band)
+        judged = [r for r in tp if (r[1] or "na") != "na"]
+        yes = sum(r[1] == "yes" for r in judged)
+        rollup = sum(r[1] == "rollup" for r in judged)
+        out["bands"].append({
+            "band": f"{lo:.1f}-{min(hi, 1.0):.1f}", "n": len(band), "tp": len(tp), "fp": fp,
+            "animal_precision": (len(tp) / (len(tp) + fp)) if (len(tp) + fp) else None,
+            "animal_ci": wilson(len(tp), len(tp) + fp) if (len(tp) + fp) else None,
+            "n_species_judged": len(judged), "exact": yes, "rollup": rollup, "wrong": len(judged) - yes - rollup,
+            "species_precision": (yes / len(judged)) if judged else None,
+            "species_ci": wilson(yes, len(judged)) if judged else None,
+        })
+    # The bar: the lowest band such that it and every band above clear the
+    # target on enough boxes. If none does, the bar stays where it is.
+    suggested = None
+    for i in range(len(out["bands"])):
+        above = out["bands"][i:]
+        if all(b["n_species_judged"] >= SPECIES_MIN_N and (b["species_precision"] or 0) >= SPECIES_TARGET for b in above):
+            suggested = SPECIES_BANDS[i][0]
+            break
+    out["suggested_species_min_score"] = suggested
+    out["target"] = SPECIES_TARGET
+    out["min_n"] = SPECIES_MIN_N
+    return out
+
+
+def render_species_markdown(n: dict) -> str:
+    lines = [f"Species-label review (reviewer {n['reviewer']}, {n['population']}, {n['n_reviewed']} boxes"
+             + (f", corridors {', '.join(n['corridors'])}" if n.get("corridors") else "") + ")", ""]
+    lines.append("| classifier score | boxes | animal precision | species judged | exact | rollup | wrong | species precision |")
+    lines.append("|---|---|---|---|---|---|---|---|")
+    for b in n["bands"]:
+        lines.append(f"| {b['band']} | {b['n']} | {_pct(b['animal_precision'])} {_ci(b['animal_ci'])} | {b['n_species_judged']} "
+                     f"| {b['exact']} | {b['rollup']} | {b['wrong']} | {_pct(b['species_precision'])} {_ci(b['species_ci'])} |")
+    lines.append("")
+    if n["suggested_species_min_score"] is None:
+        lines.append(f"No band clears {n['target']:.0%} on at least {n['min_n']} judged boxes; the naming bar stays where it is.")
+    else:
+        lines.append(f"Lowest bar the numbers support: {n['suggested_species_min_score']:.1f} "
+                     f"(every band at or above it clears {n['target']:.0%} on at least {n['min_n']} judged boxes).")
+    return "\n".join(lines)

@@ -4,7 +4,7 @@ import { useStore } from "../store";
 // and the bias figures in plain language. Numbers come from the pipeline's
 // exports where they exist; where they do not yet, the page says so.
 export default function AboutPage() {
-  const { species, manifest, cells, bias, parkName, landmarks } = useStore();
+  const { species, manifest, cells, bias, parkName, landmarks, cameraPass } = useStore();
   const named = (list: string[]) => list.map((n) => species?.species.find((s) => s.scientific_name === n)?.common_name ?? n).join(", ");
   const excluded = Object.keys(cells?.suppressed.excluded ?? {});
   const coarsened = Object.keys(cells?.suppressed.coarsened ?? {});
@@ -37,6 +37,42 @@ export default function AboutPage() {
         {coarsened.length > 0 && <> Shown coarsely: {named(coarsened)}.</>}{" "}
         Where a source already obscures a location, that record is counted but never mapped, and its photographs never appear in a cell.
       </p>
+
+      <h2 id="camera-pass">Roadside camera pass</h2>
+      <p>
+        Besides what people reported, a computer-vision model looked for animals in street-level photographs taken from park roads
+        (Mapillary, CC BY-SA; <span className="badge model">model</span> on the map). It is a supplementary layer, kept apart from human
+        sightings on purpose: it sees only what a car sees, mostly in June, and it is right less than half the time at the threshold used.
+        Its counts are small and they are shown as they are.
+      </p>
+      {cameraPass && cameraPass.corridors.length > 0 ? (
+        <div className="table-wrap">
+          <table className="pass">
+            <thead><tr><th>Corridor</th><th>Frames scored</th><th>Frames with an animal</th><th>Sightings</th><th>Named to species</th><th>Measured precision</th></tr></thead>
+            <tbody>
+              {cameraPass.corridors.map((c) => (
+                <tr key={c.key}>
+                  <td>{c.name}{c.status === "planned" ? <span className="muted"> · queued</span> : ""}</td>
+                  <td>{c.frames_scored.toLocaleString()}</td>
+                  <td>{c.frames_with_animal.toLocaleString()}</td>
+                  <td>{c.sightings.toLocaleString()}</td>
+                  <td>{c.named.toLocaleString()}{Object.keys(c.species_named).length > 0 ? ` (${Object.entries(c.species_named).map(([k, v]) => `${species?.species.find((s) => s.scientific_name === k)?.common_name ?? k} ${v}`).join(", ")})` : ""}</td>
+                  <td>{c.precision && c.precision.precision !== null ? `${Math.round(100 * c.precision.precision)}% (95% CI ${Math.round(100 * (c.precision.ci?.[0] ?? 0))} to ${Math.round(100 * (c.precision.ci?.[1] ?? 0))}%, n=${c.precision.n}, reviewer ${c.precision.reviewer})` : c.status === "planned" ? "—" : "not yet reviewed"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <p className="muted">The camera pass has not run in {parkName}.</p>
+      )}
+      {cameraPass && (
+        <p className="muted small">
+          {cameraPass.model}. A frame counts as having an animal at detector confidence {cameraPass.thresholds.detection_min_conf} or better; a species is named only when the classifier scores {cameraPass.thresholds.species_min_score} or better, otherwise the sighting is "unidentified large mammal".
+          Precision is the share of reviewed detections that a person confirmed as an animal. Recall is unmeasured and will stay so: nobody counted every animal beside those roads.
+          Detections are positioned at the camera, about {cameraPass.thresholds.range_m} m from the animal.
+        </p>
+      )}
 
       <h2>Road bias and seasonal bias</h2>
       {bias ? (

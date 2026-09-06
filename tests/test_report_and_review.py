@@ -196,3 +196,34 @@ def test_stratified_beats_uniform_on_a_skewed_population(store):
     # v2 asks for 10 per band; the high band only has 6, and is left short, not back-filled.
     assert v2 == Counter({"0.2-0.5": 10, "0.5-0.8": 10, "0.8-1.0": 6})
     assert v2["0.8-1.0"] > v1["0.8-1.0"]
+
+
+def test_species_sample_and_precision_and_camera_pass(store, tmp_path):
+    """E-033: the second review is stratified by classifier score, the report
+    reads species_agree per band, and the park summary carries the numbers."""
+    from parkwild.config import Corridor
+    from parkwild.geo import BBox
+    from parkwild.report import species_precision
+    from parkwild.review import SPECIES_BANDS, pick_species_sample, species_band_of
+    from parkwild.trackb_export import camera_pass_json
+    seed_phase0(store, tmp_path)
+    sample = pick_species_sample(store, ["test"], per_band=5, min_conf=0.2)
+    assert all(s["band"].startswith("s") and s["corridor"] == "test" for s in sample)
+    assert len({s["image_id"] for s in sample}) == len(sample)                    # one box per frame
+    assert species_band_of(0.85) == "s0.8-1.0" and species_band_of(0.61) == "s0.6-0.7" and species_band_of(0.2) is None
+    # Review every sampled box as an animal; agree with the label on the high band only.
+    rows = [{"image_id": s["image_id"], "variant": s["variant"], "det_idx": s["det_idx"], "reviewer": "me", "verdict": "tp",
+             "true_species": "x", "species_agree": "yes" if s["band"] == "s0.8-1.0" else "no", "est_distance_m": None, "notes": ""}
+            for s in sample]
+    store.upsert_reviews(rows)
+    n = species_precision(store, reviewer="me", corridors=["test"])
+    assert len(n["bands"]) == len(SPECIES_BANDS) and n["n_reviewed"] == len(sample)
+    judged = sum(b["n_species_judged"] for b in n["bands"])
+    assert judged == len(sample) and n["suggested_species_min_score"] in (None, 0.8)   # too few boxes to clear the minimum n
+    c = Corridor(key="test", name="Test corridor", park="Yellowstone National Park", state="WY", bbox=BBox.from_list([-110.3, 44.8, -110.1, 45.0]))
+    r = camera_pass_json(store, "yellowstone", tmp_path / "camera_pass.json", corridors=[c])
+    import json
+    j = json.loads((tmp_path / "camera_pass.json").read_text())
+    assert r == {"corridors": 1, "with_runs": 1} and j["corridors"][0]["status"] == "reviewed"
+    assert j["corridors"][0]["frames_scored"] > 0 and j["corridors"][0]["precision"]["reviewer"] == "me"
+    assert j["thresholds"]["species_min_score"] == 0.8 and j["corridors"][0]["bbox"] == [-110.3, 44.8, -110.1, 45.0]

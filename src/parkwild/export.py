@@ -362,7 +362,7 @@ def write_manifest(out_dir: Path, files: list[Path], extra: dict | None = None) 
 # imagery track ran, landmarks.json and boundary.geojson only after
 # `track_a.py landmarks`, roads.json only after `track_a.py roads`.
 PARK_FILES = ("cells.geojson", "species.json", "sightings.parquet", "photos_species.json", "photos_cells.json",
-              "bias.json", "landmarks.json", "boundary.geojson", "roads.json")
+              "bias.json", "landmarks.json", "boundary.geojson", "roads.json", "camera_pass.json")
 
 
 def write_park_manifest(out_dir: Path, park: str) -> Path:
@@ -376,6 +376,7 @@ def write_park_manifest(out_dir: Path, park: str) -> Path:
 
 def export_park(store: Store, park: str, out_dir: Path) -> dict:
     from .photos import export_photos  # local import: photos depends on this module's helpers
+    from .trackb_export import camera_pass_json
 
     out_dir.mkdir(parents=True, exist_ok=True)
     result = {
@@ -383,6 +384,7 @@ def export_park(store: Store, park: str, out_dir: Path) -> dict:
         "species": species_json(store, park, out_dir / "species.json"),
         "sightings": sightings_parquet(store, park, out_dir / "sightings.parquet"),
         "photos": export_photos(store, park, out_dir),
+        "camera_pass": camera_pass_json(store, park, out_dir / "camera_pass.json"),
     }
     write_park_manifest(out_dir, park)
     return result

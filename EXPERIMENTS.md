@@ -193,6 +193,13 @@ Format: date, what, number, kept?, why, where it lives.
 - **What:** the owner, on the 320 px full-height dock: "the tour block is also too big and covers the map so we lose sight of where everything is".
 - **Kept:** a content-sized translucent card in the top-right corner (300 px wide, about 380 px tall, blurred backdrop so the map shows through), three-column thumbnails with tiny credits, three lines of text, and a minimise button that leaves a one-line strip with the stop name and the arrows. The camera pads only by the card's width. The phone bar is unchanged.
 
+### E-033: making the camera pass count for something (owner's choice of 1 and 2, 2026-09-05)
+- **What:** the owner, on "model 0" everywhere: "obviously that's not good". Options offered: (1) a second, larger review to measure species-label precision by classifier score and move the naming bar if the numbers allow; (2) present the pass as what it is, a method with its own numbers, rather than a badge competing with human sightings; (3) a different sensor. Chosen: 1 and 2, "as long as it's free". Both are.
+- **Built for (1):** `phase0.py species-sample` draws boxes the map already shows (detector ≥ 0.5) from every corridor with detections, 30 per classifier-score band (0.5–0.6, 0.6–0.7, 0.7–0.8, 0.8+), renders the frame and crop, and writes `data/review/species/perspective/review_<reviewer>.csv` with the same columns as Phase 0 (`verdict`, `true_species`, `species_agree`). `phase0.py species-report` loads it and prints animal precision and species precision per band with Wilson intervals, and the lowest naming bar every band at or above clears 60% on at least 15 judged boxes. The bar in `trackb.SPECIES_MIN_SCORE` moves only to a number that report prints, and the change cites it.
+- **Built for (2):** `camera_pass.json` per park (in the manifest): per corridor, images indexed, frames scored, frames with an animal, sightings, named species, imagery months and years, contributors, and Phase 0 precision with its interval where a review exists; corridors with no run yet are "planned". The About page shows the table; the map draws each corridor as a dashed box in the model colour labelled with its count or "queued"; the species page shows the model badge only when the count is above zero and otherwise links "how it works".
+- **Queued:** the pass on Moose-Wilson (Grand Teton), Cades Cove (Great Smoky) and Hayden Valley (Yellowstone) on CPU after the park ingest; the species sample is drawn once those finish so it covers four corridors.
+- **Expected honestly:** tens of model sightings per corridor. The pass sees what a car sees; nothing here changes that.
+
 ## Open questions with a planned experiment
 
 - **Q-1 SpeciesNet determinism.** Answered (E-013).

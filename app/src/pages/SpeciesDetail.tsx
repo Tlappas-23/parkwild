@@ -8,7 +8,7 @@ const Model3D = lazy(() => import("../Model3D"));
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 export default function SpeciesDetail({ species: s, onBack }: { species: Species; onBack: () => void }) {
-  const { reducedMotion, setSpeciesFilter, setPage, photosSpecies, species: all, parkName } = useStore();
+  const { reducedMotion, setSpeciesFilter, setPage, photosSpecies, species: all, parkName, showCameraPass } = useStore();
   const photos = useMemo(() => speciesPhotos(photosSpecies, s.scientific_name), [photosSpecies, s.scientific_name]);
   const hero = photos[0];
   const max = Math.max(1, ...s.months);
@@ -62,10 +62,10 @@ export default function SpeciesDetail({ species: s, onBack }: { species: Species
           </div>
           <div className="badges">
             <span className="badge human">verified {s.confidence_basis.human_verified.toLocaleString()}</span>
-            {parkHasModel ? (
-              <span className="badge model" title="Computer-vision detections in street-level imagery; that pass covered one road corridor">model {s.confidence_basis.model_predicted.toLocaleString()}</span>
+            {parkHasModel && s.confidence_basis.model_predicted > 0 ? (
+              <button className="badge model as-link" title="Computer-vision detections in street-level imagery; how the pass works" onClick={showCameraPass}>model {s.confidence_basis.model_predicted.toLocaleString()}</button>
             ) : (
-              <span className="muted small">no imagery pass in {parkName} yet</span>
+              <button className="link small muted" onClick={showCameraPass}>{parkHasModel ? "roadside camera pass: none of this species" : `no camera pass in ${parkName} yet`} · how it works</button>
             )}
           </div>
           {s.suppression?.action !== "exclude" && (
