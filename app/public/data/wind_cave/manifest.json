@@ -1,0 +1,53 @@
+{
+  "built": "2026-09-06T21:21:32+00:00",
+  "git_commit": "a5d4b82656747c961ac59460e54eed3d80994a43",
+  "files": {
+    "cells.geojson": {
+      "sha256": "9ec5eb743a02636ace98f2714d4b062bf09a79f1c6c85ba36978835fb8193d8e",
+      "bytes": 175514
+    },
+    "species.json": {
+      "sha256": "06df33f78259d77e2d99756a61ef1ba1d1910512fa79dce19ad58e7d58950da5",
+      "bytes": 56830
+    },
+    "sightings.parquet": {
+      "sha256": "86ba269e5845134cca66e4b1e9cf55a8c5efa427c4c713bc4bcbc3f82be6c7f8",
+      "bytes": 166206
+    },
+    "photos_species.json": {
+      "sha256": "df6d64ab0ee13165e8825998aebf995e419f66164c13a3451c649557b47366b7",
+      "bytes": 73264
+    },
+    "photos_cells.json": {
+      "sha256": "5af5900ad573d63c2020e7d12349449681aeaeaf737f5f879529c3d035c7636c",
+      "bytes": 90510
+    },
+    "places.json": {
+      "sha256": "5ea89781793b50ad9f8d56fbfdf4eb5e8b91c6735429610f14a23b7f2db6abcf",
+      "bytes": 6358
+    },
+    "landmarks.json": {
+      "sha256": "1694a6cb0b7874e38857871674314490f5c023dc99cd6f49f05ac59eb7711cb5",
+      "bytes": 853
+    },
+    "boundary.geojson": {
+      "sha256": "a1a1c0ae712648f24b3d3221acb8de9176756eb022e1bc4fa25a011c0def3c4c",
+      "bytes": 5335
+    },
+    "roads.json": {
+      "sha256": "a73998fc19c12ba1586a6f2d757bd36dfaababece2626fec383a3d19ee3b7799",
+      "bytes": 71537
+    },
+    "camera_pass.json": {
+      "sha256": "a92a48aa11e791d14816da4eb1345c42036801b496a536e57d0b5634da380251",
+      "bytes": 439
+    },
+    "amenities.json": {
+      "sha256": "d2df9f82037d4f2d630ad0161a10102996d022a9d076b2aedcfc04f79247395e",
+      "bytes": 2673
+    }
+  },
+  "park": "wind_cave",
+  "name": "Wind Cave National Park",
+  "state": "SD"
+}

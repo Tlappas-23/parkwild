@@ -1,0 +1,53 @@
+{
+  "built": "2026-09-06T21:44:56+00:00",
+  "git_commit": "e6ce3024dc1d328e1ca135d942a6f4df7b6baa9c",
+  "files": {
+    "cells.geojson": {
+      "sha256": "9cdc37b19af51c3c925a895f7aafd87b4836dcc358ca5524d240e9a2dacc0fbd",
+      "bytes": 132473
+    },
+    "species.json": {
+      "sha256": "497704dd8fe0147f9cdaa25ee1a848ec3c0344ce3f65a19a7f8e93b74656ed80",
+      "bytes": 78515
+    },
+    "sightings.parquet": {
+      "sha256": "3c49777cce494fd7bd7d08148c7dca7f97f241d4fdaeda4115d9d384203f1843",
+      "bytes": 192059
+    },
+    "photos_species.json": {
+      "sha256": "f7913452f67e3d081f5597e8ae1f80a657f47078f594b2b2bfdb53ed6c0c0cd6",
+      "bytes": 99539
+    },
+    "photos_cells.json": {
+      "sha256": "17a7e1ca0b59202d5ce720c5703b8bda8c15a4a8e7c047fcc3ea285a5d6882ea",
+      "bytes": 90597
+    },
+    "places.json": {
+      "sha256": "1cb8b629e0e7538ffa61ed8c1da5de66d2ed59e7edf726aebf00cb48deaf7b7c",
+      "bytes": 22509
+    },
+    "landmarks.json": {
+      "sha256": "31f31a12209e293a3568ed81e7dd9e0075a3b1c5374037b48181dcbe887729f0",
+      "bytes": 6435
+    },
+    "boundary.geojson": {
+      "sha256": "e422b9b2e9911485c110c07798e3f5e1257500464ce974b1ab0c09f7c198d6e1",
+      "bytes": 2749
+    },
+    "roads.json": {
+      "sha256": "65c1f6fa652e6c1cf00b04f5d610c9f4347ea54c460a72ea4ed0a2befdd8f950",
+      "bytes": 125114
+    },
+    "camera_pass.json": {
+      "sha256": "ce34fb6f06d4a313907895d3f42187a942e4be0de9d8fa7733e5cf5d3486c76f",
+      "bytes": 449
+    },
+    "amenities.json": {
+      "sha256": "f0fc90f10f3583e6508e784c95b3e569e269cf06235db22c8308344e0783d2d9",
+      "bytes": 11440
+    }
+  },
+  "park": "guadalupe_mountains",
+  "name": "Guadalupe Mountains National Park",
+  "state": "TX"
+}

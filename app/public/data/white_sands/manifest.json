@@ -1,0 +1,53 @@
+{
+  "built": "2026-09-06T21:47:19+00:00",
+  "git_commit": "e6ce3024dc1d328e1ca135d942a6f4df7b6baa9c",
+  "files": {
+    "cells.geojson": {
+      "sha256": "4931f83c5d5a77889840983c9c5358d99d5fe3e2870feeecc418377421de05ae",
+      "bytes": 47139
+    },
+    "species.json": {
+      "sha256": "b6f05dc430f8f7d623f1d444c6c116b9762abcacf5cb88b21d575b9afc9e3532",
+      "bytes": 31996
+    },
+    "sightings.parquet": {
+      "sha256": "4ae8e624d596449ce7f2388455c26fe94995797361e224e9c857737f0d3e5c38",
+      "bytes": 47482
+    },
+    "photos_species.json": {
+      "sha256": "2aefcf59d22f74032d46adce8c8112ffcdb0d27ade15d0dc5b2a539d56420449",
+      "bytes": 27885
+    },
+    "photos_cells.json": {
+      "sha256": "5f6884b50a2a8981e2258b77ae8ec12a52f6f4fe618f6be0bc5be43d693c74d4",
+      "bytes": 18671
+    },
+    "places.json": {
+      "sha256": "ab681c54fb0be22ba329187c5b65aa0e112b940d2848872503b7ef820935067b",
+      "bytes": 7968
+    },
+    "landmarks.json": {
+      "sha256": "7feb1c4f2261bac7ceaa64b1420957f356f4f471b6d18ebc29d77ffbc5179aa1",
+      "bytes": 9133
+    },
+    "boundary.geojson": {
+      "sha256": "276971b119d058054f010df5a0790f2bf531ad58b00783d9a70916ba16ec7b42",
+      "bytes": 1620
+    },
+    "roads.json": {
+      "sha256": "1e8936eaaec419226b71fe858d5c228453adafd5fd5ffaf79a9f0c34fd6564e2",
+      "bytes": 56125
+    },
+    "camera_pass.json": {
+      "sha256": "a269956d840cb8cabc98128ca15eaef488d9ab2c35cfc0e17f6a6d08d81a1939",
+      "bytes": 441
+    },
+    "amenities.json": {
+      "sha256": "6c388640710fdf7d65c50fb9834163c1bd9fdcd751a5599dcba99ccea58bf94c",
+      "bytes": 4135
+    }
+  },
+  "park": "white_sands",
+  "name": "White Sands National Park",
+  "state": "NM"
+}

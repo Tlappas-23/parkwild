@@ -1,0 +1,53 @@
+{
+  "built": "2026-09-06T21:46:21+00:00",
+  "git_commit": "e6ce3024dc1d328e1ca135d942a6f4df7b6baa9c",
+  "files": {
+    "cells.geojson": {
+      "sha256": "1d0737f10670d0db96083946965ca2adad9a018fecc7d1adbfe6e95b77955bb7",
+      "bytes": 71078
+    },
+    "species.json": {
+      "sha256": "de21ab47a019502926468cc117e2166fdae5eba75ac3608d89bb7a24e7d700cf",
+      "bytes": 98014
+    },
+    "sightings.parquet": {
+      "sha256": "efd00c2364a37125ced4c051826814412018d80b5861da10b181efdfab3420f3",
+      "bytes": 136682
+    },
+    "photos_species.json": {
+      "sha256": "a2c68010f1714b2edc92c4d8c03062d32e35467bb04b29904d7b00e71a27ec52",
+      "bytes": 99329
+    },
+    "photos_cells.json": {
+      "sha256": "78b96d8e1d8c94b25940d686d3d32fcbae1b0b6d39107b51b31de369fc2c3258",
+      "bytes": 52344
+    },
+    "places.json": {
+      "sha256": "112b78ca0270145b6bb1ccfc49e6a1bdf4f792661d7e8ed802c322f7190fc581",
+      "bytes": 7160
+    },
+    "landmarks.json": {
+      "sha256": "2a9bd2403e25064db4a35a97f757651c0a2e286189f3c57d019d869f70eadf98",
+      "bytes": 6634
+    },
+    "boundary.geojson": {
+      "sha256": "890f3ebd716d710ea964ff607fd5a390c5572b807534f232b92f39b52e8ad099",
+      "bytes": 2138
+    },
+    "roads.json": {
+      "sha256": "d6ac7daeb6799dba672cb6d7120d84f45eb3d3e70e83bf2c131302a8981a9dac",
+      "bytes": 85741
+    },
+    "camera_pass.json": {
+      "sha256": "a7dc976df78668ff1124b551e3f3c63aa853c25c0fab587b3bef9eecce491c36",
+      "bytes": 446
+    },
+    "amenities.json": {
+      "sha256": "2ae3a4deef7a865aa60c03928d1603edfcdb5a4309229aaf9860b7f5d2d2b7b3",
+      "bytes": 5029
+    }
+  },
+  "park": "carlsbad_caverns",
+  "name": "Carlsbad Caverns National Park",
+  "state": "NM"
+}

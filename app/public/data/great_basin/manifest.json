@@ -1,0 +1,53 @@
+{
+  "built": "2026-09-06T21:48:43+00:00",
+  "git_commit": "e6ce3024dc1d328e1ca135d942a6f4df7b6baa9c",
+  "files": {
+    "cells.geojson": {
+      "sha256": "defe40d4ae38dda270b360d50f2c99b166f32521cfd426dc5e13c8398c092998",
+      "bytes": 155864
+    },
+    "species.json": {
+      "sha256": "daf8b5ba8929225064271f7a7513e4058c0d380fc2c7c10aec129fdb29fce804",
+      "bytes": 59117
+    },
+    "sightings.parquet": {
+      "sha256": "92050cc6f81794449c849a807c54042d1618988ddd33783e696136adec01fed5",
+      "bytes": 129252
+    },
+    "photos_species.json": {
+      "sha256": "b4398552c5c0e0a041ad614713803bdb7a47f2eab39608fa3b4e4ccd8660e3f1",
+      "bytes": 67421
+    },
+    "photos_cells.json": {
+      "sha256": "8c6af3a4e2c9c223c1dfd7e0a68c1f5364fe9a7a7d1e128a365ecca6ca01b7d1",
+      "bytes": 79435
+    },
+    "places.json": {
+      "sha256": "cc571c4a3f55d08e2896494379962f75f52031bc45cc93d32877b407da207f13",
+      "bytes": 22546
+    },
+    "landmarks.json": {
+      "sha256": "1dd138f468be7188478f897534c8f59108df4db3ffa16db48cb2b6c049a7f6b5",
+      "bytes": 18256
+    },
+    "boundary.geojson": {
+      "sha256": "75d2ba9c7b14fedb21d4c88632aedf5f1ab9ef9fcd40b964c491d60f13df7070",
+      "bytes": 2190
+    },
+    "roads.json": {
+      "sha256": "99606cf155a63abff20c2c8d6b1a06055807fb67ba8e11236053052ee4a7ef43",
+      "bytes": 116789
+    },
+    "camera_pass.json": {
+      "sha256": "464061efca7cd600c9f6a2073b4b4e4b5fda3372e868ac7eaad49c9c0cf8707b",
+      "bytes": 441
+    },
+    "amenities.json": {
+      "sha256": "6c8c271e17e5136940a87cfdb6e8814b4d3f4a37668970c1695bd30e1dee5bca",
+      "bytes": 10267
+    }
+  },
+  "park": "great_basin",
+  "name": "Great Basin National Park",
+  "state": "NV"
+}

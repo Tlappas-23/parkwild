@@ -1,9 +1,9 @@
 {
- "generated": "2026-09-06T21:13:50+00:00",
+ "generated": "2026-09-06T21:48:47+00:00",
  "attribution": "Park photographs: Wikimedia Commons, each under the licence printed on its card",
  "species_index": {
-  "sha256": "108d6c2ec75bc89e148d545867cd320b00ad7a6366e2dd91afd7c3a1b569fe8a",
-  "bytes": 1281539
+  "sha256": "26430a7fe00e7b59080922b4b59b728bb7dddf287222b742f31668631d60a927",
+  "bytes": 1472947
  },
  "parks": [
   {
@@ -1018,7 +1018,7 @@
    "key": "wind_cave",
    "name": "Wind Cave National Park",
    "state": "SD",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -103.5506,
     43.4972,
@@ -1029,11 +1029,11 @@
     -103.4437,
     43.5688
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 136,
+   "sightings": 2443,
+   "cells": 412,
+   "stops": 1,
+   "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Skyway_Lake%2C_stalactites%2C_Wind_Cave.jpg/1280px-Skyway_Lake%2C_stalactites%2C_Wind_Cave.jpg",
     "page": "https://commons.wikimedia.org/wiki/File:Skyway_Lake,_stalactites,_Wind_Cave.jpg",
@@ -1047,7 +1047,7 @@
    "key": "big_bend",
    "name": "Big Bend National Park",
    "state": "TX",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -103.7822,
     28.9719,
@@ -1058,11 +1058,11 @@
     -103.3111,
     29.3335
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 378,
+   "sightings": 18813,
+   "cells": 1490,
+   "stops": 7,
+   "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Canyon%2C_Rio_Grande%2C_Texas.jpeg/1280px-Canyon%2C_Rio_Grande%2C_Texas.jpeg",
     "page": "https://commons.wikimedia.org/wiki/File:Canyon,_Rio_Grande,_Texas.jpeg",
@@ -1076,7 +1076,7 @@
    "key": "guadalupe_mountains",
    "name": "Guadalupe Mountains National Park",
    "state": "TX",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -105.0254,
     31.8132,
@@ -1087,11 +1087,11 @@
     -104.8683,
     31.9068
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 189,
+   "sightings": 3328,
+   "cells": 257,
+   "stops": 4,
+   "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Guadalupe_Peak_from_Hunter_Peak.jpg/1280px-Guadalupe_Peak_from_Hunter_Peak.jpg",
     "page": "https://commons.wikimedia.org/wiki/File:Guadalupe_Peak_from_Hunter_Peak.jpg",
@@ -1105,7 +1105,7 @@
    "key": "carlsbad_caverns",
    "name": "Carlsbad Caverns National Park",
    "state": "NM",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -104.6848,
     32.0408,
@@ -1116,11 +1116,11 @@
     -104.5278,
     32.12
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 238,
+   "sightings": 1954,
+   "cells": 116,
+   "stops": 3,
+   "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Carlsbad_Interior_Formations.jpg/1280px-Carlsbad_Interior_Formations.jpg",
     "page": "https://commons.wikimedia.org/wiki/File:Carlsbad_Interior_Formations.jpg",
@@ -1134,7 +1134,7 @@
    "key": "white_sands",
    "name": "White Sands National Park",
    "state": "NM",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -106.4797,
     32.6562,
@@ -1145,11 +1145,11 @@
     -106.3083,
     32.7647
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 77,
+   "sightings": 500,
+   "cells": 109,
+   "stops": 4,
+   "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/White_Sands_National_Park_visitor_center_and_native_plant_garden%2C_New_Mexico%2C_United_States.jpg/1280px-White_Sands_National_Park_visitor_center_and_native_plant_garden%2C_New_Mexico%2C_United_States.jpg",
     "page": "https://commons.wikimedia.org/wiki/File:White_Sands_National_Park_visitor_center_and_native_plant_garden,_New_Mexico,_United_States.jpg",
@@ -1163,7 +1163,7 @@
    "key": "great_basin",
    "name": "Great Basin National Park",
    "state": "NV",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -114.3561,
     38.8184,
@@ -1174,11 +1174,11 @@
     -114.2443,
     38.9416
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 142,
+   "sightings": 1839,
+   "cells": 361,
+   "stops": 6,
+   "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Prometheus_Wheeler.jpg/1280px-Prometheus_Wheeler.jpg",
     "page": "https://commons.wikimedia.org/wiki/File:Prometheus_Wheeler.jpg",
