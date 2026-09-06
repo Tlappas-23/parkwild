@@ -452,3 +452,15 @@ accepting the terms risk and a possible sudden outage; (c) an Esri
 developer key (free tier, 2 million tiles a month), which puts a key in a
 public page. **Recommendation: (a)** until a public-domain source improves;
 revisit if the USDA NAIP service comes back.
+
+### O-11: response headers the site cannot send from GitHub Pages (raised 2026-09-06)
+
+GitHub Pages serves static files with no custom headers, so the
+`frame-ancestors`, `Cross-Origin-Opener-Policy` and `X-Content-Type-Options`
+lines prepared in `app/public/_headers` never reach a browser. The page's
+own Content Security Policy still governs scripts, connections, images and
+workers, which is the surface that matters for a site with no write path.
+Options: (a) stay, accept that the site can be framed; (b) move the deploy
+to Cloudflare Pages, free, which reads `_headers` and adds a CDN; the build
+and the data flow do not change. **Recommendation: (b)** when the owner has
+a Cloudflare account; nothing in the app depends on the host.

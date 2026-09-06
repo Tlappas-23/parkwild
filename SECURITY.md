@@ -82,3 +82,27 @@ so it is a decision for the owner (DECISIONS.md, ADR-0008), off by default.
   hand-entered `review.csv` files are committed so they survive.
 - Reuse of the published dataset: it is derived from CC BY-SA and CC-licensed
   sources and is meant to be reused, with attribution.
+
+## Controls in place (checked 2026-09-06)
+
+Reads are public by design; everything that changes what is published is
+locked to one account. The repository stays public so that server-side
+branch protection is free.
+
+| Layer | Control | State |
+|---|---|---|
+| `main` | protected: required checks `test` (Python) and `app` (typecheck, tests, lint, format, build), strict up-to-date, linear history, conversation resolution, no force-push, no deletion, rules enforced for admins | on |
+| Account | two-factor authentication; only the owner has write access; `CODEOWNERS` names the owner for every path | on |
+| Secrets | `.env` gitignored; pre-commit and CI secret scan; GitHub secret scanning with push protection and non-provider patterns | on |
+| Dependencies | Dependabot security updates; weekly Dependabot pull requests for npm, pip and Actions; `npm audit` clean | on |
+| Code scanning | CodeQL default setup for TypeScript and Python on every pull request | on |
+| Actions | every action pinned to a commit SHA; workflow token read-only by default; the Pages job alone gets `pages: write` and `id-token: write` | on |
+| Reporting | private vulnerability reporting on the repository; `/.well-known/security.txt` on the site points to it | on |
+| Runtime | no server, no write path, no accounts, no third-party scripts; Content Security Policy in the page; every data file hash-checked against a manifest compiled into the app; geolocation only on a tap | on |
+| Signed commits | not required yet: the owner has no signing key registered. Once one is added on GitHub, `required_signatures` on `main` is one API call (`make protect`) | off |
+
+What a static host cannot do: GitHub Pages sends no custom response
+headers, so `frame-ancestors`, `Cross-Origin-Opener-Policy` and
+`X-Content-Type-Options` in `app/public/_headers` only take effect on a host
+that reads that file (Cloudflare Pages, also free). The page-level policy
+covers scripts, connections, images and workers. Open decision O-11.
