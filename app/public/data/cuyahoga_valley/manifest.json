@@ -1,0 +1,49 @@
+{
+  "built": "2026-09-06T18:06:02+00:00",
+  "git_commit": "257cb497e55f3ffb228f70a341b5ca4fe7bb26b9",
+  "files": {
+    "cells.geojson": {
+      "sha256": "7969fb3b589c9266f11fa6fd9c2877662c59d7a13c251b487dbd5bf40c09d71e",
+      "bytes": 434194
+    },
+    "species.json": {
+      "sha256": "0f788070fdebcf75246df960c23d55e50edd5b1371d2d38fe1ef1909fa50e275",
+      "bytes": 108231
+    },
+    "sightings.parquet": {
+      "sha256": "ca6d79ef7aa9096ac69edc68b249a5d12c3b287448783e3686c53679b4d79fc2",
+      "bytes": 1026036
+    },
+    "photos_species.json": {
+      "sha256": "a7a6220213ae3b6e28d5d9c28b0862654edddfa6830b48c4d30f5a6b7aed9338",
+      "bytes": 185460
+    },
+    "photos_cells.json": {
+      "sha256": "fac89d47486e6884b0c0e6adeb837f1b9573543349216d127c3d3855df56fc68",
+      "bytes": 351714
+    },
+    "landmarks.json": {
+      "sha256": "e5493061e57e206426bddc6a4d9d6dd8f8a6a5fbc9a2f1576f2cebb2884f81da",
+      "bytes": 14044
+    },
+    "boundary.geojson": {
+      "sha256": "88b5c7ffb9208c17720ad484fa49737058f13721b072a2705df473d4cb456bfc",
+      "bytes": 9981
+    },
+    "roads.json": {
+      "sha256": "fdc6eae48870b2ff8ae5b8d387a3e8d9c7ae77b6c27d27f6d8bc45ec2f16bb70",
+      "bytes": 792808
+    },
+    "camera_pass.json": {
+      "sha256": "5c01f3296957df5111a7fd95addee0802651bb4d6db50e10896cb313742de002",
+      "bytes": 445
+    },
+    "amenities.json": {
+      "sha256": "f618f10342e751082942ab3ec5c12fb721d4558190bb560a5c25b635eb72031f",
+      "bytes": 24035
+    }
+  },
+  "park": "cuyahoga_valley",
+  "name": "Cuyahoga Valley National Park",
+  "state": "OH"
+}

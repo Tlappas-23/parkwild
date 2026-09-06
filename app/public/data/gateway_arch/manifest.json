@@ -1,0 +1,49 @@
+{
+  "built": "2026-09-06T17:49:40+00:00",
+  "git_commit": "0956b4731fb8c72c27d93aaece869be058189313",
+  "files": {
+    "cells.geojson": {
+      "sha256": "96930120e27ea4317716a5f00bddf925f47550263f4b558f7958dbfc9f79d7ee",
+      "bytes": 9591
+    },
+    "species.json": {
+      "sha256": "f56a4abf48f80d94d890b5465a2ffbe383c313f2c03449bbd8ea14667b834767",
+      "bytes": 24926
+    },
+    "sightings.parquet": {
+      "sha256": "1b7aabfc17ac970a05400422321639e7c0ec035eb71aa29651dd537f0bea0c3f",
+      "bytes": 65169
+    },
+    "photos_species.json": {
+      "sha256": "66956cbd99a5dbbc32b20195325acaab69aeebbac249e807a11968d3e985a08c",
+      "bytes": 22741
+    },
+    "photos_cells.json": {
+      "sha256": "7b26563513cda2343c7f1df9fd643e36bb297016278e930b79a2fdc23ef7df9a",
+      "bytes": 9421
+    },
+    "landmarks.json": {
+      "sha256": "b4a687577f6bd7d8444d71531df1d40f0f5080551b335f2a513ec55e347bc32c",
+      "bytes": 3834
+    },
+    "boundary.geojson": {
+      "sha256": "f7e40d5e9451dba2006ee4dc4df7ab8089cd62c42a10d4d240a806dfd0e3b043",
+      "bytes": 569
+    },
+    "roads.json": {
+      "sha256": "1c9ac4f6c184f486bbd8936a028155aec5587395d18a26db38966b1a5cac26da",
+      "bytes": 42477
+    },
+    "camera_pass.json": {
+      "sha256": "78678629275c793cbd15a56763f56d802a06e1979e7ff3f8825dc13a090c1231",
+      "bytes": 442
+    },
+    "amenities.json": {
+      "sha256": "02243c7f545ecd6fcebed37c4c77b6723387e52b07ed7f46338ab94d1bf32e2a",
+      "bytes": 2908
+    }
+  },
+  "park": "gateway_arch",
+  "name": "Gateway Arch National Park",
+  "state": "MO"
+}

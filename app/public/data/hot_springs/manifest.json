@@ -1,0 +1,49 @@
+{
+  "built": "2026-09-06T17:50:31+00:00",
+  "git_commit": "0956b4731fb8c72c27d93aaece869be058189313",
+  "files": {
+    "cells.geojson": {
+      "sha256": "7a1bd827910c777fffef2d157ed3a1a5b02e0a7609ae71e34d5953d7d90a2acd",
+      "bytes": 41634
+    },
+    "species.json": {
+      "sha256": "412544378ff77b55863d13476c984f513cde7e1437a5353f5a4c4cb49ded5535",
+      "bytes": 38963
+    },
+    "sightings.parquet": {
+      "sha256": "d3ade26f622c3d5b38a30bf4dd593347733f53fb6878c21054d9a85c595ff13e",
+      "bytes": 53169
+    },
+    "photos_species.json": {
+      "sha256": "314b74b8d955cd188466af7396d4c82e01a04461e7189e9c0dd7db24aec91075",
+      "bytes": 32826
+    },
+    "photos_cells.json": {
+      "sha256": "ec1891eec47b35cce48fda30b8e3a8de187028ce8b9374cfceb1d0fff45c87d8",
+      "bytes": 21746
+    },
+    "landmarks.json": {
+      "sha256": "570f86b66aa206f30080a24e48badea581e86783c1636ab7db386f3f601357f7",
+      "bytes": 3723
+    },
+    "boundary.geojson": {
+      "sha256": "00f437cef97aa1199681757b5e3b3aca71a2d780ee803b95b825e2db323d17ad",
+      "bytes": 5292
+    },
+    "roads.json": {
+      "sha256": "26e7accfeeef55bdb0eafa127b2fb45289779709afaf74f2c32535e0b82abd22",
+      "bytes": 88789
+    },
+    "camera_pass.json": {
+      "sha256": "ae9e1809ad7de7dadd331d6e952868c029267aedac07553c6b9a0c27f8ff8146",
+      "bytes": 441
+    },
+    "amenities.json": {
+      "sha256": "713acbda2e9d71fc5e3b4278d601279fa7f2f088e83ca1e1b8cb17ca8bb13e94",
+      "bytes": 5483
+    }
+  },
+  "park": "hot_springs",
+  "name": "Hot Springs National Park",
+  "state": "AR"
+}
