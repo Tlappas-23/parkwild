@@ -18,6 +18,9 @@ export default function AboutPage() {
 
       <h2>What you are looking at</h2>
       <p>
+        On the map, each hexagon is about 170 m across and holds every sighting whose coordinates fall inside it; the deeper the blue, the more sightings. A hexagon turns amber only where the roadside camera pass added a sighting of its own, which so far happens in one Yellowstone valley.
+      </p>
+      <p>
         <span className="badge human">verified</span> cells come from iNaturalist research-grade observations and other GBIF datasets: a person saw the animal and at least one other person agreed on the identification. The photographs on this site are theirs, shown under the licence each chose and credited beside every image.{" "}
         <span className="badge model">model</span> cells come from a computer-vision pass over street-level photographs and are drawn in a different colour on purpose; that source is a supplementary layer with measured precision of about 40% at its threshold.
       </p>

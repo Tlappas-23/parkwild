@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-06T06:47:49+00:00",
+ "generated": "2026-09-06T13:44:18+00:00",
  "attribution": "Park photographs: Wikimedia Commons, each under the licence printed on its card",
  "parks": [
   {
@@ -7,6 +7,16 @@
    "name": "Yellowstone National Park",
    "state": "WY",
    "status": "live",
+   "bbox": [
+    -111.156,
+    44.1326,
+    -109.8242,
+    45.109
+   ],
+   "center": [
+    -110.4901,
+    44.6208
+   ],
    "species": 299,
    "sightings": 59701,
    "cells": 6707,
@@ -26,9 +36,19 @@
    "name": "Grand Teton National Park",
    "state": "WY",
    "status": "live",
-   "species": 257,
-   "sightings": 18433,
-   "cells": 2743,
+   "bbox": [
+    -110.9484,
+    43.5379,
+    -110.4228,
+    44.084
+   ],
+   "center": [
+    -110.6856,
+    43.811
+   ],
+   "species": 258,
+   "sightings": 18463,
+   "cells": 2747,
    "stops": 8,
    "tour_source": "curated",
    "hero": {
@@ -45,6 +65,16 @@
    "name": "Great Smoky Mountains National Park",
    "state": "TN",
    "status": "live",
+   "bbox": [
+    -84.0139,
+    35.4269,
+    -82.998,
+    35.8414
+   ],
+   "center": [
+    -83.506,
+    35.6341
+   ],
    "species": 237,
    "sightings": 19791,
    "cells": 1998,
@@ -64,6 +94,16 @@
    "name": "Grand Canyon National Park",
    "state": "AZ",
    "status": "live",
+   "bbox": [
+    -113.9799,
+    35.7501,
+    -111.587,
+    36.8656
+   ],
+   "center": [
+    -112.7834,
+    36.3078
+   ],
    "species": 265,
    "sightings": 19321,
    "cells": 1599,
@@ -83,6 +123,16 @@
    "name": "Zion National Park",
    "state": "UT",
    "status": "live",
+   "bbox": [
+    -113.2283,
+    37.1414,
+    -112.8631,
+    37.5043
+   ],
+   "center": [
+    -113.0457,
+    37.3228
+   ],
    "species": 200,
    "sightings": 9243,
    "cells": 782,
@@ -102,6 +152,16 @@
    "name": "Yosemite National Park",
    "state": "CA",
    "status": "live",
+   "bbox": [
+    -119.8863,
+    37.4947,
+    -119.1964,
+    38.1851
+   ],
+   "center": [
+    -119.5414,
+    37.8399
+   ],
    "species": 267,
    "sightings": 47623,
    "cells": 2831,
@@ -121,6 +181,16 @@
    "name": "Rocky Mountain National Park",
    "state": "CO",
    "status": "live",
+   "bbox": [
+    -105.9137,
+    40.1581,
+    -105.4936,
+    40.5538
+   ],
+   "center": [
+    -105.7036,
+    40.3559
+   ],
    "species": 235,
    "sightings": 29774,
    "cells": 2403,
@@ -140,6 +210,16 @@
    "name": "Glacier National Park",
    "state": "MT",
    "status": "live",
+   "bbox": [
+    -114.4755,
+    48.2337,
+    -113.242,
+    49.0009
+   ],
+   "center": [
+    -113.8587,
+    48.6173
+   ],
    "species": 273,
    "sightings": 15537,
    "cells": 2573,
@@ -152,10 +232,20 @@
    "name": "Acadia National Park",
    "state": "ME",
    "status": "live",
+   "bbox": [
+    -68.661,
+    44.003,
+    -68.0299,
+    44.4299
+   ],
+   "center": [
+    -68.3455,
+    44.2164
+   ],
    "species": 269,
    "sightings": 16339,
    "cells": 3607,
-   "stops": 2,
+   "stops": 8,
    "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Acadia_National_Park_02.JPG/1280px-Acadia_National_Park_02.JPG",
@@ -171,6 +261,16 @@
    "name": "Olympic National Park",
    "state": "WA",
    "status": "live",
+   "bbox": [
+    -124.7715,
+    47.4697,
+    -123.1205,
+    48.3829
+   ],
+   "center": [
+    -123.946,
+    47.9263
+   ],
    "species": 331,
    "sightings": 42086,
    "cells": 9193,
@@ -190,10 +290,20 @@
    "name": "Shenandoah National Park",
    "state": "VA",
    "status": "live",
+   "bbox": [
+    -78.8516,
+    38.0409,
+    -78.1501,
+    38.9104
+   ],
+   "center": [
+    -78.5008,
+    38.4756
+   ],
    "species": 240,
    "sightings": 10888,
    "cells": 1394,
-   "stops": 7,
+   "stops": 8,
    "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Skyline_Drive_in_the_Fall_%2821852619608%29.jpg/1280px-Skyline_Drive_in_the_Fall_%2821852619608%29.jpg",
@@ -202,6 +312,1500 @@
     "license": "Public domain",
     "license_url": "",
     "artist": "Shenandoah National Park from Virginia"
+   }
+  },
+  {
+   "key": "arches",
+   "name": "Arches National Park",
+   "state": "UT",
+   "status": "seed",
+   "bbox": [
+    -109.7132,
+    38.6032,
+    -109.4777,
+    38.8469
+   ],
+   "center": [
+    -109.5955,
+    38.725
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Delicate_arch_sunset.jpg/1280px-Delicate_arch_sunset.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Delicate_arch_sunset.jpg",
+    "source_article": "https://en.wikipedia.org/wiki/Arches_National_Park",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+    "artist": "Palacemusic"
+   }
+  },
+  {
+   "key": "badlands",
+   "name": "Badlands National Park",
+   "state": "SD",
+   "status": "seed",
+   "bbox": [
+    -102.8981,
+    43.4767,
+    -101.8898,
+    43.9223
+   ],
+   "center": [
+    -102.3939,
+    43.6995
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/MK00609_Badlands.jpg/1280px-MK00609_Badlands.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:MK00609_Badlands.jpg",
+    "source_article": "https://en.wikipedia.org/wiki/Badlands_National_Park",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+    "artist": "Martin Kraft"
+   }
+  },
+  {
+   "key": "big_bend",
+   "name": "Big Bend National Park",
+   "state": "TX",
+   "status": "seed",
+   "bbox": [
+    -103.7822,
+    28.9719,
+    -102.84,
+    29.6951
+   ],
+   "center": [
+    -103.3111,
+    29.3335
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Canyon%2C_Rio_Grande%2C_Texas.jpeg/1280px-Canyon%2C_Rio_Grande%2C_Texas.jpeg",
+    "page": "https://commons.wikimedia.org/wiki/File:Canyon,_Rio_Grande,_Texas.jpeg",
+    "source_article": "https://en.wikipedia.org/wiki/Big_Bend_National_Park",
+    "license": "CC BY-SA 2.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/2.0",
+    "artist": "Michael from Minnesota (@Michael)"
+   }
+  },
+  {
+   "key": "biscayne",
+   "name": "Biscayne National Park",
+   "state": "FL",
+   "status": "seed",
+   "bbox": [
+    -80.3472,
+    25.2914,
+    -80.0894,
+    25.6711
+   ],
+   "center": [
+    -80.2183,
+    25.4813
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Biscayne.JPG/1280px-Biscayne.JPG",
+    "page": "https://commons.wikimedia.org/wiki/File:Biscayne.JPG",
+    "source_article": "https://en.wikipedia.org/wiki/Biscayne_National_Park",
+    "license": "CC BY-SA 3.0",
+    "license_url": "http://creativecommons.org/licenses/by-sa/3.0/",
+    "artist": "Catholic 85 at English Wikipedia"
+   }
+  },
+  {
+   "key": "black_canyon_of_the_gunnison",
+   "name": "Black Canyon of the Gunnison National Park",
+   "state": "CO",
+   "status": "seed",
+   "bbox": [
+    -107.8295,
+    38.503,
+    -107.6184,
+    38.6412
+   ],
+   "center": [
+    -107.724,
+    38.5721
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Black_Canyon_and_Gunnison_River_2008.jpg/1280px-Black_Canyon_and_Gunnison_River_2008.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Black_Canyon_and_Gunnison_River_2008.jpg",
+    "source_article": "https://en.wikipedia.org/wiki/Black_Canyon_of_the_Gunnison_National_Park",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "artist": "Terry Foote"
+   }
+  },
+  {
+   "key": "bryce_canyon",
+   "name": "Bryce Canyon National Park",
+   "state": "UT",
+   "status": "seed",
+   "bbox": [
+    -112.2741,
+    37.4421,
+    -112.0832,
+    37.6993
+   ],
+   "center": [
+    -112.1787,
+    37.5707
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Inspiration_Point_Bryce_Canyon_November_2018_panorama.jpg/1280px-Inspiration_Point_Bryce_Canyon_November_2018_panorama.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Inspiration_Point_Bryce_Canyon_November_2018_panorama.jpg",
+    "source_article": "https://en.wikipedia.org/wiki/Bryce_Canyon_National_Park",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "artist": "King of Hearts"
+   }
+  },
+  {
+   "key": "canyonlands",
+   "name": "Canyonlands National Park",
+   "state": "UT",
+   "status": "seed",
+   "bbox": [
+    -110.2352,
+    37.9599,
+    -109.6639,
+    38.5081
+   ],
+   "center": [
+    -109.9496,
+    38.234
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Green_River_Overlook_Ekker_Butte.jpg/1280px-Green_River_Overlook_Ekker_Butte.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Green_River_Overlook_Ekker_Butte.jpg",
+    "source_article": "https://en.wikipedia.org/wiki/Canyonlands_National_Park",
+    "license": "CC BY-SA 2.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/2.0",
+    "artist": "au_ears"
+   }
+  },
+  {
+   "key": "capitol_reef",
+   "name": "Capitol Reef National Park",
+   "state": "UT",
+   "status": "seed",
+   "bbox": [
+    -111.4233,
+    37.5986,
+    -110.8622,
+    38.5344
+   ],
+   "center": [
+    -111.1427,
+    38.0665
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Capitol_Reef_National_Park.jpg/1280px-Capitol_Reef_National_Park.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Capitol_Reef_National_Park.jpg",
+    "source_article": "https://en.wikipedia.org/wiki/Capitol_Reef_National_Park",
+    "license": "CC BY 2.0",
+    "license_url": "https://creativecommons.org/licenses/by/2.0",
+    "artist": "Wolfgang Staudt"
+   }
+  },
+  {
+   "key": "carlsbad_caverns",
+   "name": "Carlsbad Caverns National Park",
+   "state": "NM",
+   "status": "seed",
+   "bbox": [
+    -104.6848,
+    32.0408,
+    -104.3708,
+    32.1992
+   ],
+   "center": [
+    -104.5278,
+    32.12
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Carlsbad_Interior_Formations.jpg/1280px-Carlsbad_Interior_Formations.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Carlsbad_Interior_Formations.jpg",
+    "source_article": "https://en.wikipedia.org/wiki/Carlsbad_Caverns_National_Park",
+    "license": "CC BY-SA 3.0",
+    "license_url": "http://creativecommons.org/licenses/by-sa/3.0/",
+    "artist": "Eric Guinther, User:Marshman"
+   }
+  },
+  {
+   "key": "channel_islands",
+   "name": "Channel Islands National Park",
+   "state": "CA",
+   "status": "seed",
+   "bbox": [
+    -120.473,
+    33.4481,
+    -119.008,
+    34.2492
+   ],
+   "center": [
+    -119.7405,
+    33.8487
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/Channel_Islands_National_Park_by_Sentinel-2.jpg/1280px-Channel_Islands_National_Park_by_Sentinel-2.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Channel_Islands_National_Park_by_Sentinel-2.jpg",
+    "source_article": "https://en.wikipedia.org/wiki/Channel_Islands_National_Park",
+    "license": "CC BY-SA 3.0 igo",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0/igo/deed.en",
+    "artist": "Copernicus Sentinel-2, ESA"
+   }
+  },
+  {
+   "key": "congaree",
+   "name": "Congaree National Park",
+   "state": "SC",
+   "status": "seed",
+   "bbox": [
+    -80.8684,
+    33.7433,
+    -80.6013,
+    33.8444
+   ],
+   "center": [
+    -80.7348,
+    33.7939
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": null
+  },
+  {
+   "key": "crater_lake",
+   "name": "Crater Lake National Park",
+   "state": "OR",
+   "status": "seed",
+   "bbox": [
+    -122.3025,
+    42.7686,
+    -121.9661,
+    43.0888
+   ],
+   "center": [
+    -122.1343,
+    42.9287
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Above_Crater_Lake_%28cropped%29.jpg/1280px-Above_Crater_Lake_%28cropped%29.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Above_Crater_Lake_(cropped).jpg",
+    "source_article": "https://en.wikipedia.org/wiki/Crater_Lake_National_Park",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "artist": "Athleticamps derivative work: User:Maps and stuff (cropped to 2.5:1 ratio, elim…"
+   }
+  },
+  {
+   "key": "cuyahoga_valley",
+   "name": "Cuyahoga Valley National Park",
+   "state": "OH",
+   "status": "seed",
+   "bbox": [
+    -81.6483,
+    41.0897,
+    -81.4911,
+    41.4204
+   ],
+   "center": [
+    -81.5697,
+    41.2551
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Cuyahoga_Valley_National_Park_20.jpg/1280px-Cuyahoga_Valley_National_Park_20.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Cuyahoga_Valley_National_Park_20.jpg",
+    "source_article": "https://en.wikipedia.org/wiki/Cuyahoga_Valley_National_Park",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "artist": "Niagara66"
+   }
+  },
+  {
+   "key": "death_valley",
+   "name": "Death Valley National Park",
+   "state": "CA",
+   "status": "seed",
+   "bbox": [
+    -118.001,
+    35.6335,
+    -116.2765,
+    37.3494
+   ],
+   "center": [
+    -117.1388,
+    36.4915
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Mesquite_Sand_Dunes_in_Death_Valley.jpg/1280px-Mesquite_Sand_Dunes_in_Death_Valley.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Mesquite_Sand_Dunes_in_Death_Valley.jpg",
+    "source_article": "https://en.wikipedia.org/wiki/Death_Valley_National_Park",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+    "artist": "Brocken Inaglory"
+   }
+  },
+  {
+   "key": "denali",
+   "name": "Denali National Park",
+   "state": "AK",
+   "status": "seed",
+   "bbox": [
+    -152.8846,
+    62.2927,
+    -148.7778,
+    64.0732
+   ],
+   "center": [
+    -150.8312,
+    63.1829
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Every_Road-_Denali_%287945497984%29.jpg/1280px-Every_Road-_Denali_%287945497984%29.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Every_Road-_Denali_(7945497984).jpg",
+    "source_article": "https://en.wikipedia.org/wiki/Denali_National_Park_and_Preserve",
+    "license": "Public domain",
+    "license_url": "",
+    "artist": "Denali National Park and Preserve"
+   }
+  },
+  {
+   "key": "dry_tortugas",
+   "name": "Dry Tortugas National Park",
+   "state": "FL",
+   "status": "seed",
+   "bbox": [
+    -82.9679,
+    24.5653,
+    -81.7555,
+    24.7261
+   ],
+   "center": [
+    -82.3617,
+    24.6457
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Fort-Jefferson_Dry-Tortugas.jpg/1280px-Fort-Jefferson_Dry-Tortugas.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Fort-Jefferson_Dry-Tortugas.jpg",
+    "source_article": "https://en.wikipedia.org/wiki/Dry_Tortugas_National_Park",
+    "license": "Public domain",
+    "license_url": "",
+    "artist": "U.S. National Park Service"
+   }
+  },
+  {
+   "key": "everglades",
+   "name": "Everglades National Park",
+   "state": "FL",
+   "status": "seed",
+   "bbox": [
+    -81.5183,
+    24.85,
+    -80.3887,
+    25.8899
+   ],
+   "center": [
+    -80.9535,
+    25.37
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Sunset_over_the_River_of_Grass%2C_NPSphoto%2C_G.Gardner_%289255157507%29.jpg/1280px-Sunset_over_the_River_of_Grass%2C_NPSphoto%2C_G.Gardner_%289255157507%29.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Sunset_over_the_River_of_Grass,_NPSphoto,_G.Gardner_(9255157507).jpg",
+    "source_article": "https://en.wikipedia.org/wiki/Everglades_National_Park",
+    "license": "Public domain",
+    "license_url": "",
+    "artist": "Everglades NPS from Homestead, Florida, United States"
+   }
+  },
+  {
+   "key": "gates_of_the_arctic",
+   "name": "Gates of the Arctic National Park",
+   "state": "AK",
+   "status": "seed",
+   "bbox": [
+    -156.9994,
+    66.6496,
+    -149.5289,
+    68.6554
+   ],
+   "center": [
+    -153.2641,
+    67.6525
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Remote_river_in_Gates_of_the_Arctic_%2816524035298%29.jpg/1280px-Remote_river_in_Gates_of_the_Arctic_%2816524035298%29.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Remote_river_in_Gates_of_the_Arctic_(16524035298).jpg",
+    "source_article": "https://en.wikipedia.org/wiki/Gates_of_the_Arctic_National_Park_and_Preserve",
+    "license": "Public domain",
+    "license_url": "",
+    "artist": "Sean Tevebaugh, National Park Service"
+   }
+  },
+  {
+   "key": "gateway_arch",
+   "name": "Gateway Arch National Park",
+   "state": "MO",
+   "status": "seed",
+   "bbox": [
+    -90.189,
+    38.6192,
+    -90.1825,
+    38.6295
+   ],
+   "center": [
+    -90.1857,
+    38.6243
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Gateway_Arch%2C_St._Louis.jpg/1280px-Gateway_Arch%2C_St._Louis.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Gateway_Arch,_St._Louis.jpg",
+    "source_article": "https://en.wikipedia.org/wiki/Gateway_Arch_National_Park",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "artist": "Lewis Hulbert"
+   }
+  },
+  {
+   "key": "glacier_bay",
+   "name": "Glacier Bay National Park",
+   "state": "AK",
+   "status": "seed",
+   "bbox": [
+    -138.5882,
+    58.1592,
+    -135.3167,
+    59.483
+   ],
+   "center": [
+    -136.9525,
+    58.8211
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": null
+  },
+  {
+   "key": "great_basin",
+   "name": "Great Basin National Park",
+   "state": "NV",
+   "status": "seed",
+   "bbox": [
+    -114.3561,
+    38.8184,
+    -114.1325,
+    39.0647
+   ],
+   "center": [
+    -114.2443,
+    38.9416
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Prometheus_Wheeler.jpg/1280px-Prometheus_Wheeler.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Prometheus_Wheeler.jpg",
+    "source_article": "https://en.wikipedia.org/wiki/Great_Basin_National_Park",
+    "license": "Public domain",
+    "license_url": "",
+    "artist": "James R Bouldin (talk · contribs)"
+   }
+  },
+  {
+   "key": "great_sand_dunes",
+   "name": "Great Sand Dunes National Park",
+   "state": "CO",
+   "status": "seed",
+   "bbox": [
+    -105.7282,
+    37.6628,
+    -105.4285,
+    37.9563
+   ],
+   "center": [
+    -105.5783,
+    37.8095
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Great_Sand_Dunes_National_Park_and_Preserve%2C_United_States_%28Unsplash%29.jpg/1280px-Great_Sand_Dunes_National_Park_and_Preserve%2C_United_States_%28Unsplash%29.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Great_Sand_Dunes_National_Park_and_Preserve,_United_States_(Unsplash).jpg",
+    "source_article": "https://en.wikipedia.org/wiki/Great_Sand_Dunes_National_Park_and_Preserve",
+    "license": "CC0",
+    "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "artist": "Lionello DelPiccolo liodp"
+   }
+  },
+  {
+   "key": "guadalupe_mountains",
+   "name": "Guadalupe Mountains National Park",
+   "state": "TX",
+   "status": "seed",
+   "bbox": [
+    -105.0254,
+    31.8132,
+    -104.7112,
+    32.0004
+   ],
+   "center": [
+    -104.8683,
+    31.9068
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Guadalupe_Peak_from_Hunter_Peak.jpg/1280px-Guadalupe_Peak_from_Hunter_Peak.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Guadalupe_Peak_from_Hunter_Peak.jpg",
+    "source_article": "https://en.wikipedia.org/wiki/Guadalupe_Mountains_National_Park",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "artist": "CarlCarlsonIV"
+   }
+  },
+  {
+   "key": "hot_springs",
+   "name": "Hot Springs National Park",
+   "state": "AR",
+   "status": "seed",
+   "bbox": [
+    -93.1135,
+    34.4988,
+    -93.0182,
+    34.5595
+   ],
+   "center": [
+    -93.0659,
+    34.5292
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Steamy_Entrance_Springs_on_Cold_Night_in_Hot_Springs_National_Park.jpg/1280px-Steamy_Entrance_Springs_on_Cold_Night_in_Hot_Springs_National_Park.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Steamy_Entrance_Springs_on_Cold_Night_in_Hot_Springs_National_Park.jpg",
+    "source_article": "https://en.wikipedia.org/wiki/Hot_Springs_National_Park",
+    "license": "CC BY 4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0",
+    "artist": "TripOfALifestyle.com"
+   }
+  },
+  {
+   "key": "isle_royale",
+   "name": "Isle Royale National Park",
+   "state": "MI",
+   "status": "seed",
+   "bbox": [
+    -89.4143,
+    47.7586,
+    -88.1748,
+    48.3021
+   ],
+   "center": [
+    -88.7945,
+    48.0303
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Edisen_Fishery_at_IRNP.jpg/1280px-Edisen_Fishery_at_IRNP.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Edisen_Fishery_at_IRNP.jpg",
+    "source_article": "https://en.wikipedia.org/wiki/Isle_Royale_National_Park",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "artist": "William Wadas"
+   }
+  },
+  {
+   "key": "joshua_tree",
+   "name": "Joshua Tree National Park",
+   "state": "CA",
+   "status": "seed",
+   "bbox": [
+    -116.458,
+    33.6702,
+    -115.2622,
+    34.1293
+   ],
+   "center": [
+    -115.8601,
+    33.8998
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Joshua_Tree_-_Cyclops_%2B_Potato_Head_-_Sunrise.jpg/1280px-Joshua_Tree_-_Cyclops_%2B_Potato_Head_-_Sunrise.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Joshua_Tree_-_Cyclops_%2B_Potato_Head_-_Sunrise.jpg",
+    "source_article": "https://en.wikipedia.org/wiki/Joshua_Tree_National_Park",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+    "artist": "Jarek Tuszyński"
+   }
+  },
+  {
+   "key": "katmai",
+   "name": "Katmai National Park",
+   "state": "AK",
+   "status": "seed",
+   "bbox": [
+    -156.5285,
+    57.8733,
+    -153.2504,
+    59.274
+   ],
+   "center": [
+    -154.8894,
+    58.5736
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Katmai_Crater_1980.jpg/1280px-Katmai_Crater_1980.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Katmai_Crater_1980.jpg",
+    "source_article": "https://en.wikipedia.org/wiki/Katmai_National_Park_and_Preserve",
+    "license": "Public domain",
+    "license_url": "",
+    "artist": "Captain Budd Christman, NOAA Corps"
+   }
+  },
+  {
+   "key": "kenai_fjords",
+   "name": "Kenai Fjords National Park",
+   "state": "AK",
+   "status": "seed",
+   "bbox": [
+    -150.9767,
+    59.2889,
+    -149.5165,
+    60.3042
+   ],
+   "center": [
+    -150.2466,
+    59.7966
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Kenai_Fjords_coast.jpg/1280px-Kenai_Fjords_coast.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Kenai_Fjords_coast.jpg",
+    "source_article": "https://en.wikipedia.org/wiki/Kenai_Fjords_National_Park",
+    "license": "Public domain",
+    "license_url": "",
+    "artist": "NPS"
+   }
+  },
+  {
+   "key": "kings_canyon",
+   "name": "Kings Canyon National Park",
+   "state": "CA",
+   "status": "seed",
+   "bbox": [
+    -118.9832,
+    36.5929,
+    -118.3339,
+    37.2376
+   ],
+   "center": [
+    -118.6585,
+    36.9153
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/KingsCanyonNP.JPG/1280px-KingsCanyonNP.JPG",
+    "page": "https://commons.wikimedia.org/wiki/File:KingsCanyonNP.JPG",
+    "source_article": "https://en.wikipedia.org/wiki/Kings_Canyon_National_Park",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+    "artist": "Crd637"
+   }
+  },
+  {
+   "key": "kobuk_valley",
+   "name": "Kobuk Valley National Park",
+   "state": "AK",
+   "status": "seed",
+   "bbox": [
+    -160.2964,
+    66.9118,
+    -157.8298,
+    67.8709
+   ],
+   "center": [
+    -159.0631,
+    67.3914
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Kobuk_Bendlova_235.jpg/1280px-Kobuk_Bendlova_235.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Kobuk_Bendlova_235.jpg",
+    "source_article": "https://en.wikipedia.org/wiki/Kobuk_Valley_National_Park",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+    "artist": "16Terezka"
+   }
+  },
+  {
+   "key": "lake_clark",
+   "name": "Lake Clark National Park",
+   "state": "AK",
+   "status": "seed",
+   "bbox": [
+    -155.005,
+    59.8513,
+    -152.1987,
+    61.5128
+   ],
+   "center": [
+    -153.6018,
+    60.6821
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/Lake_Clark_National_Park.jpg/1280px-Lake_Clark_National_Park.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Lake_Clark_National_Park.jpg",
+    "source_article": "https://en.wikipedia.org/wiki/Lake_Clark_National_Park_and_Preserve",
+    "license": "Public domain",
+    "license_url": "",
+    "artist": "unknown"
+   }
+  },
+  {
+   "key": "lassen_volcanic",
+   "name": "Lassen Volcanic National Park",
+   "state": "CA",
+   "status": "seed",
+   "bbox": [
+    -121.6201,
+    40.3445,
+    -121.2468,
+    40.585
+   ],
+   "center": [
+    -121.4334,
+    40.4648
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Lassen_Peak_and_Lake_Helen.jpg/1280px-Lassen_Peak_and_Lake_Helen.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Lassen_Peak_and_Lake_Helen.jpg",
+    "source_article": "https://en.wikipedia.org/wiki/Lassen_Volcanic_National_Park",
+    "license": "Public domain",
+    "license_url": "",
+    "artist": "NPS Photo"
+   }
+  },
+  {
+   "key": "mammoth_cave",
+   "name": "Mammoth Cave National Park",
+   "state": "KY",
+   "status": "seed",
+   "bbox": [
+    -86.267,
+    37.0974,
+    -86.0238,
+    37.2705
+   ],
+   "center": [
+    -86.1454,
+    37.1839
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Mammoth_Cave_Rotunda_%28USGS_Lwt02830%29.jpg/1280px-Mammoth_Cave_Rotunda_%28USGS_Lwt02830%29.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Mammoth_Cave_Rotunda_(USGS_Lwt02830).jpg",
+    "source_article": "https://en.wikipedia.org/wiki/Mammoth_Cave_National_Park",
+    "license": "Public domain",
+    "license_url": "",
+    "artist": "Willis Thomas Lee"
+   }
+  },
+  {
+   "key": "mesa_verde",
+   "name": "Mesa Verde National Park",
+   "state": "CO",
+   "status": "seed",
+   "bbox": [
+    -108.5547,
+    37.1564,
+    -108.3396,
+    37.3505
+   ],
+   "center": [
+    -108.4472,
+    37.2535
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Cliff_Palace-Colorado-Mesa_Verde_NP.jpg/1280px-Cliff_Palace-Colorado-Mesa_Verde_NP.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Cliff_Palace-Colorado-Mesa_Verde_NP.jpg",
+    "source_article": "https://en.wikipedia.org/wiki/Mesa_Verde_National_Park",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "artist": "Tobi 87"
+   }
+  },
+  {
+   "key": "mount_rainier",
+   "name": "Mount Rainier National Park",
+   "state": "WA",
+   "status": "seed",
+   "bbox": [
+    -122.1295,
+    46.7078,
+    -121.4429,
+    47.0011
+   ],
+   "center": [
+    -121.7862,
+    46.8544
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/Mount_Rainier_from_above_Myrtle_Falls_in_August.JPG/1280px-Mount_Rainier_from_above_Myrtle_Falls_in_August.JPG",
+    "page": "https://commons.wikimedia.org/wiki/File:Mount_Rainier_from_above_Myrtle_Falls_in_August.JPG",
+    "source_article": "https://en.wikipedia.org/wiki/Mount_Rainier_National_Park",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+    "artist": "Samuel Kerr"
+   }
+  },
+  {
+   "key": "new_river_gorge",
+   "name": "New River Gorge National Park and Preserve",
+   "state": "WV",
+   "status": "seed",
+   "bbox": [
+    -81.1565,
+    37.6742,
+    -80.8562,
+    38.1188
+   ],
+   "center": [
+    -81.0063,
+    37.8965
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Grandview_Overlook%2C_New_River.jpg/1280px-Grandview_Overlook%2C_New_River.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Grandview_Overlook,_New_River.jpg",
+    "source_article": "https://en.wikipedia.org/wiki/New_River_Gorge_National_Park_and_Preserve",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "artist": "Aparkswv"
+   }
+  },
+  {
+   "key": "north_cascades",
+   "name": "North Cascades National Park",
+   "state": "WA",
+   "status": "seed",
+   "bbox": [
+    -121.6394,
+    48.3694,
+    -120.6318,
+    49.0009
+   ],
+   "center": [
+    -121.1356,
+    48.6852
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/Cascade_Pass_and_Pelton_Basin.jpg/1280px-Cascade_Pass_and_Pelton_Basin.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Cascade_Pass_and_Pelton_Basin.jpg",
+    "source_article": "https://en.wikipedia.org/wiki/North_Cascades_National_Park",
+    "license": "Public domain",
+    "license_url": "",
+    "artist": "National Park Service/Deby Dixon"
+   }
+  },
+  {
+   "key": "petrified_forest",
+   "name": "Petrified Forest National Park",
+   "state": "AZ",
+   "status": "seed",
+   "bbox": [
+    -109.9687,
+    34.7787,
+    -109.5767,
+    35.1706
+   ],
+   "center": [
+    -109.7727,
+    34.9746
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Jasper_Forest_at_Petrified_Forest_NP_in_AZ_12.jpg/1280px-Jasper_Forest_at_Petrified_Forest_NP_in_AZ_12.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Jasper_Forest_at_Petrified_Forest_NP_in_AZ_12.jpg",
+    "source_article": "https://en.wikipedia.org/wiki/Petrified_Forest_National_Park",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "artist": "Jeffhollett"
+   }
+  },
+  {
+   "key": "pinnacles",
+   "name": "Pinnacles National Park",
+   "state": "CA",
+   "status": "seed",
+   "bbox": [
+    -121.2455,
+    36.4084,
+    -121.1012,
+    36.5642
+   ],
+   "center": [
+    -121.1734,
+    36.4863
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Rock_formations_at_Pinnacles_National_Park.jpg/1280px-Rock_formations_at_Pinnacles_National_Park.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Rock_formations_at_Pinnacles_National_Park.jpg",
+    "source_article": "https://en.wikipedia.org/wiki/Pinnacles_National_Park",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+    "artist": "Brocken Inaglory"
+   }
+  },
+  {
+   "key": "redwood",
+   "name": "Redwood National Park",
+   "state": "CA",
+   "status": "seed",
+   "bbox": [
+    -124.1602,
+    41.0806,
+    -123.8495,
+    41.8398
+   ],
+   "center": [
+    -124.0048,
+    41.4602
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Redwood_National_Park%2C_fog_in_the_forest.jpg/1280px-Redwood_National_Park%2C_fog_in_the_forest.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Redwood_National_Park,_fog_in_the_forest.jpg",
+    "source_article": "https://en.wikipedia.org/wiki/Redwood_National_and_State_Parks",
+    "license": "CC BY-SA 2.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/2.0",
+    "artist": "Michael Schweppe"
+   }
+  },
+  {
+   "key": "saguaro",
+   "name": "Saguaro National Park",
+   "state": "AZ",
+   "status": "seed",
+   "bbox": [
+    -111.2438,
+    32.104,
+    -110.4985,
+    32.3521
+   ],
+   "center": [
+    -110.8712,
+    32.228
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Saguaro_Sunset.jpg/1280px-Saguaro_Sunset.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Saguaro_Sunset.jpg",
+    "source_article": "https://en.wikipedia.org/wiki/Saguaro_National_Park",
+    "license": "CC BY 3.0",
+    "license_url": "https://creativecommons.org/licenses/by/3.0",
+    "artist": "Saguaro Pictures"
+   }
+  },
+  {
+   "key": "sequoia",
+   "name": "Sequoia National Park",
+   "state": "CA",
+   "status": "seed",
+   "bbox": [
+    -118.9196,
+    36.2914,
+    -118.2348,
+    36.7008
+   ],
+   "center": [
+    -118.5772,
+    36.4961
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/General_Sherman_Tree_in_Sequoia_National_Park_-_June_2022.jpg/1280px-General_Sherman_Tree_in_Sequoia_National_Park_-_June_2022.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:General_Sherman_Tree_in_Sequoia_National_Park_-_June_2022.jpg",
+    "source_article": "https://en.wikipedia.org/wiki/Sequoia_National_Park",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "artist": "Marty Aligata"
+   }
+  },
+  {
+   "key": "theodore_roosevelt",
+   "name": "Theodore Roosevelt National Park",
+   "state": "ND",
+   "status": "seed",
+   "bbox": [
+    -103.6308,
+    46.8883,
+    -103.243,
+    47.6316
+   ],
+   "center": [
+    -103.4369,
+    47.26
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/View_of_Theodore_Roosevelt_National_Park.jpg/1280px-View_of_Theodore_Roosevelt_National_Park.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:View_of_Theodore_Roosevelt_National_Park.jpg",
+    "source_article": "https://en.wikipedia.org/wiki/Theodore_Roosevelt_National_Park",
+    "license": "Public domain",
+    "license_url": "",
+    "artist": "NPS/Mark Hoffman"
+   }
+  },
+  {
+   "key": "virgin_islands",
+   "name": "Virgin Islands National Park",
+   "state": "VI",
+   "status": "seed",
+   "bbox": [
+    -64.8024,
+    18.2966,
+    -64.6774,
+    18.3772
+   ],
+   "center": [
+    -64.7399,
+    18.3369
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/St_John_Trunk_Bay_3.jpg/1280px-St_John_Trunk_Bay_3.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:St_John_Trunk_Bay_3.jpg",
+    "source_article": "https://en.wikipedia.org/wiki/Virgin_Islands_National_Park",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+    "artist": "Fred Hsu (Wikipedia:User:Fred Hsu on en.wikipedia)"
+   }
+  },
+  {
+   "key": "voyageurs",
+   "name": "Voyageurs National Park",
+   "state": "MN",
+   "status": "seed",
+   "bbox": [
+    -93.2036,
+    48.2993,
+    -92.4539,
+    48.6315
+   ],
+   "center": [
+    -92.8288,
+    48.4654
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Voyageurs_National_Park.jpg/1280px-Voyageurs_National_Park.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Voyageurs_National_Park.jpg",
+    "source_article": "https://en.wikipedia.org/wiki/Voyageurs_National_Park",
+    "license": "Public domain",
+    "license_url": "",
+    "artist": "unknown"
+   }
+  },
+  {
+   "key": "white_sands",
+   "name": "White Sands National Park",
+   "state": "NM",
+   "status": "seed",
+   "bbox": [
+    -106.4797,
+    32.6562,
+    -106.1369,
+    32.8732
+   ],
+   "center": [
+    -106.3083,
+    32.7647
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/White_Sands_National_Park_visitor_center_and_native_plant_garden%2C_New_Mexico%2C_United_States.jpg/1280px-White_Sands_National_Park_visitor_center_and_native_plant_garden%2C_New_Mexico%2C_United_States.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:White_Sands_National_Park_visitor_center_and_native_plant_garden,_New_Mexico,_United_States.jpg",
+    "source_article": "https://en.wikipedia.org/wiki/White_Sands_National_Park",
+    "license": "Public domain",
+    "license_url": "",
+    "artist": "uncredited National Park Service employee"
+   }
+  },
+  {
+   "key": "wind_cave",
+   "name": "Wind Cave National Park",
+   "state": "SD",
+   "status": "seed",
+   "bbox": [
+    -103.5506,
+    43.4972,
+    -103.3368,
+    43.6405
+   ],
+   "center": [
+    -103.4437,
+    43.5688
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Skyway_Lake%2C_stalactites%2C_Wind_Cave.jpg/1280px-Skyway_Lake%2C_stalactites%2C_Wind_Cave.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Skyway_Lake,_stalactites,_Wind_Cave.jpg",
+    "source_article": "https://en.wikipedia.org/wiki/Wind_Cave_National_Park",
+    "license": "Public domain",
+    "license_url": "",
+    "artist": "National Park Service of the United States of America"
+   }
+  },
+  {
+   "key": "wrangell_st_elias",
+   "name": "Wrangell-St. Elias National Park",
+   "state": "AK",
+   "status": "seed",
+   "bbox": [
+    -145.435,
+    59.6926,
+    -139.0612,
+    62.718
+   ],
+   "center": [
+    -142.2481,
+    61.2053
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Mt_Saint_Elias%2C_South_Central_Alaska.jpg/1280px-Mt_Saint_Elias%2C_South_Central_Alaska.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Mt_Saint_Elias,_South_Central_Alaska.jpg",
+    "source_article": "https://en.wikipedia.org/wiki/Wrangell%E2%80%93St._Elias_National_Park_and_Preserve",
+    "license": "Public domain",
+    "license_url": "",
+    "artist": "Mr. David Sinson, NOAA, Office of Coast Survey"
+   }
+  },
+  {
+   "key": "american_samoa",
+   "name": "National Park of American Samoa",
+   "state": "AS",
+   "status": "seed",
+   "bbox": [
+    -170.7279,
+    -14.2837,
+    -169.4175,
+    -14.168
+   ],
+   "center": [
+    -170.0727,
+    -14.2258
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Pola_Islands_Tutuila_NPS.jpg/1280px-Pola_Islands_Tutuila_NPS.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Pola_Islands_Tutuila_NPS.jpg",
+    "source_article": "https://en.wikipedia.org/wiki/National_Park_of_American_Samoa",
+    "license": "Public domain",
+    "license_url": "",
+    "artist": "Tavita Togia, National Park Service"
+   }
+  },
+  {
+   "key": "haleakala",
+   "name": "Haleakala National Park",
+   "state": "HI",
+   "status": "seed",
+   "bbox": [
+    -156.2567,
+    20.6264,
+    -156.0404,
+    20.7724
+   ],
+   "center": [
+    -156.1486,
+    20.6994
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Haleakala_National_Park_02.jpg/1280px-Haleakala_National_Park_02.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Haleakala_National_Park_02.jpg",
+    "source_article": "https://en.wikipedia.org/wiki/Haleakal%C4%81_National_Park",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "artist": "Niagara66"
+   }
+  },
+  {
+   "key": "hawaii_volcanoes",
+   "name": "Hawaii Volcanoes National Park",
+   "state": "HI",
+   "status": "seed",
+   "bbox": [
+    -155.8007,
+    19.0583,
+    -155.0159,
+    19.5476
+   ],
+   "center": [
+    -155.4083,
+    19.3029
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/P%C4%81hoehoe_and_Aa_flows_at_Hawaii.jpg/1280px-P%C4%81hoehoe_and_Aa_flows_at_Hawaii.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:P%C4%81hoehoe_and_Aa_flows_at_Hawaii.jpg",
+    "source_article": "https://en.wikipedia.org/wiki/Hawai%CA%BBi_Volcanoes_National_Park",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+    "artist": "Brocken Inaglory"
+   }
+  },
+  {
+   "key": "indiana_dunes",
+   "name": "Indiana Dunes National Lakeshore",
+   "state": "IN",
+   "status": "seed",
+   "bbox": [
+    -87.4617,
+    41.5075,
+    -86.8366,
+    41.7171
+   ],
+   "center": [
+    -87.1492,
+    41.6123
+   ],
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Indiana_Dunes_National_Lakeshore%2C_Michigan_City%2C_Indiana%2C_Estados_Unidos%2C_2012-10-20%2C_DD_03.jpg/1280px-Indiana_Dunes_National_Lakeshore%2C_Michigan_City%2C_Indiana%2C_Estados_Unidos%2C_2012-10-20%2C_DD_03.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Indiana_Dunes_National_Lakeshore,_Michigan_City,_Indiana,_Estados_Unidos,_2012-10-20,_DD_03.jpg",
+    "source_article": "https://en.wikipedia.org/wiki/Indiana_Dunes_National_Park",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+    "artist": "Diego Delso"
    }
   }
  ]

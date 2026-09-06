@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import maplibregl, { type GeoJSONSource, type LngLatBoundsLike, type Map as MLMap } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { ChevronLeft, Play, Route, SlidersHorizontal } from "lucide-react";
+import { ChevronLeft, Globe, Play, Route, SlidersHorizontal } from "lucide-react";
+import { PARKS_INDEX } from "../parksIndex";
+import { addParksLayers, liveBounds, setParksData } from "../parksOverlay";
 import type { FeatureCollection } from "geojson";
 import { filteredFeatures, speciesMatches, useStore } from "../store";
 import { ORBIT_DEG, ORBIT_MS, placeOf, placeOfLandmark, STOP_PITCH, STOP_ZOOM, stopBearing, thingsNear, tourStops, trailLines, type Place } from "../tour";
@@ -82,11 +84,15 @@ export default function MapPage() {
   const wasTouring = useRef(false);
   const fittedPark = useRef<string | null>(null);      // which park the view was last framed on
   const [ready, setReady] = useState(false);
+  const [overview, setOverview] = useState(false);          // zoomed out to every park
+  const enterParkRef = useRef(useStore.getState().enterPark);
   const {
     cells, species, boundary, landmarks, speciesFilter, yearRange, setSpeciesFilter, setYearRange, selectCell, selectedCell,
     reducedMotion, basemap, setBasemap, terrain3d, setTerrain3d, tour, startTour, tourGo, plan, location, openPlan, addSite, park, cameraPass,
-    amenities, tourTab, controlsOpen, setControlsOpen, selectedPlace, selectPlace, roads,
+    amenities, tourTab, controlsOpen, setControlsOpen, selectedPlace, selectPlace, roads, showCameraPass, setPage,
   } = useStore();
+  // The amber swatch earns its place only where the camera pass found something.
+  const hasModelCells = useMemo(() => (cells?.features ?? []).some((f) => f.properties.mp > 0), [cells]);
   const [query, setQuery] = useState("");
   // Handlers are registered once on the map; refs keep them pointing at the live store actions.
   const selectCellRef = useRef(selectCell); selectCellRef.current = selectCell;
@@ -185,6 +191,7 @@ export default function MapPage() {
       });
       label("landmark-label-stops", true, 7);
       label("landmark-label", false, 10.5);
+      addParksLayers(map);
       map.addLayer({ id: "corridor-label", type: "symbol", source: "corridors", minzoom: 8,
         layout: { "text-field": ["get", "label"], "text-font": ["Noto Sans Regular"], "text-size": 10.5, "text-anchor": "bottom-left", "text-offset": [0.3, -0.3], "text-max-width": 14 },
         paint: { "text-color": "#8a5200", "text-halo-color": "rgba(255,255,255,0.92)", "text-halo-width": 1.3 } });
@@ -215,9 +222,16 @@ export default function MapPage() {
                    "horizon-fog-blend": 0.8, "sky-horizon-blend": 0.6, "atmosphere-blend": ["interpolate", ["linear"], ["zoom"], 0, 1, 10, 1, 12, 0] });
 
       // One click handler: a landmark wins over the cell under it.
-      const hitLayers = ["things-dot", "landmark-dot", "cells-fill", "cells-coarse"];
+      const hitLayers = ["parks-dot", "things-dot", "landmark-dot", "cells-fill", "cells-coarse"];
       map.on("click", (e) => {
         const hits = map.queryRenderedFeatures(e.point, { layers: hitLayers });
+        const pk = hits.find((f) => f.layer.id === "parks-dot");
+        if (pk) {
+          const p = pk.properties as { key: string; live: boolean; name: string; status: string };
+          if (p.live) { setOverview(false); enterParkRef.current(p.key); }
+          else new maplibregl.Popup({ closeButton: false, offset: 10 }).setLngLat(e.lngLat).setHTML(`<strong>${esc(p.name)}</strong><br><span class="muted">${p.status === "planned" ? "sightings are being gathered" : "not started yet"}</span>`).addTo(map);
+          return;
+        }
         // A thing or a landmark opens the place drawer; a tour stop moves the tour.
         const th = hits.find((f) => f.layer.id === "things-dot");
         if (th) {
@@ -261,6 +275,27 @@ export default function MapPage() {
     return () => { document.removeEventListener("click", onDocClick); ro.disconnect(); map.remove(); mapRef.current = null; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // "All parks": drop the pan limit and the wash, show every park, frame the
+  // country; entering a park or turning it off brings the park view back.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!ready || !map) return;
+    setParksData(map, overview ? PARKS_INDEX.parks : []);
+    map.setLayoutProperty("mask", "visibility", overview ? "none" : "visible");
+    if (overview) {
+      map.setMaxBounds(null);
+      const b = liveBounds(PARKS_INDEX.parks);
+      if (b) map.fitBounds(b, { padding: 60, pitch: 0, bearing: 0, maxZoom: 6, duration: reducedMotion ? 0 : 1600 });
+    } else if (boundsRef.current) {
+      const b = boundsRef.current;
+      map.fitBounds(b, { padding: 36, pitch: 0, bearing: 0, duration: reducedMotion ? 0 : 1400 });
+      map.once("moveend", () => { if (boundsRef.current === b) map.setMaxBounds(padBounds(b, MAX_BOUNDS_PAD)); });
+    }
+  }, [ready, overview, reducedMotion]);
+
+  // A park change ends the overview.
+  useEffect(() => { setOverview(false); }, [park]);
 
   // Cells follow the filters.
   useEffect(() => {
@@ -314,16 +349,18 @@ export default function MapPage() {
 
   // Terrain view keeps the vector landcover and shades it; satellite view hides
   // the fills so USGS imagery shows through, with roads and labels on top.
+  // The country view always uses the drawn map: the imagery service is thin
+  // below zoom 5 and a blank continent is not a map.
   useEffect(() => {
     const map = mapRef.current;
     if (!ready || !map) return;
-    const sat = basemap === "satellite";
+    const sat = basemap === "satellite" && !overview;
     map.setLayoutProperty("usgs-imagery", "visibility", sat ? "visible" : "none");
     map.setLayoutProperty("hillshade", "visibility", sat ? "none" : "visible");
     for (const id of fillIds.current) if (map.getLayer(id)) map.setLayoutProperty(id, "visibility", sat ? "none" : "visible");
     map.setPaintProperty("mask", "fill-color", sat ? "#0a1016" : "#f4f3ee");
     map.setPaintProperty("mask", "fill-opacity", sat ? 0.55 : 0.7);
-  }, [ready, basemap]);
+  }, [ready, basemap, overview]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -445,6 +482,7 @@ export default function MapPage() {
           </div>
           <button className={"toggle" + (terrain3d ? " on" : "")} aria-pressed={terrain3d} onClick={() => setTerrain3d(!terrain3d)}>3D</button>
           {!plan.open && <button className="toggle" onClick={openPlan}><Route className="ico" aria-hidden="true" /> Plan a visit</button>}
+          <button className={"toggle" + (overview ? " on" : "")} aria-pressed={overview} onClick={() => setOverview((v) => !v)}><Globe className="ico" aria-hidden="true" /> All parks</button>
         </div>
         <div className="control">
           <label htmlFor="species-search">Species</label>
@@ -487,11 +525,11 @@ export default function MapPage() {
 
       <div className="legend" aria-label="Legend">
         <span><i className="swatch human" /> people saw it</span>
-        <span><i className="swatch model" /> includes model-predicted</span>
+        {hasModelCells && <span><i className="swatch model" /> roadside camera pass <button className="link small" onClick={showCameraPass}>what's that?</button></span>}
         <span><i className="dot stop" /> tour stop</span>
         <span><i className="dot" /> landmark</span>
         {cameraPass && cameraPass.corridors.length > 0 && <span><i className="swatch pass" /> camera pass area</span>}
-        <span className="muted">Cells ~170 m; larger for sensitive species. Empty means nobody looked.</span>
+        <span className="muted">Cells ~170 m; larger for sensitive species. Empty means nobody looked. <button className="link small" onClick={() => setPage("about")}>About the data</button></span>
       </div>
 
       <CellDetail />
