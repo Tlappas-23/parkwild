@@ -18,7 +18,7 @@ export default defineConfig({
     // the hand-written one in public/, not a generated one.
     VitePWA({
       registerType: "autoUpdate",
-      injectRegister: "script-defer",   // an external registerSW.js; an inline script would violate the CSP
+      injectRegister: "script-defer", // an external registerSW.js; an inline script would violate the CSP
       manifest: false,
       includeAssets: ["icon.svg", "manifest.webmanifest"],
       workbox: {
@@ -46,15 +46,24 @@ export default defineConfig({
         runtimeCaching: [
           {
             // vector tiles + fonts, USGS imagery, and the terrain DEM tiles: all immutable in practice
-            urlPattern: ({ url }) => ["tiles.openfreemap.org", "basemap.nationalmap.gov"].includes(url.hostname)
-              || (url.hostname === "s3.amazonaws.com" && url.pathname.startsWith("/elevation-tiles-prod/")),
+            urlPattern: ({ url }) =>
+              ["tiles.openfreemap.org", "basemap.nationalmap.gov"].includes(url.hostname) ||
+              (url.hostname === "s3.amazonaws.com" && url.pathname.startsWith("/elevation-tiles-prod/")),
             handler: "CacheFirst",
-            options: { cacheName: "basemap", expiration: { maxEntries: 900, maxAgeSeconds: 30 * 24 * 3600 }, cacheableResponse: { statuses: [0, 200] } },
+            options: {
+              cacheName: "basemap",
+              expiration: { maxEntries: 900, maxAgeSeconds: 30 * 24 * 3600 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
           },
           {
             urlPattern: ({ url }) => url.pathname.includes("/data/") && url.searchParams.has("v"),
             handler: "CacheFirst",
-            options: { cacheName: "data", expiration: { maxEntries: 80, maxAgeSeconds: 60 * 24 * 3600 }, cacheableResponse: { statuses: [200] } },
+            options: {
+              cacheName: "data",
+              expiration: { maxEntries: 80, maxAgeSeconds: 60 * 24 * 3600 },
+              cacheableResponse: { statuses: [200] },
+            },
           },
           {
             urlPattern: ({ url }) => url.pathname.includes("/models/"),
