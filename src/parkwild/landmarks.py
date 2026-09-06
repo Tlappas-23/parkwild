@@ -255,7 +255,10 @@ def commons_photos_near(lat: float, lon: float, *, session: requests.Session | N
         lic = pick_licence(info.get("extmetadata") or {})
         if lic is None or not info.get("thumburl"):
             continue
-        out.append({"url": info["thumburl"], "page": info.get("descriptionurl", ""), "dist_m": round(g["dist"]),
+        # The API answers with thumb.wikimedia.org; the same path is served from
+        # upload.wikimedia.org, the host the page's content-security policy allows.
+        url = info["thumburl"].replace("https://thumb.wikimedia.org/", "https://upload.wikimedia.org/").split("?")[0]
+        out.append({"url": url, "page": info.get("descriptionurl", ""), "dist_m": round(g["dist"]),
                     "width": info.get("thumbwidth"), "height": info.get("thumbheight"), **lic})
         if len(out) >= PHOTOS_PER_STOP:
             break
