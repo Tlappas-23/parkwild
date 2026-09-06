@@ -224,6 +224,10 @@ Format: date, what, number, kept?, why, where it lives.
 - **Numbers:** printed per park by `track_a.py landmarks` (stop_photos, stops_with_street); Old Faithful: 6 photographs within 4 m, all CC BY-SA 3.0.
 - **Unresolved:** past zoom 16 the imagery blurs; a sharper free source would change the whole feel and none is clean today. Commons geosearch ranks by distance, not quality; a "quality image" filter would need a second query per file.
 
+### E-038: the left panel folds away
+- **What:** the owner: "can we hide the left panel as well".
+- **Kept:** a collapse button on the panel and a "Filters" pill in the corner that reopens it and shows the active species and whether a route is being planned; the panel folds on its own when a tour starts and returns when it ends, so a tour is map, card, nothing else.
+
 ## Open questions with a planned experiment
 
 - **Q-1 SpeciesNet determinism.** Answered (E-013).

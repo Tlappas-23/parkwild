@@ -315,3 +315,11 @@ table.pass th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05
 .photo-grid figure { margin: 0; }
 .photo-grid img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 8px; background: var(--panel-2); display: block; }
 .photo-grid .credit.compact { font-size: 9.5px; line-height: 1.2; margin-top: 3px; }
+
+
+/* the left panel folds away */
+.controls { position: relative; }
+.controls-hide { position: absolute; top: 8px; right: 8px; width: 26px; height: 26px; font-size: 16px; line-height: 1; }
+.controls .view-row { padding-right: 28px; }
+.controls-pill { position: absolute; top: 14px; left: 14px; z-index: 5; display: inline-flex; align-items: center; gap: 8px; font: inherit; font-size: 13px; font-weight: 600; color: var(--fg); background: color-mix(in oklab, var(--panel) 88%, transparent); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid var(--line); border-radius: 999px; padding: 8px 12px; box-shadow: var(--shadow); cursor: pointer; }
+.controls-pill .pill-chip { background: color-mix(in oklab, var(--accent) 14%, var(--panel)); color: var(--accent-ink); border-radius: 999px; padding: 2px 8px; font-size: 12px; }
