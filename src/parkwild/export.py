@@ -350,7 +350,7 @@ def write_manifest(out_dir: Path, files: list[Path], extra: dict | None = None) 
 # Presence decides what the manifest covers: bias.json exists only after the
 # imagery track ran, landmarks.json and boundary.geojson only after
 # `track_a.py landmarks`, roads.json only after `track_a.py roads`.
-PARK_FILES = ("cells.geojson", "species.json", "sightings.parquet", "photos_species.json", "photos_cells.json",
+PARK_FILES = ("cells.geojson", "species.json", "sightings.parquet", "photos_species.json", "photos_cells.json", "places.json",
               "bias.json", "landmarks.json", "boundary.geojson", "roads.json", "camera_pass.json", "amenities.json")
 
 

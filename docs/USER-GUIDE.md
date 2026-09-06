@@ -36,6 +36,10 @@ Click any trail, feature, campsite or landmark, in the Things-to-do list or on t
 
 Choose a start (your location, asked once and never stored, or any landmark), Drive or Hike, and the places you want: all tour stops in one tap, the busiest spots of the species you have filtered, a searched landmark or campsite, or anything added from a card or drawer. "Plan the best route" orders them over the park's real roads and trails, draws the route, and lists each leg with distance, time and a turn-by-turn link. Times assume 35 mph or 5 km/h plus five minutes a stop; routes know nothing of closures, so check nps.gov.
 
+## Places
+
+Every named trail, site, viewpoint, campground and facility in the park, ordered by how many sightings people recorded within reach of it (500 m of a point, 300 m of a trail). That is where observers went, the only free measure of where visitors go; it is not a visitor count. Filter by kind, search, or sort by longest trail, by Wikipedia readers a month (landmarks with an article), or A to Z. Each row shows a twelve-month sparkline and its busiest months. Open a place for its photograph and Wikipedia summary, the month-by-month chart, the animals people recorded there with a photograph each, and buttons to show it on the map or add it to a route. The file loads when you first open the page.
+
 ## Species
 
 Two scopes at the top: **In this park** is the photo grid of everything recorded in the open park; **All parks** searches every park at once and each row says where the animal turns up and how often. Type "elk", "bison", a scientific name or an old name. Open a species for photographs, months, sources, and **Where people see them, park by park**: every park with its count and busiest cell, and a "Show in" button that opens that park's map filtered to the species, landing on that cell with its drawer open. A sensitive species that is not mapped shows counts only; a coarsened one says so. The "Show in" button under the photograph does the same for the open park.

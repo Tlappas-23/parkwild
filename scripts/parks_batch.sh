@@ -1,10 +1,11 @@
 #!/bin/sh
 # Bring parks live unattended, in groups. For each park: the whole of Track A
-# (iNaturalist research-grade and GBIF sightings, dedupe, export), then the
-# landmarks, the road-and-trail graph and the things to do; after every GROUP
-# parks, a data-only PR through publish_data.sh, so parks appear on the site
-# as they finish rather than all at the end. A park that fails is logged and
-# skipped; the rest carry on. Logs: data/batch/<park>.log.
+# (iNaturalist research-grade and GBIF sightings, dedupe, export) unless the
+# export already exists, then whichever of landmarks, roads, things to do and
+# places is missing; after every GROUP parks, a data-only PR through
+# publish_data.sh, so parks appear on the site as they finish rather than all
+# at the end. Safe to restart: finished work is skipped. A park that fails is
+# logged and skipped; the rest carry on. Logs: data/batch/<park>.log.
 #
 #   nohup scripts/parks_batch.sh key1 key2 ... > data/batch/batch.log 2>&1 &
 #   GROUP=4 scripts/parks_batch.sh ...
@@ -20,11 +21,18 @@ publish() {
 }
 pending=""; n=0
 for p in "$@"; do
-  log "$p: sightings (iNaturalist + GBIF), dedupe, export"
-  if ! $PY "$ROOT/scripts/track_a.py" all --park "$p" > "$ROOT/data/batch/$p.log" 2>&1; then log "$p: Track A failed (see data/batch/$p.log); skipped"; continue; fi
-  for step in landmarks roads amenities; do
-    log "$p: $step"
-    $PY "$ROOT/scripts/track_a.py" "$step" --park "$p" >> "$ROOT/data/batch/$p.log" 2>&1 || log "$p: $step failed (continuing)"
+  d="$ROOT/data/export/$p"
+  if [ -f "$d/species.json" ] && [ -f "$d/cells.geojson" ]; then
+    log "$p: already exported; filling in what is missing"
+  else
+    log "$p: sightings (iNaturalist + GBIF), dedupe, export"
+    if ! $PY "$ROOT/scripts/track_a.py" all --park "$p" > "$ROOT/data/batch/$p.log" 2>&1; then log "$p: Track A failed (see data/batch/$p.log); skipped"; continue; fi
+  fi
+  for step in landmarks:landmarks.json roads:roads.json amenities:amenities.json park-places:places.json; do
+    cmd=${step%%:*}; file=${step##*:}
+    [ -f "$d/$file" ] && continue
+    log "$p: $cmd"
+    $PY "$ROOT/scripts/track_a.py" "$cmd" --park "$p" >> "$ROOT/data/batch/$p.log" 2>&1 || log "$p: $cmd failed (continuing)"
   done
   pending="$pending $p"; n=$((n + 1))
   if [ $((n % GROUP)) -eq 0 ]; then publish $pending; pending=""; fi

@@ -129,6 +129,17 @@ export interface ParkCard {
   bbox?: [number, number, number, number]; center?: [number, number];
   species: number | null; sightings: number | null; cells: number | null; stops: number | null; tour_source: string | null; hero: ParkHero | null;
 }
+// Places (parkwild/places.py): every named trail, site, campground and
+// facility with the sightings people recorded within reach (500 m of a point,
+// 300 m of a trail), the species, and a count per month. Landmarks with an
+// article carry its average monthly readers.
+export interface PlaceNear { n: number; species: number; top: [string, number][]; months: number[]; }
+export interface PlaceRec {
+  id: string; src: "landmark" | "item" | "trail"; kind: string; sub?: string | null; name: string; lon: number; lat: number;
+  length_m?: number | null; ele_m?: number | null; url?: string | null; views_pm?: number | null; tags?: Record<string, string> | null; near: PlaceNear;
+}
+export interface PlacesFile { park: string; generated: string; point_radius_m: number; trail_buffer_m: number; attribution: string; notes: Record<string, string>; places: PlaceRec[]; }
+
 export interface ParksIndex { generated: string; attribution: string; parks: ParkCard[]; species_index?: { sha256: string; bytes: number } | null; }
 
 // Where each animal was seen, park by park (parkwild/speciesindex.py): one
