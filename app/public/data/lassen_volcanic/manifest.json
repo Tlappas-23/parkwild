@@ -1,0 +1,53 @@
+{
+  "built": "2026-09-06T21:53:21+00:00",
+  "git_commit": "e6ce3024dc1d328e1ca135d942a6f4df7b6baa9c",
+  "files": {
+    "cells.geojson": {
+      "sha256": "f6b82101e0dc0ab6c08ba1135159d677b0cb3602611053e49c5ce2ad1516d5ab",
+      "bytes": 266900
+    },
+    "species.json": {
+      "sha256": "0db8492b23d45529a9ab7bccb6655649a97dc7a71f18da16525cba9bb5d96c77",
+      "bytes": 75435
+    },
+    "sightings.parquet": {
+      "sha256": "81be5dfb591943a93ebff363792f5c43f6442c173b20ec98a9ad8e4736a2dd7e",
+      "bytes": 490807
+    },
+    "photos_species.json": {
+      "sha256": "2fc251e320cf35242f03cb50143d6d865a732f1b6ae7d320bc0b0e9dbc30e029",
+      "bytes": 90992
+    },
+    "photos_cells.json": {
+      "sha256": "33cb63fa6ad21cc371f83b091f713fcca7d46e264a59878c8725196a1adf9611",
+      "bytes": 152069
+    },
+    "places.json": {
+      "sha256": "946c4ab97a1cf1e9ff2945607d2feec7339d7d5fb8f28f988e2c990082b00ced",
+      "bytes": 63741
+    },
+    "landmarks.json": {
+      "sha256": "c3cd27f6c2bc4887c4258265431bedc8e40af53b90e29b842614e20e9c5da0c1",
+      "bytes": 12974
+    },
+    "boundary.geojson": {
+      "sha256": "9f4a847aadef7e9ef4483ad9f8e2722319e0b28818c056fa4a9a0f1e1926b783",
+      "bytes": 2280
+    },
+    "roads.json": {
+      "sha256": "b952c03d271b10fd739c675a65a5a690a74b1dc2a01327ef696a429d38a71a3f",
+      "bytes": 240853
+    },
+    "camera_pass.json": {
+      "sha256": "6e4df6354c5bb822e278bd23ad762405d3257e34998103bf96ef8eba1e1f87a8",
+      "bytes": 445
+    },
+    "amenities.json": {
+      "sha256": "bba18caa4cbe429a901792d600f81799aba99b4d2906351fc1b7582931a57799",
+      "bytes": 29526
+    }
+  },
+  "park": "lassen_volcanic",
+  "name": "Lassen Volcanic National Park",
+  "state": "CA"
+}

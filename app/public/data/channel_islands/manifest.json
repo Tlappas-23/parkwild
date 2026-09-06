@@ -1,0 +1,53 @@
+{
+  "built": "2026-09-06T23:37:54+00:00",
+  "git_commit": "e6ce3024dc1d328e1ca135d942a6f4df7b6baa9c",
+  "files": {
+    "cells.geojson": {
+      "sha256": "2f5293e9bca34b6e5b4a64637c8b7807dd5d66353a4cd5b7096a4a2ac2aab026",
+      "bytes": 3538936
+    },
+    "species.json": {
+      "sha256": "adfc92f64731ea34215c2d4215b9400387e32efcd2a650059657ada086c3c725",
+      "bytes": 150308
+    },
+    "sightings.parquet": {
+      "sha256": "4ef9d66120b891f025e9ce8ecdaf46f68f78718fa0cf1b072d9c267f13380c80",
+      "bytes": 2084379
+    },
+    "photos_species.json": {
+      "sha256": "38907f9e70be35ae0c8894aa25e4bfea84b0312f7affd35ad6d6217f97085898",
+      "bytes": 145692
+    },
+    "photos_cells.json": {
+      "sha256": "8005e02e190e836d553ec3701262d204797425e403c11203b2e5cd776da278a2",
+      "bytes": 283929
+    },
+    "places.json": {
+      "sha256": "0b45ba07c50f249348af6396a785f503f008c8981e51347d64d651f06b77831a",
+      "bytes": 52367
+    },
+    "landmarks.json": {
+      "sha256": "c8022504449f32c4e4c33bf42847899cd587777329ac439da7f9cd2c980f5369",
+      "bytes": 13739
+    },
+    "boundary.geojson": {
+      "sha256": "da59979b00cc41c19977f0d8027638976209651c7b1b0882ffebe317cd4bdf12",
+      "bytes": 1357
+    },
+    "roads.json": {
+      "sha256": "8dc10434f222cb8bda7157cb8661d3b7ebfcb9a535a72a4eb6acab0f833e0037",
+      "bytes": 606001
+    },
+    "camera_pass.json": {
+      "sha256": "8909f92472c182aefcd95e30bd3c237624be82f529e7d8e0d8fbf6f343c49d87",
+      "bytes": 445
+    },
+    "amenities.json": {
+      "sha256": "1c44b4174b29abccf416a9520a03f1cc6c150ccf0f9981af0e95d4e9f7523e65",
+      "bytes": 21805
+    }
+  },
+  "park": "channel_islands",
+  "name": "Channel Islands National Park",
+  "state": "CA"
+}

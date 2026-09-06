@@ -1,0 +1,53 @@
+{
+  "built": "2026-09-06T21:59:38+00:00",
+  "git_commit": "e6ce3024dc1d328e1ca135d942a6f4df7b6baa9c",
+  "files": {
+    "cells.geojson": {
+      "sha256": "8716487d226ee9728d6e7aa87e91e9ef39c0c7b4907f67840720f7c0d9acaf87",
+      "bytes": 536173
+    },
+    "species.json": {
+      "sha256": "4ef6fe74cad13959d0a7c12b20bff490cc853a914b3383d90ed889312ea361db",
+      "bytes": 113902
+    },
+    "sightings.parquet": {
+      "sha256": "d8e61507545e7fc7a814d781e3dd77bd303263d3d85caed5959532ddd656b2f6",
+      "bytes": 572198
+    },
+    "photos_species.json": {
+      "sha256": "5bf5038dd7a549ac6ceea5987d3ce26b42cb0898448bc3f1e1c2bf4fd8c4fe1b",
+      "bytes": 133541
+    },
+    "photos_cells.json": {
+      "sha256": "1ad6904e9bff110b7561c865e2db4bc90680e39d3d9166c37e16b39080dfccb8",
+      "bytes": 205325
+    },
+    "places.json": {
+      "sha256": "e8adfcace874f2c3733fc9e8e58e9010b024aa054b9acb935021d5f620ac2632",
+      "bytes": 47912
+    },
+    "landmarks.json": {
+      "sha256": "f634cb7e1a18075bd3568916df1d2602c219f086868a5dcb9b3e6a5149068c32",
+      "bytes": 4562
+    },
+    "boundary.geojson": {
+      "sha256": "1e0ce63395cdd0ffe4fe29cf22a588a1b85b9a47cc0cd16de54a4210595d0aac",
+      "bytes": 6535
+    },
+    "roads.json": {
+      "sha256": "b1b0ae80a67ace478594263431ec73218a59faece29905757ed229225b032e9e",
+      "bytes": 527048
+    },
+    "camera_pass.json": {
+      "sha256": "d844654d859907ed2e69d26e5e061d5a4df6061223743799a9f7b734a4cb64fc",
+      "bytes": 437
+    },
+    "amenities.json": {
+      "sha256": "ef0e5d451f771f67614339181a6ee44286e321ab4b3cfd007e823fcfdf3ab2eb",
+      "bytes": 25160
+    }
+  },
+  "park": "redwood",
+  "name": "Redwood National Park",
+  "state": "CA"
+}
