@@ -200,6 +200,12 @@ Format: date, what, number, kept?, why, where it lives.
 - **Queued:** the pass on Moose-Wilson (Grand Teton), Cades Cove (Great Smoky) and Hayden Valley (Yellowstone) on CPU after the park ingest; the species sample is drawn once those finish so it covers four corridors.
 - **Expected honestly:** tens of model sightings per corridor. The pass sees what a car sees; nothing here changes that.
 
+### E-034: the app never updated itself
+- **What:** the owner sent a screenshot of the two-column tour card, four deploys old, asking again for a home page that already existed. Their tab had never received a newer build.
+- **Why:** `registerType: "autoUpdate"` in vite-plugin-pwa only calls `skipWaiting()` on a `SKIP_WAITING` message, which the old shell never sends, and does not claim clients. So each new worker installed and then waited for every tab of the old one to close. Meanwhile the old shell and its precached data agreed with each other, so the integrity check (E-023, E-027) had nothing to object to. A visitor who never closes the tab, or reopens the site from history, stays on the first build they ever saw.
+- **Kept:** the worker now skips waiting at install and claims open pages (`skipWaiting`, `clientsClaim`); the app reloads on the controller change when it happens within 30 s of opening, and otherwise shows a "newer version is ready" pill so a tour or a plan is never yanked away. Existing stale tabs pick this up on the next worker update check, which GitHub Pages' ten-minute cache bounds; closing every tab of the site once does it immediately.
+- **Number:** the owner's screenshot was build 4 of 8 that day.
+
 ## Open questions with a planned experiment
 
 - **Q-1 SpeciesNet determinism.** Answered (E-013).

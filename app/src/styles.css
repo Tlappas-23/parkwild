@@ -275,3 +275,9 @@ table.pass th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05
 .badge.as-link { cursor: pointer; font: inherit; font-size: 11px; font-weight: 600; }
 .link.small.muted { font-size: 12px; }
 .legend .swatch.pass { background: transparent; border: 1.5px dashed #b86e00; }
+
+
+/* update pill and home search */
+.update-pill { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 50; background: var(--fg); color: var(--panel); padding: 8px 10px 8px 14px; border-radius: 999px; font-size: 13px; display: flex; gap: 10px; align-items: center; box-shadow: var(--shadow); }
+.update-pill .primary { background: var(--panel); color: var(--fg); border-color: var(--panel); }
+.home-search { max-width: 360px; margin-top: 12px; }

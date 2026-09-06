@@ -34,6 +34,13 @@ export default defineConfig({
         // an old shell saw new data and its integrity check refused it (E-023).
         ignoreURLParametersMatching: [/^v$/],
         cleanupOutdatedCaches: true,
+        // "autoUpdate" alone only skips waiting on a message the old shell
+        // never sends, so a new worker sat in "waiting" for as long as any tab
+        // stayed open and the owner kept seeing a build from days before
+        // (E-034). Take over at install, claim open pages, and let the app
+        // reload on the controller change.
+        skipWaiting: true,
+        clientsClaim: true,
         runtimeCaching: [
           {
             // vector tiles + fonts, USGS imagery, and the terrain DEM tiles: all immutable in practice
