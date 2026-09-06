@@ -28,6 +28,10 @@ const TERRAIN_TILES = "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{
 // TERRAIN_EXAGGERATION — ARBITRARY (1 is true relief; on the paper-style map a
 // little more reads better at a 60° pitch, on imagery it starts to look wrong)
 const TERRAIN_EXAGGERATION = 1.35;
+// FOCUS_ZOOM / FOCUS_ZOOM_COARSE — ARBITRARY (landing on a species' busiest cell: a ~170 m hexagon
+// with its neighbours in view, or a ~3 km one for a coarsened species)
+const FOCUS_ZOOM = 13.8;
+const FOCUS_ZOOM_COARSE = 11.2;
 const TERRAIN_EXAGGERATION_SATELLITE = 1.12;
 // MAX_BOUNDS_PAD — ARBITRARY (how far past the boundary a visitor can pan, as a
 // fraction of the park's size; this is a map of the park, not of the state)
@@ -93,7 +97,7 @@ export default function MapPage() {
   const {
     cells, species, boundary, landmarks, speciesFilter, yearRange, setSpeciesFilter, setYearRange, selectCell, selectedCell,
     reducedMotion, basemap, setBasemap, terrain3d, setTerrain3d, tour, startTour, tourGo, plan, location, openPlan, addSite, park, cameraPass,
-    amenities, tourTab, controlsOpen, setControlsOpen, selectedPlace, selectPlace, roads, showCameraPass, setPage, driveMode,
+    amenities, tourTab, controlsOpen, setControlsOpen, selectedPlace, selectPlace, roads, showCameraPass, setPage, driveMode, focusCell,
   } = useStore();
   // The amber swatch earns its place only where the camera pass found something.
   const hasModelCells = useMemo(() => (cells?.features ?? []).some((f) => f.properties.mp > 0), [cells]);
@@ -334,6 +338,17 @@ export default function MapPage() {
     // camera has settled so it cannot clip the approach.
     const cam = map.cameraForBounds(b, { padding: 36 });
     const fast = reducedMotion;
+    // Arriving for a species' hotspot (showSpeciesInPark): straight to the cell
+    // instead of the whole park.
+    const pending = useStore.getState().focusCell;
+    if (pending && pending.park === park) {
+      useStore.getState().clearFocusCell();
+      useStore.getState().selectCell(pending.cell);
+      map.flyTo({ center: [pending.lon, pending.lat], zoom: pending.res >= 9 ? FOCUS_ZOOM : FOCUS_ZOOM_COARSE, pitch: 0, bearing: 0, duration: fast ? 0 : 2200, essential: true });
+      fittedPark.current = park;
+      map.once("moveend", () => { if (boundsRef.current === b) map.setMaxBounds(padBounds(b, MAX_BOUNDS_PAD)); });
+      return;
+    }
     if (cam) {
       if (fittedPark.current === null) map.jumpTo({ center: cam.center, zoom: (cam.zoom ?? 8) - 1.4, pitch: 38, bearing: -18 });
       map.easeTo({ center: cam.center, zoom: cam.zoom, pitch: 0, bearing: 0, duration: fast ? 0 : fittedPark.current === null ? 1700 : 2200, essential: true });
@@ -341,6 +356,18 @@ export default function MapPage() {
     fittedPark.current = park;
     map.once("moveend", () => { if (boundsRef.current === b) map.setMaxBounds(padBounds(b, MAX_BOUNDS_PAD)); });
   }, [ready, boundary, cells, park, reducedMotion]);
+
+  // The same hotspot when the park is already in: go there now. (A park
+  // switch is handled on arrival, above, which clears the request first.)
+  useEffect(() => {
+    const map = mapRef.current;
+    const pending = useStore.getState().focusCell;
+    if (!ready || !map || !cells || !pending || pending.park !== park || fittedPark.current !== park) return;
+    useStore.getState().clearFocusCell();
+    if (overview) setOverview(false);
+    useStore.getState().selectCell(pending.cell);
+    map.flyTo({ center: [pending.lon, pending.lat], zoom: pending.res >= 9 ? FOCUS_ZOOM : FOCUS_ZOOM_COARSE, pitch: 0, bearing: 0, duration: reducedMotion ? 0 : 1800, essential: true });
+  }, [ready, cells, park, focusCell, overview, reducedMotion]);
 
   useEffect(() => {
     const map = mapRef.current;

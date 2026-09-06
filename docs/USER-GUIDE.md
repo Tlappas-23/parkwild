@@ -38,7 +38,7 @@ Choose a start (your location, asked once and never stored, or any landmark), Dr
 
 ## Species
 
-A grid of every species with a photograph; search by any name; filter mammals or birds. A species page shows the photographs with their observers, sightings, years, the busiest month, and "seen more than usual", the month in which the species' share of sightings most exceeds everyone's, which separates the animal's season from the visitors'. "Show on the map" applies the filter.
+Two scopes at the top: **In this park** is the photo grid of everything recorded in the open park; **All parks** searches every park at once and each row says where the animal turns up and how often. Type "elk", "bison", a scientific name or an old name. Open a species for photographs, months, sources, and **Where people see them, park by park**: every park with its count and busiest cell, and a "Show in" button that opens that park's map filtered to the species, landing on that cell with its drawer open. A sensitive species that is not mapped shows counts only; a coarsened one says so. The "Show in" button under the photograph does the same for the open park.
 
 ## Ask (optional)
 
