@@ -13,7 +13,7 @@ import { nearbySpecies, photoNear, placeOf, thingsNear, TOUR_DWELL_MS, TOUR_RADI
 // always see the map". It is now a slim bar with a "Details" toggle for the
 // full text and larger photographs.
 export default function Tour() {
-  const { tour, landmarks, cells, photosSpecies, photosCells, ensureCellPhotos, tourGo, tourNext, tourPrev, tourPlay, endTour, selectSpecies, addSite, amenities, tourTab, setTourTab, selectPlace } = useStore();
+  const { tour, landmarks, cells, photosSpecies, photosCells, ensureCellPhotos, tourGo, tourNext, tourPrev, tourPlay, endTour, selectSpecies, addSite, amenities, tourTab, setTourTab, selectPlace, tourDrive } = useStore();
   const [expanded, setExpanded] = useState(false);
   const [minimised, setMinimised] = useState(false);   // a one-line strip: name and arrows, nothing else
   const stops = useMemo(() => tourStops(landmarks), [landmarks]);
@@ -44,12 +44,13 @@ export default function Tour() {
   // The cell strips hold the photographs taken near each stop; fetch them once.
   useEffect(() => { if (tour.active) void ensureCellPhotos(); }, [tour.active, ensureCellPhotos]);
 
-  // Autoplay: dwell, then move on; stops by itself at the last stop.
+  // Autoplay: once the camera has arrived, dwell, then move on; stops by
+  // itself at the last stop. The dwell does not count while on the road.
   useEffect(() => {
-    if (!tour.active || !tour.playing) return;
+    if (!tour.active || !tour.playing || tourDrive) return;
     const t = setTimeout(() => { if (tour.stop < stops.length - 1) tourNext(); else tourPlay(false); }, TOUR_DWELL_MS);
     return () => clearTimeout(t);
-  }, [tour.active, tour.playing, tour.stop, stops.length, tourNext, tourPlay]);
+  }, [tour.active, tour.playing, tour.stop, stops.length, tourNext, tourPlay, tourDrive]);
 
   // Arrow keys walk, Escape leaves.
   useEffect(() => {
@@ -82,7 +83,7 @@ export default function Tour() {
     <section className={"tour" + (expanded ? " expanded" : "")} aria-label="Virtual tour" aria-live="polite">
       <div className="tour-main">
         <div className="tour-title">
-          <span className="eyebrow">{tour.stop + 1}/{stops.length} · {stop.kind}{stop.ele_m ? ` · ${Math.round(stop.ele_m).toLocaleString()} m` : ""}</span>
+          <span className="eyebrow">{tourDrive ? `On the road · ${(tourDrive.distanceM / 1000).toFixed(1)} km to` : `${tour.stop + 1}/${stops.length} · ${stop.kind}${stop.ele_m ? ` · ${Math.round(stop.ele_m).toLocaleString()} m` : ""}`}</span>
           <h2>{stop.name}</h2>
         </div>
         {stop.summary?.extract ? (

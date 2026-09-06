@@ -43,6 +43,8 @@ interface State {
   terrain3d: boolean;
   tour: TourState;
   tourPrevBasemap: Basemap | null;   // what the visitor had before the tour switched to satellite
+  tourDrive: { to: string; distanceM: number } | null;   // set while the camera is on the road between stops
+  setTourDrive: (d: { to: string; distanceM: number } | null) => void;
   location: Location | null;         // the device's position, only ever asked for on a tap
   locationError: string | null;
   roads: RoadsFile | null;           // loaded on the first route request
@@ -131,6 +133,8 @@ export const useStore = create<State>((set, get) => ({
   terrain3d: !prefersReduced,        // relief on by default; off for people who asked the OS for less motion
   tour: NO_TOUR,
   tourPrevBasemap: null,
+  tourDrive: null,
+  setTourDrive: (tourDrive) => set({ tourDrive }),
   location: null,
   locationError: null,
   roads: null,

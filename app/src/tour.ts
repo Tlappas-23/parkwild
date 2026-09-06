@@ -12,10 +12,20 @@ import type { AmenitiesFile, AmenityItem, CellsFile, Landmark, LandmarksFile, Ph
 export const TOUR_RADIUS_M = 2500;
 // TOUR_DWELL_MS — ARBITRARY (time to read a paragraph and glance at the photos)
 export const TOUR_DWELL_MS = 14000;
-// STOP_ZOOM / STOP_PITCH — ARBITRARY (standing on the hillside above the
-// stop: the first version sat at 12.4 / 60°, which the owner read as too far)
-export const STOP_ZOOM = 13.3;
-export const STOP_PITCH = 64;
+// STOP_ZOOM / STOP_PITCH — ARBITRARY (standing above the stop, close enough
+// to see the place: 12.4 / 60° then 13.3 read as too far; imagery is sharp to 16)
+export const STOP_ZOOM = 14.4;
+export const STOP_PITCH = 62;
+// DRIVE_* — ARBITRARY (the road between stops from a driver's height: low
+// zoom, steep pitch, distance compressed so a 20 km leg takes about ten
+// seconds and a short one never less than four)
+export const DRIVE_ZOOM = 15.4;
+export const DRIVE_PITCH = 72;
+export const DRIVE_SPEED_MS = 2200;      // virtual metres per second
+export const DRIVE_MIN_MS = 4000;
+export const DRIVE_MAX_MS = 14000;
+// DRIVE_LOOKAHEAD_M — ARBITRARY (the camera faces this far up the road; shorter jitters on bends)
+export const DRIVE_LOOKAHEAD_M = 120;
 // ORBIT_DEG_PER_S — ARBITRARY (a slow turn around the stop for as long as the
 // tour runs; about a quarter turn per dwell. The first version was one
 // 45° animation that any tap on the map cancelled for good, E-044)
@@ -215,4 +225,41 @@ export function speciesNearLines(cells: CellsFile | null, lines: number[][][], b
     }
   }
   return { list: [...agg.values()].sort((a, b) => b.count - a.count).slice(0, limit), total, cells: count, cellIds };
+}
+
+
+// A polyline resampled to even steps, with cumulative distance, so the drive
+// can place the camera at any distance along it.
+export interface Resampled { pts: number[][]; cum: number[]; total: number; }
+export function resample(coords: number[][], stepM: number): Resampled {
+  const pts: number[][] = [coords[0]];
+  const cum: number[] = [0];
+  let carry = 0, total = 0;
+  for (let i = 1; i < coords.length; i++) {
+    const [ax, ay] = coords[i - 1], [bx, by] = coords[i];
+    const seg = haversineM(ax, ay, bx, by);
+    if (seg === 0) continue;
+    let d = stepM - carry;
+    while (d <= seg) {
+      const f = d / seg;
+      pts.push([ax + (bx - ax) * f, ay + (by - ay) * f]);
+      total += stepM;
+      cum.push(total);
+      d += stepM;
+    }
+    carry = seg - (d - stepM);
+    total = cum[cum.length - 1] + carry;
+  }
+  const lastTotal = cum[cum.length - 1] + carry;
+  pts.push(coords[coords.length - 1]); cum.push(lastTotal);
+  return { pts, cum, total: lastTotal };
+}
+export function pointAt(rs: Resampled, d: number): [number, number] {
+  if (d <= 0) return rs.pts[0] as [number, number];
+  if (d >= rs.total) return rs.pts[rs.pts.length - 1] as [number, number];
+  let lo = 0, hi = rs.cum.length - 1;
+  while (hi - lo > 1) { const mid = (lo + hi) >> 1; if (rs.cum[mid] <= d) lo = mid; else hi = mid; }
+  const span = rs.cum[hi] - rs.cum[lo] || 1, f = (d - rs.cum[lo]) / span;
+  const a = rs.pts[lo], b = rs.pts[hi];
+  return [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f];
 }
