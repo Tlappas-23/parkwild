@@ -254,6 +254,11 @@ Format: date, what, number, kept?, why, where it lives.
 - **What:** the owner: after opening a park you should be able to see the full map and click into a park from it, as well as from the home page; and "includes model-predicted" in the legend looked unnecessary.
 - **Kept:** the park index now carries every park the seed matched (63: 11 live, 52 not started) with a bounding box and centre, deduplicated by name against the configured ones. The home page shows the country with every park as a dot (filled for live, hollow for pending, faint for not started; a click on a live one enters it) and lists the not-started parks by name instead of 52 grey cards. On a park's map an "All parks" button drops the pan limit and the wash, frames the live parks and shows the same dots; clicking one glides into that park. The legend shows the amber swatch only in a park where the camera pass found something (today, Yellowstone), names it "roadside camera pass" with a link to the About section, and links "About the data". The About page now says what a hexagon is and when it turns amber.
 
+### E-044: the tour's motion stopped at the first tap
+- **What:** the owner: "when I start the tour and click a blue section to see the animals the motion stops until I hit the next button".
+- **Why:** the turn around each stop was one 45° `easeTo`, and MapLibre cancels any running camera animation on a pointer-down; nothing restarted it.
+- **Kept:** a frame loop for the life of the tour that nudges the bearing (3.2° per second) whenever the map is not already moving: it waits for the flight in, yields to a drag or a scroll, and resumes by itself. A tap on a cell or a landmark opens its drawer and the map keeps turning. Off under reduced motion.
+
 ## Open questions with a planned experiment
 
 - **Q-1 SpeciesNet determinism.** Answered (E-013).
