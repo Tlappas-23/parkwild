@@ -161,6 +161,12 @@ Format: date, what, number, kept?, why, where it lives.
 - **Numbers:** MapPage chunk 19 KB (7 KB gzipped); the maplibre chunk is unchanged at 276 KB gzipped; three new CSP hosts.
 - **Unresolved:** 3D terrain on low-end phones (it is off under `prefers-reduced-motion`, and a toggle); USGS tile service limits are undocumented for this volume; the outside-the-park wash hides the roads that lead into the park, which a visitor might want.
 
+### E-027: integrity error again, on the first deploy after E-023
+- **What:** the owner opened the live site minutes after the E-026 deploy and saw "species.json failed its integrity check (expected 19446acc…, got 5e653d26…)". The expected hash is the previous build's species.json, the received one is the new build's: an old app shell ran against new data.
+- **Why:** E-023 fixed one path (old worker serving new data) but the shell itself can still be old: the browser or the GitHub Pages CDN had index.html and its bundle cached, the new worker took control on install (autoUpdate), and the recovery called `location.reload()`, which the same caches answered with the same old shell. The second attempt was blocked by the one-shot session flag, so the error stayed.
+- **Kept:** the recovery now unregisters the worker, drops every cache and navigates to the same page with a `?fresh=<timestamp>` parameter, which nothing has cached; it may try again after 45 s and the error box has a Reload button that does the same by hand. Data files left the precache: each URL carries `?v=<hash>`, so a content-addressed runtime cache hands every shell exactly the files it was built with, and a first visit no longer downloads three parks in the background (precache 12 MB → 2.2 MB, shell only).
+- **Unresolved:** a stale CDN edge can still serve an old index.html for up to ten minutes after a deploy; the fresh URL bypasses the edge for the document but the old bundle it references may be gone (404) in that window. Not seen yet; it would show as a blank page, not an integrity error.
+
 ## Open questions with a planned experiment
 
 - **Q-1 SpeciesNet determinism.** Answered (E-013).

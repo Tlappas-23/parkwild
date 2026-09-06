@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect } from "react";
+import { hardReload, stripFreshParam } from "./data";
 import { PARKS, useStore } from "./store";
 import SpeciesPage from "./pages/SpeciesPage";
 import AboutPage from "./pages/AboutPage";
@@ -6,9 +7,19 @@ import AboutPage from "./pages/AboutPage";
 // The map page pulls in maplibre-gl (its own chunk); it is loaded only when shown.
 const MapPage = lazy(() => import("./pages/MapPage"));
 
+// After a deploy the new service worker installs but waits while any tab
+// still runs the old one (E-027). Telling it to skip waiting means the next
+// navigation gets the new shell; data URLs are content-addressed, so the
+// worker changing under a running page cannot hand it the wrong file.
+function nudgeWaitingWorker(): void {
+  try {
+    void navigator.serviceWorker?.getRegistration().then((r) => r?.waiting?.postMessage({ type: "SKIP_WAITING" }));
+  } catch { /* no worker support */ }
+}
+
 export default function App() {
   const { page, setPage, load, error, species, park, parkName, setPark } = useStore();
-  useEffect(() => { void load(); }, [load]);
+  useEffect(() => { stripFreshParam(); nudgeWaitingWorker(); void load(); }, [load]);
 
   return (
     <div className="app">
@@ -36,7 +47,12 @@ export default function App() {
         </nav>
       </header>
       <main className={page === "map" ? "main-map" : ""}>
-        {error && <div role="alert" className="error">Data could not be loaded: {error}</div>}
+        {error && (
+          <div role="alert" className="error">
+            Data could not be loaded: {error}{" "}
+            <button className="ghost" onClick={() => void hardReload()}>Reload</button>
+          </div>
+        )}
         {!error && !species && <div className="loading"><div className="spinner" aria-hidden="true" /><p className="muted">Loading {parkName}…</p></div>}
         {species && page === "map" && (
           <Suspense fallback={<div className="loading"><div className="spinner" aria-hidden="true" /><p className="muted">Loading map…</p></div>}>
