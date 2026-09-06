@@ -9,6 +9,7 @@ Track A driver: reference sightings from iNaturalist and GBIF.
     track_a.py summary --park yellowstone
     track_a.py landmarks --park yellowstone   # boundary.geojson + landmarks.json for the tour
     track_a.py roads     --park yellowstone   # roads.json: OSM roads + trails graph for directions
+    track_a.py index                          # app/public/data/parks.json for the home page (all parks)
     track_a.py all     --park yellowstone      # ingest all + dedupe + export
 
 Every step is idempotent: re-running refreshes the mirror and re-derives the
@@ -31,6 +32,7 @@ from parkwild.decisionlog import print_decision_summary  # noqa: E402
 from parkwild.export import export_park  # noqa: E402
 from parkwild.inaturalist import find_places  # noqa: E402
 from parkwild.landmarks import build_landmarks  # noqa: E402
+from parkwild.parksindex import build_index  # noqa: E402
 from parkwild.report import update_results_md  # noqa: E402
 from parkwild.roads import build_roads  # noqa: E402
 from parkwild.sightings import dedupe, ingest_gbif, ingest_inaturalist, park_summary  # noqa: E402
@@ -117,6 +119,12 @@ def cmd_roads(args):
     print(json.dumps(build_roads(park, EXPORT_DIR / park.key), indent=2))
 
 
+def cmd_index(args):
+    """parks.json for the home page: every configured park, counts for the
+    exported ones, a credited hero photograph (network: Wikipedia, Commons)."""
+    print(json.dumps(build_index(heroes=not args.no_heroes), indent=2))
+
+
 def cmd_all(args):
     args.source = "all"
     args.gbif_counts_only = False
@@ -173,6 +181,10 @@ def build_parser():
     p = sub.add_parser("roads", help="OSM roads and trails as a routing graph for the app (network, no database)")
     p.add_argument("--park", required=True)
     p.set_defaults(func=cmd_roads)
+
+    p = sub.add_parser("index", help="app/public/data/parks.json: every park, counts, credited hero image (network, no database)")
+    p.add_argument("--no-heroes", action="store_true")
+    p.set_defaults(func=cmd_index)
 
     p = sub.add_parser("all", help="ingest all sources, dedupe, export, summarise")
     p.add_argument("--park", required=True)

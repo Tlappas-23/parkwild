@@ -146,6 +146,8 @@ make track-a PARK=yellowstone          # ingest iNaturalist + GBIF, dedupe, expo
 .venv/bin/python scripts/track_a.py ingest --park yellowstone --include-ebird      # only after ADR-0011 is decided
 .venv/bin/python scripts/track_a.py landmarks --park yellowstone   # park outline + OSM landmarks + tour stops (network, no DB)
 .venv/bin/python scripts/track_a.py roads --park yellowstone       # roads.json: OSM roads + trails graph for the route planner (network, no DB)
+.venv/bin/python scripts/track_a.py index                          # app/public/data/parks.json: every park, counts, credited hero photo
+.venv/bin/python scripts/parks_seed.py                             # look up all 63 parks on iNaturalist -> config/parks.seed.toml
 ```
 
 ### Adding a park
@@ -188,8 +190,9 @@ you tick from your position over the park's own road and trail graph
 (ADR-0018), and a cell panel that follows the species filter and links the
 same box on iNaturalist; species grid and detail
 with month histogram and a lazy 3D viewer; About with methods, limitations,
-suppression and licensing. A park select switches between every park baked
-into the build (ADR-0017). Deploy target is
+suppression and licensing; a home page with a card per park (counts, a
+credited Commons photograph, ADR-0019) that opens each park's map with an
+animated arrival on the whole outline (ADR-0017). Deploy target is
 Cloudflare Pages with `app/public/_headers` for CSP.
 
 Rough cost on this machine: steps 1 to 3 are a few minutes of API calls and

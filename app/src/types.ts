@@ -117,3 +117,11 @@ export interface BoundaryFile {
 // [from, to, length_m, kind (0 road, 1 trail), oneway (0/1), name_index, coords].
 export type RoadEdge = [number, number, number, number, number, number, number[][]];
 export interface RoadsFile { park: string; fetched: string; attribution: string; nodes: number[][]; edges: RoadEdge[]; names: string[]; }
+
+// The home page's park index (parkwild/parksindex.py), imported at build time.
+export interface ParkHero { url: string; page: string; source_article: string; license: string; license_url: string; artist: string; }
+export interface ParkCard {
+  key: string; name: string; state: string; status: "live" | "planned";
+  species: number | null; sightings: number | null; cells: number | null; stops: number | null; tour_source: string | null; hero: ParkHero | null;
+}
+export interface ParksIndex { generated: string; attribution: string; parks: ParkCard[]; }

@@ -1,0 +1,208 @@
+{
+ "generated": "2026-09-06T01:12:32+00:00",
+ "attribution": "Park photographs: Wikimedia Commons, each under the licence printed on its card",
+ "parks": [
+  {
+   "key": "yellowstone",
+   "name": "Yellowstone National Park",
+   "state": "WY",
+   "status": "live",
+   "species": 299,
+   "sightings": 59701,
+   "cells": 6707,
+   "stops": 11,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Grand_Canyon_of_the_Yellowstone_Lower_Falls_%2895819p%29.jpg/1280px-Grand_Canyon_of_the_Yellowstone_Lower_Falls_%2895819p%29.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Grand_Canyon_of_the_Yellowstone_Lower_Falls_(95819p).jpg",
+    "source_article": "https://en.wikipedia.org/wiki/Yellowstone_National_Park",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "artist": "Rhododendrites"
+   }
+  },
+  {
+   "key": "grand_teton",
+   "name": "Grand Teton National Park",
+   "state": "WY",
+   "status": "live",
+   "species": 257,
+   "sightings": 18433,
+   "cells": 2743,
+   "stops": 8,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Barns_grand_tetons.jpg/1280px-Barns_grand_tetons.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Barns_grand_tetons.jpg",
+    "source_article": "https://en.wikipedia.org/wiki/Grand_Teton_National_Park",
+    "license": "Public domain",
+    "license_url": "",
+    "artist": "Jon Sullivan, PD Photo."
+   }
+  },
+  {
+   "key": "great_smoky",
+   "name": "Great Smoky Mountains National Park",
+   "state": "TN",
+   "status": "live",
+   "species": 237,
+   "sightings": 19791,
+   "cells": 1998,
+   "stops": 8,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/View_atop_Cliff_Tops_on_Mount_LeConte%2C_GSMNP%2C_TN.jpg/1280px-View_atop_Cliff_Tops_on_Mount_LeConte%2C_GSMNP%2C_TN.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:View_atop_Cliff_Tops_on_Mount_LeConte,_GSMNP,_TN.jpg",
+    "source_article": "https://en.wikipedia.org/wiki/Great_Smoky_Mountains_National_Park",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "artist": "AppalachianCentrist"
+   }
+  },
+  {
+   "key": "grand_canyon",
+   "name": "Grand Canyon National Park",
+   "state": "AZ",
+   "status": "planned",
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Dawn_on_the_S_rim_of_the_Grand_Canyon_%288645178272%29.jpg/1280px-Dawn_on_the_S_rim_of_the_Grand_Canyon_%288645178272%29.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Dawn_on_the_S_rim_of_the_Grand_Canyon_(8645178272).jpg",
+    "source_article": "https://en.wikipedia.org/wiki/Grand_Canyon_National_Park",
+    "license": "CC BY-SA 2.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/2.0",
+    "artist": "Murray Foubister"
+   }
+  },
+  {
+   "key": "zion",
+   "name": "Zion National Park",
+   "state": "UT",
+   "status": "planned",
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Zion_angels_landing_view.jpg/1280px-Zion_angels_landing_view.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Zion_angels_landing_view.jpg",
+    "source_article": "https://en.wikipedia.org/wiki/Zion_National_Park",
+    "license": "CC BY-SA 3.0",
+    "license_url": "http://creativecommons.org/licenses/by-sa/3.0/",
+    "artist": "Diliff"
+   }
+  },
+  {
+   "key": "yosemite",
+   "name": "Yosemite National Park",
+   "state": "CA",
+   "status": "planned",
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Half_Dome_with_Eastern_Yosemite_Valley_%2850MP%29.jpg/1280px-Half_Dome_with_Eastern_Yosemite_Valley_%2850MP%29.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Half_Dome_with_Eastern_Yosemite_Valley_(50MP).jpg",
+    "source_article": "https://en.wikipedia.org/wiki/Yosemite_National_Park",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+    "artist": "Thomas Wolf, www.foto-tw.de"
+   }
+  },
+  {
+   "key": "rocky_mountain",
+   "name": "Rocky Mountain National Park",
+   "state": "CO",
+   "status": "planned",
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Rocky_Mountain_National_Park_in_September_2011_-_Glacier_Gorge_from_Bear_Lake.JPG/1280px-Rocky_Mountain_National_Park_in_September_2011_-_Glacier_Gorge_from_Bear_Lake.JPG",
+    "page": "https://commons.wikimedia.org/wiki/File:Rocky_Mountain_National_Park_in_September_2011_-_Glacier_Gorge_from_Bear_Lake.JPG",
+    "source_article": "https://en.wikipedia.org/wiki/Rocky_Mountain_National_Park",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+    "artist": "Daniel Mayer (Mav)"
+   }
+  },
+  {
+   "key": "glacier",
+   "name": "Glacier National Park",
+   "state": "MT",
+   "status": "planned",
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": null
+  },
+  {
+   "key": "acadia",
+   "name": "Acadia National Park",
+   "state": "ME",
+   "status": "planned",
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Acadia_National_Park_02.JPG/1280px-Acadia_National_Park_02.JPG",
+    "page": "https://commons.wikimedia.org/wiki/File:Acadia_National_Park_02.JPG",
+    "source_article": "https://en.wikipedia.org/wiki/Acadia_National_Park",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+    "artist": "Plh1234us"
+   }
+  },
+  {
+   "key": "olympic",
+   "name": "Olympic National Park",
+   "state": "WA",
+   "status": "planned",
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Cedar_Creek_Abbey_Island_Ruby_Beach.jpg/1280px-Cedar_Creek_Abbey_Island_Ruby_Beach.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Cedar_Creek_Abbey_Island_Ruby_Beach.jpg",
+    "source_article": "https://en.wikipedia.org/wiki/Olympic_National_Park",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+    "artist": "Adbar"
+   }
+  },
+  {
+   "key": "shenandoah",
+   "name": "Shenandoah National Park",
+   "state": "VA",
+   "status": "planned",
+   "species": null,
+   "sightings": null,
+   "cells": null,
+   "stops": null,
+   "tour_source": null,
+   "hero": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Skyline_Drive_in_the_Fall_%2821852619608%29.jpg/1280px-Skyline_Drive_in_the_Fall_%2821852619608%29.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Skyline_Drive_in_the_Fall_(21852619608).jpg",
+    "source_article": "https://en.wikipedia.org/wiki/Shenandoah_National_Park",
+    "license": "Public domain",
+    "license_url": "",
+    "artist": "Shenandoah National Park from Virginia"
+   }
+  }
+ ]
+}

@@ -313,6 +313,24 @@ that), loaded on demand. Routes ignore closures and seasons and say so.
 
 ---
 
+## ADR-0019: Park photographs come from Wikimedia Commons under the licence Commons states
+
+**Context.** The home page wants a landscape per park. The project's own
+photographs are of animals, and only iNaturalist's.
+**Decision.** Use each park's Wikipedia lead image, but only after asking
+Commons for the file's licence: public domain, CC0, CC BY or CC BY-SA pass;
+GFDL-only, fair use and anything unstated do not. The card prints the
+artist, the licence and a link to the Commons file page. The image is
+hotlinked at 1,280 px; the CSP allows upload.wikimedia.org for images only.
+**Rejected.** NPS galleries (public domain but no per-photo metadata to
+keep); showing the lead image without checking (most are fine, some are
+not, and "most" is not the standard here).
+**Consequence.** Re-running `track_a.py index` keeps heroes already found
+and only looks up the missing ones. A park without a reusable lead image
+gets its initials on a plain card until an editor changes the article.
+
+---
+
 ## Open decisions (owner's call; recorded here so nothing is decided by drift)
 
 | # | Decision | Default until decided | Where |
