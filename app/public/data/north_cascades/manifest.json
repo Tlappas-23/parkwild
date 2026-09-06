@@ -1,0 +1,53 @@
+{
+  "built": "2026-09-06T23:39:53+00:00",
+  "git_commit": "e6ce3024dc1d328e1ca135d942a6f4df7b6baa9c",
+  "files": {
+    "cells.geojson": {
+      "sha256": "156dbad92451502471b68b3be705cf6a4a4e9d78bd9b7c25152ed9136943900f",
+      "bytes": 112906
+    },
+    "species.json": {
+      "sha256": "817ae2107520f1386997e2c43b48c9c3acb787cc1365512b30ebcf32bc0b082f",
+      "bytes": 39831
+    },
+    "sightings.parquet": {
+      "sha256": "64db52470d0872c874254bbf0fd2cd5b38b4e5afe2f6d38a8f002c446abac2eb",
+      "bytes": 72694
+    },
+    "photos_species.json": {
+      "sha256": "8ba9f17805801d6505596a75f35f62d979f7461d9cfa6efab2099960da31d91f",
+      "bytes": 22938
+    },
+    "photos_cells.json": {
+      "sha256": "11e7a2cc843fe69d947d830a7456f40061318bedd56b94772bf4ae4b96e0a6f7",
+      "bytes": 28767
+    },
+    "places.json": {
+      "sha256": "0088776362022488037637611f937f19a78323cf6b59fb0303ea64831464b246",
+      "bytes": 88694
+    },
+    "landmarks.json": {
+      "sha256": "8f861dbe301faea341f3643109aae2b2de259c8cf6eb90ac021105829caa50a8",
+      "bytes": 16371
+    },
+    "boundary.geojson": {
+      "sha256": "62e1b889d26980c6c58fa4afc803e33e4f70bf42d014c9873700a4ab60efa862",
+      "bytes": 4972
+    },
+    "roads.json": {
+      "sha256": "b5515677b38b0ba39aebd6c842abf466e349816ef0acbb4d2321c82b46657bfe",
+      "bytes": 286151
+    },
+    "camera_pass.json": {
+      "sha256": "e58adbf69de5e2cbbf28fa7474248b7ae7ce118a890a5959b859b590a9dfd9aa",
+      "bytes": 444
+    },
+    "amenities.json": {
+      "sha256": "17e3a431731e72ea66742aad04ea782445894790962712e1d5d2ad2408f5fc69",
+      "bytes": 67258
+    }
+  },
+  "park": "north_cascades",
+  "name": "North Cascades National Park",
+  "state": "WA"
+}

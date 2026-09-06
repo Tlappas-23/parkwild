@@ -1,0 +1,53 @@
+{
+  "built": "2026-09-06T22:10:31+00:00",
+  "git_commit": "e6ce3024dc1d328e1ca135d942a6f4df7b6baa9c",
+  "files": {
+    "cells.geojson": {
+      "sha256": "326a5b3e931dd51d37c92515c09c8ed1094b3b4e04dde2ad00ac0189cad8708a",
+      "bytes": 223076
+    },
+    "species.json": {
+      "sha256": "99153ce34bfc568ee89705f38f28a2069b5403af810e9ae66b2ac5a98e869ca0",
+      "bytes": 85784
+    },
+    "sightings.parquet": {
+      "sha256": "f6eb25d956c0d7fb222b23ecff91ad879bde3de6da57bb04f430af582ef12dbc",
+      "bytes": 699344
+    },
+    "photos_species.json": {
+      "sha256": "32f873ca66f15fa5364beb37b99ee36270e3e04444c6970c0d06f9d4ba8a1edb",
+      "bytes": 131461
+    },
+    "photos_cells.json": {
+      "sha256": "4e611f14824eb747420e274902cc3c57b8cbce15d4d40737412cc7fc97d9426a",
+      "bytes": 247189
+    },
+    "places.json": {
+      "sha256": "776833ac525dff2eb6281227754e6bbe8e26c5e7b94cb7b21428dc26c62b11ec",
+      "bytes": 21843
+    },
+    "landmarks.json": {
+      "sha256": "cdd12d3bb3c83b4028ae4c99d90c3a76118358b13fc42ea3431eefff74f28ed0",
+      "bytes": 19063
+    },
+    "boundary.geojson": {
+      "sha256": "75716f1ff3612517191a9bfae9b0032c6804f24252d693322bbc259e6115605b",
+      "bytes": 3352
+    },
+    "roads.json": {
+      "sha256": "4caa36c44586da23e8f39a8bc613ba776a46a2abe8ae8b65b4821d69c5f1e85a",
+      "bytes": 107100
+    },
+    "camera_pass.json": {
+      "sha256": "b872573ccde2141ea781397d76aa8cffa45be2bf5466a49073443689f245541f",
+      "bytes": 439
+    },
+    "amenities.json": {
+      "sha256": "6437463c6e354a1bb18b53dff4ab5a2cdfe14cb62c7cf942c6f5eb8aa6bc36c4",
+      "bytes": 8541
+    }
+  },
+  "park": "pinnacles",
+  "name": "Pinnacles National Park",
+  "state": "CA"
+}

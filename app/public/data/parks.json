@@ -1,9 +1,9 @@
 {
- "generated": "2026-09-06T21:48:47+00:00",
+ "generated": "2026-09-06T23:41:14+00:00",
  "attribution": "Park photographs: Wikimedia Commons, each under the licence printed on its card",
  "species_index": {
-  "sha256": "26430a7fe00e7b59080922b4b59b728bb7dddf287222b742f31668631d60a927",
-  "bytes": 1472947
+  "sha256": "1132f9fe76c6523b53f3f1bd27aa55cc7a8168f8157402d95221857cc319bd02",
+  "bytes": 1679728
  },
  "parks": [
   {
@@ -1192,7 +1192,7 @@
    "key": "lassen_volcanic",
    "name": "Lassen Volcanic National Park",
    "state": "CA",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -121.6201,
     40.3445,
@@ -1203,11 +1203,11 @@
     -121.4334,
     40.4648
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 180,
+   "sightings": 10274,
+   "cells": 581,
+   "stops": 8,
+   "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Lassen_Peak_and_Lake_Helen.jpg/1280px-Lassen_Peak_and_Lake_Helen.jpg",
     "page": "https://commons.wikimedia.org/wiki/File:Lassen_Peak_and_Lake_Helen.jpg",
@@ -1221,7 +1221,7 @@
    "key": "redwood",
    "name": "Redwood National Park",
    "state": "CA",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -124.1602,
     41.0806,
@@ -1232,11 +1232,11 @@
     -124.0048,
     41.4602
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 272,
+   "sightings": 8341,
+   "cells": 1273,
+   "stops": 3,
+   "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Redwood_National_Park%2C_fog_in_the_forest.jpg/1280px-Redwood_National_Park%2C_fog_in_the_forest.jpg",
     "page": "https://commons.wikimedia.org/wiki/File:Redwood_National_Park,_fog_in_the_forest.jpg",
@@ -1250,7 +1250,7 @@
    "key": "pinnacles",
    "name": "Pinnacles National Park",
    "state": "CA",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -121.2455,
     36.4084,
@@ -1261,11 +1261,11 @@
     -121.1734,
     36.4863
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 201,
+   "sightings": 11897,
+   "cells": 371,
+   "stops": 8,
+   "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Rock_formations_at_Pinnacles_National_Park.jpg/1280px-Rock_formations_at_Pinnacles_National_Park.jpg",
     "page": "https://commons.wikimedia.org/wiki/File:Rock_formations_at_Pinnacles_National_Park.jpg",
@@ -1279,7 +1279,7 @@
    "key": "channel_islands",
    "name": "Channel Islands National Park",
    "state": "CA",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -120.473,
     33.4481,
@@ -1290,11 +1290,11 @@
     -119.7405,
     33.8487
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 354,
+   "sightings": 40881,
+   "cells": 8993,
+   "stops": 8,
+   "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/Channel_Islands_National_Park_by_Sentinel-2.jpg/1280px-Channel_Islands_National_Park_by_Sentinel-2.jpg",
     "page": "https://commons.wikimedia.org/wiki/File:Channel_Islands_National_Park_by_Sentinel-2.jpg",
@@ -1308,7 +1308,7 @@
    "key": "north_cascades",
    "name": "North Cascades National Park",
    "state": "WA",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -121.6394,
     48.3694,
@@ -1319,11 +1319,11 @@
     -121.1356,
     48.6852
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 95,
+   "sightings": 848,
+   "cells": 287,
+   "stops": 8,
+   "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/Cascade_Pass_and_Pelton_Basin.jpg/1280px-Cascade_Pass_and_Pelton_Basin.jpg",
     "page": "https://commons.wikimedia.org/wiki/File:Cascade_Pass_and_Pelton_Basin.jpg",
@@ -1337,7 +1337,7 @@
    "key": "voyageurs",
    "name": "Voyageurs National Park",
    "state": "MN",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -93.2036,
     48.2993,
@@ -1348,11 +1348,11 @@
     -92.8288,
     48.4654
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 112,
+   "sightings": 643,
+   "cells": 269,
+   "stops": 2,
+   "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Voyageurs_National_Park.jpg/1280px-Voyageurs_National_Park.jpg",
     "page": "https://commons.wikimedia.org/wiki/File:Voyageurs_National_Park.jpg",

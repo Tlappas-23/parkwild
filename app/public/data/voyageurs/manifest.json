@@ -1,0 +1,53 @@
+{
+  "built": "2026-09-06T23:41:10+00:00",
+  "git_commit": "e6ce3024dc1d328e1ca135d942a6f4df7b6baa9c",
+  "files": {
+    "cells.geojson": {
+      "sha256": "62957dabb0b679a5f5270008523947f7bf223d21e78c926361db04ed4bb04cff",
+      "bytes": 105771
+    },
+    "species.json": {
+      "sha256": "e4a6a9e24dee332efbdf28e613bf1baea621f8ca891f757e8bc570eef9c20580",
+      "bytes": 46397
+    },
+    "sightings.parquet": {
+      "sha256": "35f7076339a539d57e4dcfb6a403da693f632c764974a26e22b438aa5170b7a3",
+      "bytes": 55078
+    },
+    "photos_species.json": {
+      "sha256": "83199e16f796bd606c55cf3edb5e2274df4c9edeb9ea2f30c6dfb76115d48774",
+      "bytes": 32457
+    },
+    "photos_cells.json": {
+      "sha256": "0f39c47bd2f659cd1826101c2fdfd1e32093717e87ca29078647cc24ca2e42ef",
+      "bytes": 25726
+    },
+    "places.json": {
+      "sha256": "c4e4d17fe5bfa0edcfdb738878db59e3bfd295e73f9a7a476017c411107d90b1",
+      "bytes": 58296
+    },
+    "landmarks.json": {
+      "sha256": "b02dbd8a23c8184f2ee7bf34dfb1140043c8312bacca6055504e628ae1c20bc6",
+      "bytes": 651
+    },
+    "boundary.geojson": {
+      "sha256": "e5d13a2fe68c0d40dee58966d64339868ef269579d60077d49fd59d9e6bc9e32",
+      "bytes": 5890
+    },
+    "roads.json": {
+      "sha256": "211208e1d98692e1c34f2b9cfa084c4f9c63727901b32f3d9d030ed06e4dfe1a",
+      "bytes": 93501
+    },
+    "camera_pass.json": {
+      "sha256": "2d2fe730701319d37ae54ac1526557f540df0d87ad32c11fb4bc06941333b974",
+      "bytes": 439
+    },
+    "amenities.json": {
+      "sha256": "af5cb8179a1405c73d9c7a2b963043934ece984eba46b814cea64cc865a99c4a",
+      "bytes": 39660
+    }
+  },
+  "park": "voyageurs",
+  "name": "Voyageurs National Park",
+  "state": "MN"
+}
