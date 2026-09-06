@@ -1,13 +1,13 @@
 {
-  "built": "2026-09-06T06:47:39+00:00",
-  "git_commit": "fa38be70aabf9dbd62e6c617618c3e6dd606f7c5",
+  "built": "2026-09-06T16:47:04+00:00",
+  "git_commit": "162490d39d3fe40f44c7a85ce0001b72be95a1b4",
   "files": {
     "cells.geojson": {
       "sha256": "3d776eb3d0258568ed54c5fddbed1a8f625f5ac1959932cde71cc3fa75ea2f02",
       "bytes": 3647468
     },
     "species.json": {
-      "sha256": "6d5c27bf27b50964700f2bdc9ff8770e2ae274a8e14d8b5330cf2054475126d9",
+      "sha256": "16549fc7f52d315b4fc438d83775a3ed4ddd9ca1a5747941366350052c6599eb",
       "bytes": 145156
     },
     "sightings.parquet": {
@@ -35,11 +35,11 @@
       "bytes": 1184406
     },
     "camera_pass.json": {
-      "sha256": "51766c3a111828a805f2f9355c053848b12ccbf4f0224d3a028fa7193e600079",
+      "sha256": "12412acb16f3e6dd55e7d929542461de8074d284146185787ab7a94e12f0cbac",
       "bytes": 437
     },
     "amenities.json": {
-      "sha256": "27416c7dc0c2b16dae07e5c7bb0cad43166240dff6b42e8a808ea4dafeb93f5a",
+      "sha256": "289c6915f48a35e63ac91317fb0474b252388009e7e81bf4318a2fa0cc757971",
       "bytes": 136272
     }
   },
