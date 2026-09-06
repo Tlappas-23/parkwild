@@ -12,6 +12,15 @@ BRANCH="ship/$(date +%Y%m%d-%H%M%S)-$SLUG"
 git checkout -q -b "$BRANCH"
 git add -A
 if [ -n "$BODY_FILE" ]; then git commit -q -F "$BODY_FILE"; else git commit -q -m "$TITLE"; fi
+# Local main drifts behind origin while PRs auto-merge (the eight-park publish
+# landed while a follow-up was being written, PR #28/#29). Rebase the new
+# branch onto origin/main before pushing; a real conflict stops here.
+git fetch -q origin
+if ! git rebase -q origin/main; then
+  echo "ship.sh: the branch conflicts with origin/main; resolve in a worktree and push by hand" >&2
+  git rebase --abort
+  exit 1
+fi
 git push -q -u origin "$BRANCH"
 if [ -n "$BODY_FILE" ]; then
   gh pr create --title "$TITLE" --body-file "$BODY_FILE" --base main --head "$BRANCH" >/dev/null
