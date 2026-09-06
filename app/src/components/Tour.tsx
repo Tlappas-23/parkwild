@@ -221,8 +221,10 @@ export default function Tour() {
               ? `On the road · ${(tourDrive.distanceM / 1000).toFixed(1)} km to`
               : `${tour.stop + 1}/${stops.length} · ${stop.kind}${stop.ele_m ? ` · ${Math.round(stop.ele_m).toLocaleString()} m` : ""}`}
           </span>
-          <h2>{stop.name}</h2>
-          <WeatherChip lat={stop.lat} lon={stop.lon} climate={climate} compact />
+          <div className="tour-name-row">
+            <h2>{stop.name}</h2>
+            <WeatherChip lat={stop.lat} lon={stop.lon} climate={climate} badge />
+          </div>
         </div>
         {stop.summary?.extract ? (
           <p className="tour-text">

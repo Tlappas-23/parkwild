@@ -144,3 +144,9 @@ fortnightly refresh (`scripts/refresh.sh`, cron on the 1st and 15th) pulls
 only the sightings that changed, rebuilds places and climate, and publishes
 the same way. Open questions and the reasoning behind every choice are in
 [DECISIONS.md](DECISIONS.md).
+
+## License
+
+The code is under the MIT License (see [LICENSE](LICENSE)). The data the
+site shows keeps the licence of its source, listed above and credited beside
+every photograph and record; nothing in the MIT grant covers it.
