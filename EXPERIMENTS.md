@@ -286,6 +286,11 @@ Format: date, what, number, kept?, why, where it lives.
 - **Kept:** the species page has an "All parks" scope whose rows name the parks an animal is seen in, most first. Every species page gains "Where people see them, park by park": count, busiest cell, and "Show in Yellowstone" which opens that park's map filtered to the species and lands on that cell with its drawer open (the map picks the hotspot up when the park's cells arrive). Species from another park open a lighter page from the index. The old "Show on the map" is now "Show in Zion" and lands on the busiest cell too.
 - **Checked:** unit test on a two-park fixture; on the built app, All parks → "elk" → Wapiti shows Yellowstone 5,099 first, "Show in Yellowstone" switches park, filters, and selects the busiest cell.
 
+### E-050: play that looks like play
+- **What:** the owner: "the play/pause doesn't really work; if you click and change the view it loses it and forces you to click Next for the movement".
+- **Found:** a headless run with a real click, drag and wheel (`play_probe`) showed the auto-advance itself surviving all three: Play at 7.5 s, a cell opened at 12 s, a drag at 19 s, the drive left at 21.5 s and the next at 53.5 s. What the visitor saw was different: the tour started paused, Play produced nothing for a full 14 s dwell, every tap on the map (`touchstart`) silenced the slow turn for 10 s, and nothing on the card said a count was running. A still camera with a "Pause" label reads as broken.
+- **Kept:** the tour plays from the start (Pause is one tap away); the dwell counts from the arrival at a stop, so Play pressed after the stop has had its time moves on within 1.2 s; a 3 px bar along the top of the card fills over the dwell; only a drag, turn, tilt, pinch or wheel pauses the turn, for 5 s, and a tap does not. Checked headless on the built app: playing from the start, advance at the dwell, a tap opening a cell without a pause, resume within 1.2 s after Pause and Play at a stop past its dwell.
+
 ## Open questions with a planned experiment
 
 - **Q-1 SpeciesNet determinism.** Answered (E-013).

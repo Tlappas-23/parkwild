@@ -194,11 +194,13 @@ export const useStore = create<State>((set, get) => ({
   // The tour is the 3D walk: relief on and imagery under it, the way a flyover
   // reads; leaving the tour puts the visitor's own basemap choice back.
   // The tour clears the stage: the left panel folds away and comes back on exit.
-  startTour: () => set({ tour: { active: true, stop: 0, playing: false }, page: "map", selectedCell: null, terrain3d: true,
+  // "Take the tour" plays from the start; Pause is one tap away. Starting
+  // paused made the first stop look stuck (E-050).
+  startTour: () => set({ tour: { active: true, stop: 0, playing: true }, page: "map", selectedCell: null, terrain3d: true,
                          tourPrevBasemap: get().tour.active ? get().tourPrevBasemap : get().basemap, basemap: "satellite",
                          controlsBeforeTour: get().tour.active ? get().controlsBeforeTour : get().controlsOpen, controlsOpen: false }),
   endTour: () => set({ tour: NO_TOUR, basemap: get().tourPrevBasemap ?? get().basemap, tourPrevBasemap: null, controlsOpen: get().controlsBeforeTour }),
-  tourGo: (stop) => set({ tour: { ...get().tour, active: true, stop }, page: "map", selectedCell: null, terrain3d: true,
+  tourGo: (stop) => set({ tour: { ...get().tour, active: true, stop, playing: get().tour.active ? get().tour.playing : true }, page: "map", selectedCell: null, terrain3d: true,
                           tourPrevBasemap: get().tour.active ? get().tourPrevBasemap : get().basemap, basemap: "satellite",
                           controlsBeforeTour: get().tour.active ? get().controlsBeforeTour : get().controlsOpen, controlsOpen: false }),
   tourNext: () => {
