@@ -1,7 +1,8 @@
 // The virtual tour's arithmetic: which animals were recorded around a stop,
 // and which way the camera should face. Pure functions; the map page and the
 // tour panel both use them.
-import type { CellsFile, Landmark, LandmarksFile } from "./types";
+import { cellPhotos, speciesPhotos, type Photo } from "./photos";
+import type { CellsFile, Landmark, LandmarksFile, PhotosCellsFile, PhotosSpeciesFile } from "./types";
 
 // TOUR_RADIUS_M — ASSUMED (a valley-scale neighbourhood around a viewpoint)
 // Sightings within this distance of a stop count as "recorded here". 2.5 km
@@ -10,10 +11,15 @@ import type { CellsFile, Landmark, LandmarksFile } from "./types";
 // REVISIT IF: forest stops in the Smokies (short sightlines) look empty.
 export const TOUR_RADIUS_M = 2500;
 // TOUR_DWELL_MS — ARBITRARY (time to read a paragraph and glance at the photos)
-export const TOUR_DWELL_MS = 11000;
-// STOP_ZOOM / STOP_PITCH — ARBITRARY (a hillside view: relief visible, cells still readable)
-export const STOP_ZOOM = 12.4;
-export const STOP_PITCH = 60;
+export const TOUR_DWELL_MS = 14000;
+// STOP_ZOOM / STOP_PITCH — ARBITRARY (standing on the hillside above the
+// stop: the first version sat at 12.4 / 60°, which the owner read as too far)
+export const STOP_ZOOM = 13.3;
+export const STOP_PITCH = 64;
+// ORBIT_DEG / ORBIT_MS — ARBITRARY (a slow part-turn around the stop while the
+// narration runs, so the map moves during the tour; a drag stops it)
+export const ORBIT_DEG = 45;
+export const ORBIT_MS = TOUR_DWELL_MS;
 
 const EARTH_R = 6371000;
 
@@ -51,15 +57,16 @@ export function stopBearing(stops: Landmark[], i: number): number {
 }
 
 export interface NearbySpecies { species: string; common: string | null; count: number; hv: number; mp: number; }
-export interface Nearby { list: NearbySpecies[]; total: number; cells: number; }
+export interface Nearby { list: NearbySpecies[]; total: number; cells: number; cellIds: string[]; }
 
 // Species recorded in open-coordinate cells within `radiusM` of a point.
 // Coarsened (sensitive-species) cells are skipped on purpose: a 3 km cell
 // says nothing about a particular viewpoint, and pinning a grizzly to a
 // landmark is exactly what the suppression list exists to prevent.
 export function nearbySpecies(cells: CellsFile | null, lon: number, lat: number, radiusM = TOUR_RADIUS_M, limit = 6): Nearby {
-  if (!cells) return { list: [], total: 0, cells: 0 };
+  if (!cells) return { list: [], total: 0, cells: 0, cellIds: [] };
   const agg = new Map<number, NearbySpecies>();
+  const cellIds: string[] = [];
   let total = 0, n = 0;
   for (const f of cells.features) {
     if (f.properties.coarsened) continue;
@@ -69,6 +76,7 @@ export function nearbySpecies(cells: CellsFile | null, lon: number, lat: number,
     for (let i = 0; i < k; i++) { cx += ring[i][0]; cy += ring[i][1]; }
     if (haversineM(lon, lat, cx / k, cy / k) > radiusM) continue;
     n++;
+    cellIds.push(f.properties.cell);
     total += f.properties.count;
     for (const e of f.properties.sp) {
       const cur = agg.get(e[0]) ?? { species: cells.species_index[e[0]].n, common: cells.species_index[e[0]].c, count: 0, hv: 0, mp: 0 };
@@ -76,5 +84,21 @@ export function nearbySpecies(cells: CellsFile | null, lon: number, lat: number,
       agg.set(e[0], cur);
     }
   }
-  return { list: [...agg.values()].sort((a, b) => b.count - a.count).slice(0, limit), total, cells: n };
+  return { list: [...agg.values()].sort((a, b) => b.count - a.count).slice(0, limit), total, cells: n, cellIds };
+}
+
+// A photograph of the species taken inside the stop's radius when one exists:
+// the cell strips keep one per species per cell and the galleries know their
+// cell, so most stops can show an animal seen right there. Otherwise the
+// species' best photograph from anywhere in the park, and the card says so.
+export function photoNear(species: string, cellIds: string[], photosCells: PhotosCellsFile | null, photosSpecies: PhotosSpeciesFile | null): { photo: Photo; near: boolean } | null {
+  for (const id of cellIds) {
+    const p = cellPhotos(photosCells, id).find((x) => x.species === species);
+    if (p) return { photo: p, near: true };
+  }
+  const near = new Set(cellIds);
+  const gallery = speciesPhotos(photosSpecies, species);
+  const g = gallery.find((p) => p.cell !== null && near.has(p.cell));
+  if (g) return { photo: g, near: true };
+  return gallery[0] ? { photo: gallery[0], near: false } : null;
 }
