@@ -12,6 +12,9 @@ test("park names lose their suffix and keep their identity", () => {
 });
 
 test("popup text from data cannot carry markup", () => {
-  assert.equal(esc(`<img src=x onerror="alert(1)"> & 'Bill's' Pass`), "&lt;img src=x onerror=&quot;alert(1)&quot;&gt; &amp; &#39;Bill&#39;s&#39; Pass");
+  assert.equal(
+    esc(`<img src=x onerror="alert(1)"> & 'Bill's' Pass`),
+    "&lt;img src=x onerror=&quot;alert(1)&quot;&gt; &amp; &#39;Bill&#39;s&#39; Pass",
+  );
   assert.equal(esc("Old Faithful"), "Old Faithful");
 });

@@ -72,7 +72,8 @@ touched. `docs/ARCHITECTURE.md` has the full map, file by file.
 ## Repository layout
 
 ```
-app/                     the site (Vite, React, MapLibre); app/scripts has the build helpers and the headless tour probe
+app/                     the site (Vite, React, MapLibre): src/app (shell), src/pages, src/components, src/lib (pure logic, tested),
+                         src/data (loaders, types), src/store, src/styles; scripts/ has the build helpers and the headless tour probe
 config/                  parks.toml (all 63 parks), corridors.toml, suppression.toml, taxonomy.toml
 docs/                    ARCHITECTURE.md, USER-GUIDE.md, data cards, the AI evaluation
 scripts/                 track_a.py, track_b.py, phase0.py, parks_batch.sh, publish_data.sh, ship.sh, check_secrets.py

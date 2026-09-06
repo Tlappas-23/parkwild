@@ -5,10 +5,24 @@
 // (import.meta.glob below), so a file swapped on the CDN after the build fails
 // the hash check and is refused. In development, with no baked manifest, the
 // check is skipped and a warning is logged instead of blocking work.
-import type { AmenitiesFile, BiasFile, BoundaryFile, CameraPassFile, CellsFile, LandmarksFile, Manifest, PhotosCellsFile, PhotosSpeciesFile, PlacesFile, RoadsFile, SpeciesFile, SpeciesIndexFile } from "./types";
+import type {
+  AmenitiesFile,
+  BiasFile,
+  BoundaryFile,
+  CameraPassFile,
+  CellsFile,
+  LandmarksFile,
+  Manifest,
+  PhotosCellsFile,
+  PhotosSpeciesFile,
+  PlacesFile,
+  RoadsFile,
+  SpeciesFile,
+  SpeciesIndexFile,
+} from "./types";
 import { PARKS_INDEX } from "./parksIndex";
 
-const baked = import.meta.glob<Manifest>("../public/data/*/manifest.json", { eager: true, import: "default" });
+const baked = import.meta.glob<Manifest>("../../public/data/*/manifest.json", { eager: true, import: "default" });
 
 function bakedManifest(park: string): Manifest | null {
   for (const [path, m] of Object.entries(baked)) {
@@ -25,7 +39,9 @@ export function availableParks(): { key: string; name: string; state: string | n
     const key = path.split("/data/")[1].split("/")[0];
     return { key, name: m.name ?? key, state: m.state ?? null };
   });
-  return list.sort((a, b) => (a.key === "yellowstone" ? -1 : b.key === "yellowstone" ? 1 : a.name.localeCompare(b.name)));
+  return list.sort((a, b) =>
+    a.key === "yellowstone" ? -1 : b.key === "yellowstone" ? 1 : a.name.localeCompare(b.name),
+  );
 }
 
 async function sha256Hex(buf: ArrayBuffer): Promise<string> {
@@ -40,7 +56,11 @@ export async function fetchVerified<T>(park: string, name: string, manifest: Man
 // The cross-park species index sits beside the park folders; its hash rides in
 // parks.json, which is baked into the build like the park manifests.
 export async function loadSpeciesIndex(): Promise<SpeciesIndexFile> {
-  return fetchChecked<SpeciesIndexFile>("data/species_index.json", PARKS_INDEX.species_index?.sha256, "species_index.json");
+  return fetchChecked<SpeciesIndexFile>(
+    "data/species_index.json",
+    PARKS_INDEX.species_index?.sha256,
+    "species_index.json",
+  );
 }
 
 async function fetchChecked<T>(path: string, expected: string | undefined, name: string): Promise<T> {
@@ -57,8 +77,10 @@ async function fetchChecked<T>(path: string, expected: string | undefined, name:
       // has newer data. Drop the worker and its caches and come back on a
       // fresh URL; only if that does not resolve it is the mismatch shown.
       if (await refreshOnce()) throw new Error("A newer version is available; reloading…");
-      throw new Error(`${name} failed its integrity check (expected ${expected.slice(0, 12)}…, got ${actual.slice(0, 12)}…). `
-        + "This usually means a new version was published moments ago.");
+      throw new Error(
+        `${name} failed its integrity check (expected ${expected.slice(0, 12)}…, got ${actual.slice(0, 12)}…). ` +
+          "This usually means a new version was published moments ago.",
+      );
     }
   } else {
     console.warn(`[parkwild] no baked manifest entry for ${name}; integrity not verified (dev build?)`);
@@ -83,7 +105,9 @@ async function refreshOnce(): Promise<boolean> {
     const last = Number(sessionStorage.getItem(RELOAD_KEY) ?? 0);
     if (Date.now() - last < RELOAD_RETRY_MS) return false;
     sessionStorage.setItem(RELOAD_KEY, String(Date.now()));
-  } catch { return false; }
+  } catch {
+    return false;
+  }
   await dropWorkerAndCaches();
   freshNavigate();
   return true;
@@ -96,7 +120,9 @@ async function dropWorkerAndCaches(): Promise<void> {
       await Promise.all(regs.map((r) => r.unregister()));
     }
     if ("caches" in window) await Promise.all((await caches.keys()).map((k) => caches.delete(k)));
-  } catch { /* best effort; the fresh URL alone usually suffices */ }
+  } catch {
+    /* best effort; the fresh URL alone usually suffices */
+  }
 }
 
 function freshNavigate(): void {
@@ -107,7 +133,11 @@ function freshNavigate(): void {
 
 // The visitor's own "Reload" button: no retry window, same procedure.
 export async function hardReload(): Promise<void> {
-  try { sessionStorage.removeItem(RELOAD_KEY); } catch { /* ignore */ }
+  try {
+    sessionStorage.removeItem(RELOAD_KEY);
+  } catch {
+    /* ignore */
+  }
   await dropWorkerAndCaches();
   freshNavigate();
 }
@@ -120,7 +150,9 @@ export function stripFreshParam(): void {
     if (!u.searchParams.has(FRESH_PARAM)) return;
     u.searchParams.delete(FRESH_PARAM);
     history.replaceState(null, "", u.toString());
-  } catch { /* ignore */ }
+  } catch {
+    /* ignore */
+  }
 }
 
 export async function loadPark(park: string) {
@@ -130,10 +162,10 @@ export async function loadPark(park: string) {
     fetchVerified<SpeciesFile>(park, "species.json", manifest),
     fetchVerified<BiasFile>(park, "bias.json", manifest).catch(() => null),
     fetchVerified<PhotosSpeciesFile>(park, "photos_species.json", manifest).catch(() => null),
-    fetchVerified<LandmarksFile>(park, "landmarks.json", manifest).catch(() => null),      // tour: optional until landmarks ran
+    fetchVerified<LandmarksFile>(park, "landmarks.json", manifest).catch(() => null), // tour: optional until landmarks ran
     fetchVerified<BoundaryFile>(park, "boundary.geojson", manifest).catch(() => null),
-    fetchVerified<CameraPassFile>(park, "camera_pass.json", manifest).catch(() => null),   // the roadside pass: optional
-    fetchVerified<AmenitiesFile>(park, "amenities.json", manifest).catch(() => null),      // things to do: optional
+    fetchVerified<CameraPassFile>(park, "camera_pass.json", manifest).catch(() => null), // the roadside pass: optional
+    fetchVerified<AmenitiesFile>(park, "amenities.json", manifest).catch(() => null), // things to do: optional
   ]);
   return { cells, species, bias, photosSpecies, landmarks, boundary, cameraPass, amenities, manifest };
 }

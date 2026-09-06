@@ -23,9 +23,23 @@ function walk(dir) {
   return files;
 }
 const entries = walk(join(root, "src"));
-if (entries.length === 0) { console.error("no *.test.ts files under src/"); process.exit(1); }
-await build({ entryPoints: entries, outdir: out, bundle: true, platform: "node", format: "esm", target: "node22", sourcemap: "inline", logLevel: "error",
-  define: { "import.meta.env.BASE_URL": '"/"' } });
-const built = readdirSync(out).filter((f) => /\.test\.js$/.test(f)).map((f) => join(out, f));
+if (entries.length === 0) {
+  console.error("no *.test.ts files under src/");
+  process.exit(1);
+}
+await build({
+  entryPoints: entries,
+  outdir: out,
+  bundle: true,
+  platform: "node",
+  format: "esm",
+  target: "node22",
+  sourcemap: "inline",
+  logLevel: "error",
+  define: { "import.meta.env.BASE_URL": '"/"' },
+});
+const built = readdirSync(out)
+  .filter((f) => /\.test\.js$/.test(f))
+  .map((f) => join(out, f));
 const r = spawnSync(process.execPath, ["--test", "--enable-source-maps", ...built], { stdio: "inherit" });
 process.exit(r.status ?? 1);
