@@ -35,6 +35,7 @@ from parkwild.export import export_park  # noqa: E402
 from parkwild.inaturalist import find_places  # noqa: E402
 from parkwild.landmarks import build_landmarks  # noqa: E402
 from parkwild.parksindex import build_index  # noqa: E402
+from parkwild.places import build_places  # noqa: E402
 from parkwild.report import update_results_md  # noqa: E402
 from parkwild.roads import build_roads  # noqa: E402
 from parkwild.sightings import dedupe, ingest_gbif, ingest_inaturalist, park_summary  # noqa: E402
@@ -129,6 +130,15 @@ def cmd_index(args):
     print(json.dumps(build_index(heroes=not args.no_heroes, **kw), indent=2))
 
 
+def cmd_park_places(args):
+    """places.json: every named trail, site, campground and facility with the
+    sightings people recorded within reach, by species and month, and the
+    Wikipedia readers of landmarks with an article (network for the readers
+    only; no database)."""
+    park = get_park(args.park)
+    print(json.dumps(build_places(park, views=not args.no_views), indent=2))
+
+
 def cmd_species_index(args):
     """species_index.json: where each animal was seen, park by park, rolled up
     from the files the app ships (no network, no database). Run it after
@@ -206,6 +216,11 @@ def build_parser():
     p = sub.add_parser("amenities", help="amenities.json: things to do, camping, trails around the park's places (network, no database)")
     p.add_argument("--park", required=True)
     p.set_defaults(func=cmd_amenities)
+
+    p = sub.add_parser("park-places", help="places.json: named trails, sites, camps and facilities with sightings within reach (no database)")
+    p.add_argument("--park", required=True)
+    p.add_argument("--no-views", action="store_true", help="skip the Wikipedia pageviews (offline)")
+    p.set_defaults(func=cmd_park_places)
 
     p = sub.add_parser("species-index", help="species_index.json: every species across the shipped parks, with busiest cells (no network, no database)")
     p.add_argument("--data-dir", default=None, help="park folders to roll up (default: app/public/data)")

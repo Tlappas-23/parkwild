@@ -24,6 +24,9 @@ Live site: https://tlappas-23.github.io/parkwild/
 - **Tour.** Lands close over each landmark in satellite 3D, turns slowly
   while you read, then follows the park's roads to the next stop. Each stop
   lists the wildlife recorded within 2.5 km, things to do, and photographs.
+- **Places.** Every named trail, site, campground and facility, ordered by
+  how many sightings people recorded within reach, with its busiest months,
+  photographs, Wikipedia summary and the animals seen there.
 - **Species.** Search one park or all parks at once. Every species page shows
   where people see the animal, park by park, with a button that opens that
   park's map on the animal's busiest cell.

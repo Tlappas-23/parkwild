@@ -4,6 +4,7 @@ import { RefreshCw } from "lucide-react";
 import { hardReload, stripFreshParam } from "./data";
 import { useStore } from "./store";
 import SpeciesPage from "./pages/SpeciesPage";
+import PlacesPage from "./pages/PlacesPage";
 import AboutPage from "./pages/AboutPage";
 import HomePage from "./pages/HomePage";
 
@@ -59,9 +60,9 @@ export default function App() {
           )}
         </div>
         <nav aria-label="Pages">
-          {(["home", "map", "species", "ask", "about"] as const).map((p) => (
+          {(["home", "map", "places", "species", "ask", "about"] as const).map((p) => (
             <button key={p} className={page === p ? "active" : ""} aria-current={page === p ? "page" : undefined} onClick={() => setPage(p)}>
-              {p === "home" ? "Parks" : p === "map" ? "Map" : p === "species" ? "Species" : p === "ask" ? "Ask" : "About"}
+              {p === "home" ? "Parks" : p === "map" ? "Map" : p === "places" ? "Places" : p === "species" ? "Species" : p === "ask" ? "Ask" : "About"}
             </button>
           ))}
         </nav>
@@ -85,6 +86,7 @@ export default function App() {
             <MapPage />
           </Suspense>
         )}
+        {species && page === "places" && <PlacesPage />}
         {species && page === "species" && <SpeciesPage />}
         {species && page === "ask" && (
           <Suspense fallback={<div className="loading"><div className="spinner" aria-hidden="true" /><p className="muted">Loading…</p></div>}>

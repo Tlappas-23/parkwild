@@ -1,12 +1,12 @@
 // One store for UI state. Data is loaded once per park; filters are applied
 // in selectors so the map and the species pages agree on what "filtered" means.
 import { create } from "zustand";
-import type { AmenitiesFile, BiasFile, BoundaryFile, CameraPassFile, CellFeature, CellsFile, LandmarksFile, Manifest, PhotosCellsFile, PhotosSpeciesFile, RoadsFile, SpeciesFile, SpeciesHotspot, SpeciesIndexFile } from "./types";
-import { availableParks, loadCellPhotos, loadPark, loadRoads, loadSpeciesIndex } from "./data";
+import type { AmenitiesFile, BiasFile, BoundaryFile, CameraPassFile, CellFeature, CellsFile, LandmarksFile, Manifest, PhotosCellsFile, PhotosSpeciesFile, PlacesFile, RoadsFile, SpeciesFile, SpeciesHotspot, SpeciesIndexFile } from "./types";
+import { availableParks, loadCellPhotos, loadPark, loadPlaces, loadRoads, loadSpeciesIndex } from "./data";
 import { MAX_SITES, planRoute, routerFor, type Mode, type PlanResult, type Site } from "./routing";
 import type { Place } from "./tour";
 
-export type Page = "home" | "map" | "species" | "ask" | "about";
+export type Page = "home" | "map" | "places" | "species" | "ask" | "about";
 export type Basemap = "terrain" | "satellite";
 export interface TourState { active: boolean; stop: number; playing: boolean; }
 export interface Location { lon: number; lat: number; accuracyM: number; }
@@ -25,6 +25,11 @@ interface State {
   boundary: BoundaryFile | null;
   cameraPass: CameraPassFile | null;   // Track B per corridor; null where it never ran
   amenities: AmenitiesFile | null;     // things to do around places; null until exported
+  places: PlacesFile | null;           // named trails, sites, camps and facilities with what people recorded within reach; loaded on first need
+  placesState: "idle" | "loading" | "ready" | "missing";
+  ensurePlaces: () => Promise<void>;
+  selectedPlaceId: string | null;      // the place page open on the Places page
+  selectPlaceId: (id: string | null) => void;
   tourTab: "wildlife" | "todo" | "photos";
   setTourTab: (t: "wildlife" | "todo" | "photos") => void;
   controlsOpen: boolean;               // the left panel; folds away during a tour and on request
@@ -125,6 +130,21 @@ export const useStore = create<State>((set, get) => ({
   boundary: null,
   cameraPass: null,
   amenities: null,
+  places: null,
+  placesState: "idle",
+  ensurePlaces: async () => {
+    if (get().places || get().placesState === "loading") return;
+    const park = get().park;
+    set({ placesState: "loading" });
+    try {
+      const places = await loadPlaces(park, get().manifest);
+      if (get().park === park) set({ places, placesState: "ready" });
+    } catch (e) {
+      console.warn("[parkwild] places unavailable:", (e as Error).message);
+      if (get().park === park) set({ placesState: "missing" });
+    }
+  },
+  selectedPlaceId: null,
   tourTab: "wildlife",
   setTourTab: (tourTab) => set({ tourTab }),
   controlsOpen: typeof window === "undefined" || window.innerWidth >= 900,   // phones start with the map
@@ -171,7 +191,8 @@ export const useStore = create<State>((set, get) => ({
   locationError: null,
   roads: null,
   plan: NO_PLAN,
-  setPage: (page) => set({ page, selectedSpecies: page === "species" ? get().selectedSpecies : null }),
+  setPage: (page) => set({ page, selectedSpecies: page === "species" ? get().selectedSpecies : null, selectedPlaceId: page === "places" ? get().selectedPlaceId : null }),
+  selectPlaceId: (selectedPlaceId) => set({ selectedPlaceId, page: "places" }),
   // "How the camera pass works" links land on that section of the About page.
   showCameraPass: () => { set({ page: "about" }); setTimeout(() => document.getElementById("camera-pass")?.scrollIntoView({ behavior: "smooth", block: "start" }), 60); },
   setSpeciesFilter: (speciesFilter) => set({ speciesFilter }),
@@ -183,7 +204,7 @@ export const useStore = create<State>((set, get) => ({
   setPark: (park) => {
     if (park === get().park || !PARKS.some((p) => p.key === park)) return;
     set({ park, parkName: nameOf(park), cells: null, species: null, bias: null, photosSpecies: null, photosCells: null,
-          landmarks: null, boundary: null, cameraPass: null, amenities: null, manifest: null, error: null, speciesFilter: null, selectedCell: null,
+          landmarks: null, boundary: null, cameraPass: null, amenities: null, places: null, placesState: "idle", selectedPlaceId: null, manifest: null, error: null, speciesFilter: null, selectedCell: null,
           selectedSpecies: null, selectedPlace: null, tour: NO_TOUR, roads: null, plan: { ...NO_PLAN, start: get().plan.start?.kind === "me" ? get().plan.start : null } });
     try { const u = new URL(window.location.href); u.searchParams.set("park", park); window.history.replaceState(null, "", u.toString()); } catch { /* ignore */ }
     void get().load();
