@@ -83,7 +83,7 @@ export default function MapPage() {
   const {
     cells, species, boundary, landmarks, speciesFilter, yearRange, setSpeciesFilter, setYearRange, selectCell, selectedCell,
     reducedMotion, basemap, setBasemap, terrain3d, setTerrain3d, tour, startTour, tourGo, plan, location, openPlan, addSite, park, cameraPass,
-    amenities, tourTab,
+    amenities, tourTab, controlsOpen, setControlsOpen,
   } = useStore();
   const [query, setQuery] = useState("");
   // Handlers are registered once on the map; refs keep them pointing at the live store actions.
@@ -401,7 +401,13 @@ export default function MapPage() {
     <div className={"map-page" + (tour.active ? " touring" : "")}>
       <div ref={container} className="map" role="region" aria-label="Map of aggregated sightings" />
 
-      <div className="controls" role="group" aria-label="Filters">
+      {!controlsOpen && (
+        <button className="controls-pill" onClick={() => setControlsOpen(true)} aria-label="Show filters and tools">
+          <span aria-hidden="true">☰</span> Filters{current ? <span className="pill-chip">{current.common_name ?? current.scientific_name}</span> : null}{plan.open ? <span className="pill-chip">route</span> : null}
+        </button>
+      )}
+      <div className="controls" role="group" aria-label="Filters" hidden={!controlsOpen}>
+        <button className="icon-btn controls-hide" onClick={() => setControlsOpen(false)} aria-label="Hide filters and tools" title="Hide panel">‹</button>
         <div className="control view-row">
           {stops.length > 0 && !tour.active && <button className="primary" onClick={startTour}>▶ Take the tour</button>}
           <div className="seg" role="group" aria-label="Basemap">

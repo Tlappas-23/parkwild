@@ -26,6 +26,9 @@ interface State {
   amenities: AmenitiesFile | null;     // things to do around places; null until exported
   tourTab: "wildlife" | "todo" | "photos";
   setTourTab: (t: "wildlife" | "todo" | "photos") => void;
+  controlsOpen: boolean;               // the left panel; folds away during a tour and on request
+  controlsBeforeTour: boolean;
+  setControlsOpen: (open: boolean) => void;
   manifest: Manifest | null;
   error: string | null;
   speciesFilter: string | null;      // scientific name, or null for all
@@ -109,6 +112,9 @@ export const useStore = create<State>((set, get) => ({
   amenities: null,
   tourTab: "wildlife",
   setTourTab: (tourTab) => set({ tourTab }),
+  controlsOpen: true,
+  controlsBeforeTour: true,
+  setControlsOpen: (controlsOpen) => set({ controlsOpen }),
   manifest: null,
   error: null,
   speciesFilter: null,
@@ -146,11 +152,14 @@ export const useStore = create<State>((set, get) => ({
   setTerrain3d: (terrain3d) => set({ terrain3d }),
   // The tour is the 3D walk: relief on and imagery under it, the way a flyover
   // reads; leaving the tour puts the visitor's own basemap choice back.
+  // The tour clears the stage: the left panel folds away and comes back on exit.
   startTour: () => set({ tour: { active: true, stop: 0, playing: false }, page: "map", selectedCell: null, terrain3d: true,
-                         tourPrevBasemap: get().tour.active ? get().tourPrevBasemap : get().basemap, basemap: "satellite" }),
-  endTour: () => set({ tour: NO_TOUR, basemap: get().tourPrevBasemap ?? get().basemap, tourPrevBasemap: null }),
+                         tourPrevBasemap: get().tour.active ? get().tourPrevBasemap : get().basemap, basemap: "satellite",
+                         controlsBeforeTour: get().tour.active ? get().controlsBeforeTour : get().controlsOpen, controlsOpen: false }),
+  endTour: () => set({ tour: NO_TOUR, basemap: get().tourPrevBasemap ?? get().basemap, tourPrevBasemap: null, controlsOpen: get().controlsBeforeTour }),
   tourGo: (stop) => set({ tour: { ...get().tour, active: true, stop }, page: "map", selectedCell: null, terrain3d: true,
-                          tourPrevBasemap: get().tour.active ? get().tourPrevBasemap : get().basemap, basemap: "satellite" }),
+                          tourPrevBasemap: get().tour.active ? get().tourPrevBasemap : get().basemap, basemap: "satellite",
+                          controlsBeforeTour: get().tour.active ? get().controlsBeforeTour : get().controlsOpen, controlsOpen: false }),
   tourNext: () => {
     const n = get().landmarks?.tour.length ?? 0, t = get().tour;
     set({ tour: t.stop < n - 1 ? { ...t, stop: t.stop + 1 } : { ...t, playing: false } });
