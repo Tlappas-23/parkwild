@@ -6,7 +6,7 @@ import { PARKS_INDEX } from "../parksIndex";
 import { addParksLayers, liveBounds, setParksData } from "../parksOverlay";
 import type { FeatureCollection } from "geojson";
 import { filteredFeatures, speciesMatches, useStore } from "../store";
-import { DRIVE_LOOKAHEAD_M, DRIVE_MAX_MS, DRIVE_MIN_LEG_M, DRIVE_MIN_MS, DRIVE_PITCH, DRIVE_SPEED_MS, DRIVE_ZOOM, headingAt, ORBIT_DEG_PER_S, ORBIT_PAUSE_MS, placeOf, placeOfLandmark, pointAt, resample, STOP_PITCH, STOP_ZOOM, stopBearing, thingsNear, tourStops, trailLines, type Place } from "../tour";
+import { cruisePitch, cruiseZoom, DRIVE_LOOKAHEAD_MIN_M, DRIVE_LOOKAHEAD_PX, DRIVE_MIN_LEG_M, headingAt, legDurationMs, metersPerPixel, ORBIT_DEG_PER_S, ORBIT_PAUSE_MS, placeOf, placeOfLandmark, pointAt, resample, STOP_PITCH, STOP_ZOOM, stopBearing, thingsNear, tourStops, trailLines, type Place } from "../tour";
 import { routerFor } from "../routing";
 import type { BoundaryFile, LandmarksFile, Ring } from "../types";
 import CellDetail from "./CellDetail";
@@ -224,6 +224,16 @@ export default function MapPage() {
       // A tall sky so the pitched tour view has a horizon instead of a void.
       map.setSky({ "sky-color": "#a8c8e8", "horizon-color": "#e6edf3", "fog-color": "#dfe6ec", "fog-ground-blend": 0.55,
                    "horizon-fog-blend": 0.8, "sky-horizon-blend": 0.6, "atmosphere-blend": ["interpolate", ["linear"], ["zoom"], 0, 1, 10, 1, 12, 0] });
+
+      // A flight that lands before its terrain tile has arrived leaves the
+      // camera's target at the wrong height, and MapLibre keeps that height
+      // until the next camera move (E-048): the stop is a kilometre below the
+      // ground and the screen is fog. Once the map is idle, put it back.
+      map.on("idle", () => {
+        if (!map.getTerrain() || map.isMoving()) return;
+        const q = map.queryTerrainElevation(map.getCenter());
+        if (q != null && Number.isFinite(q) && Math.abs(q - map.getCameraTargetElevation()) > 1) map.jumpTo({ elevation: q });
+      });
 
       // One click handler: a landmark wins over the cell under it.
       const hitLayers = ["parks-dot", "things-dot", "landmark-dot", "cells-fill", "cells-coarse"];
@@ -474,14 +484,24 @@ export default function MapPage() {
       if (coords.length < 2) { arrive(stopBearing(stops, tour.stop), 2200); return; }
       const rs = resample(coords, 25);
       if (rs.total < DRIVE_MIN_LEG_M) { arrive(stopBearing(stops, tour.stop), 2200); return; }
-      const duration = Math.max(DRIVE_MIN_MS, Math.min(DRIVE_MAX_MS, (rs.total / DRIVE_SPEED_MS) * 1000));
+      const duration = legDurationMs(rs.total);
+      const zoom = cruiseZoom(rs.total, duration, stop.lat);
+      const pitch = cruisePitch(zoom);
+      const lookM = Math.max(DRIVE_LOOKAHEAD_MIN_M, DRIVE_LOOKAHEAD_PX * metersPerPixel(zoom, stop.lat));
       setDrive({ to: stop.name, distanceM: rs.total });
       driving.current = true;
       map.stop();
       map.setPadding(padding);
-      // Down onto the road first, then along it.
-      let heading = headingAt(rs, 0, DRIVE_LOOKAHEAD_M);
-      await new Promise<void>((res) => { map.once("moveend", () => res()); map.flyTo({ center: rs.pts[0] as [number, number], zoom: DRIVE_ZOOM, pitch: DRIVE_PITCH, bearing: heading, duration: 1400, essential: true }); });
+      // MapLibre's jumpTo looks the ground up at the zoom it is handed; a
+      // fractional zoom finds no terrain tile, the camera's target drops to
+      // sea level, a kilometre under the park, and the screen shows fog until
+      // something else moves the camera (E-048). So the ground height goes in
+      // by hand, from the last terrain tile that has it.
+      let ground = map.queryTerrainElevation(rs.pts[0] as [number, number]) ?? map.getCameraTargetElevation();
+      const groundAt = (p: [number, number]) => { const q = map.queryTerrainElevation(p); if (q != null && Number.isFinite(q)) ground = q; return ground; };
+      // Up to cruising height over the road first, then along it.
+      let heading = headingAt(rs, 0, lookM);
+      await new Promise<void>((res) => { map.once("moveend", () => res()); map.flyTo({ center: rs.pts[0] as [number, number], zoom, pitch, bearing: heading, duration: 2000, essential: true }); });
       if (cancelled) return;
       const t0 = performance.now();
       let lastNow = t0;
@@ -491,16 +511,16 @@ export default function MapPage() {
         const e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;      // ease in, ease out
         const d = e * rs.total;
         const p = pointAt(rs, d);
-        const target = headingAt(rs, d, DRIVE_LOOKAHEAD_M);
+        const target = headingAt(rs, d, lookM);
         const diff = ((target - heading + 540) % 360) - 180;                 // turn the short way, smoothly
         const k = Math.min(1, (now - lastNow) / 120);                         // frame-rate independent smoothing
         lastNow = now;
         heading = heading + diff * k;
-        map.jumpTo({ center: p, bearing: heading, pitch: DRIVE_PITCH, zoom: DRIVE_ZOOM });
+        map.jumpTo({ center: p, bearing: heading, pitch, zoom, elevation: groundAt(p) });
         if (t < 1) { raf = requestAnimationFrame(frame); return; }
         driving.current = false;
         setDrive(null);
-        arrive(heading, 1800);
+        arrive(heading, 2000);
       };
       raf = requestAnimationFrame(frame);
     })();
@@ -523,8 +543,11 @@ export default function MapPage() {
     // A drag, a wheel, a pinch or the rotate buttons all mean "my turn":
     // the orbit waits ORBIT_PAUSE_MS after the last one. Without this it
     // took the map back the moment a finger lifted, which read as "I can't
-    // spin the map".
-    const touched = () => { userTouch.current = performance.now(); };
+    // spin the map". MapLibre fires rotatestart and pitchstart for its own
+    // camera moves as well, so only events carrying a real input event count;
+    // the first version counted the orbit's own nudge and paused itself for
+    // good (E-048).
+    const touched = (e: { originalEvent?: unknown }) => { if (e.originalEvent) userTouch.current = performance.now(); };
     map.on("dragstart", touched); map.on("rotatestart", touched); map.on("pitchstart", touched); map.on("wheel", touched); map.on("touchstart", touched);
     const tick = (now: number) => {
       const dt = Math.min(now - last, 100);

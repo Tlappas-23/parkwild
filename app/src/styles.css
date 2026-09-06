@@ -454,8 +454,8 @@ nav button.active { background: var(--panel); color: var(--fg); box-shadow: var(
 
 
 /* rotate and tilt buttons, above the zoom control */
-.cam-ctrl { position: absolute; right: 14px; bottom: 122px; z-index: 5; display: grid; grid-template-columns: 1fr 1fr; gap: 4px; background: var(--glass); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); padding: 4px; border-radius: 12px; box-shadow: var(--shadow-sm); }
+.cam-ctrl { position: absolute; right: 14px; bottom: 142px; z-index: 5; display: grid; grid-template-columns: 1fr 1fr; gap: 4px; background: var(--glass); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); padding: 4px; border-radius: 12px; box-shadow: var(--shadow-sm); }
 .cam-ctrl .icon-btn { width: 30px; height: 30px; min-height: 30px; background: var(--panel); }
 .icon-btn.on { background: var(--fg); color: var(--bg); }
-@media (min-width: 900px) { .legend { bottom: 214px; } }
-@media (max-width: 899px) { .cam-ctrl { bottom: 118px; } }
+@media (min-width: 900px) { .legend { bottom: 234px; } }
+@media (max-width: 899px) { .cam-ctrl { bottom: 138px; } }

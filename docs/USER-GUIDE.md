@@ -20,7 +20,7 @@ You arrive on the whole park outline. Blue hexagons are places where people reco
 
 ## Tour
 
-"Take the tour" lands close over each stop in satellite 3D and turns slowly while you read; turn or tilt the map yourself and it waits ten seconds before taking over again. On Next the camera drops onto the road and drives the shortest road path to the next stop from a driver's height, then settles over it; the car/plane button on the card switches to a straight flight instead, and the choice is remembered. The card in the corner has three tabs:
+"Take the tour" lands close over each stop in satellite 3D and turns slowly while you read; turn or tilt the map yourself and it waits ten seconds before taking over again. On Next the camera rises over the road and follows the shortest road path to the next stop, climbing higher the longer the leg so the ground passes at a readable pace, then settles close over the stop; the car/plane button on the card switches to a straight flight instead, and the choice is remembered. The card in the corner has three tabs:
 
 - **Wildlife**: the species recorded within 2.5 km, each with a photograph taken near that stop when one exists ("near here").
 - **Things to do**: key features, hikes with lengths, camping and lodging with the fees and reservation rules OpenStreetMap carries, and facilities; a plus on each adds it to a route; the same items appear on the map while the tab is open.
@@ -49,6 +49,8 @@ Press Enable to download a small language model once (about 1 GB) and run it on 
 Per park: what the hexagons mean, what the map cannot tell you, sensitive species, exactly where a model is involved and where it is not, road and seasonal bias where measured, sources and licences, and links to these documents.
 
 ## For the owner
+
+- **Check the tour camera without eyes on it:** `node app/scripts/tour-probe.mjs "https://tlappas-23.github.io/parkwild/?park=zion" /tmp/probe 44 8` starts headless Chrome, runs the tour, presses Next at 8 s, and leaves camera samples and screenshots in the folder (E-048).
 
 - Add a park: a stanza in `config/parks.toml` (or copy from `config/parks.seed.toml`), then `make track-a PARK=key`, `track_a.py landmarks|roads|amenities --park key`, `make app-data PARK=key`, `track_a.py index`, ship.
 - Ship: `scripts/ship.sh "title" body.md` opens a PR with auto-merge; main is protected.
