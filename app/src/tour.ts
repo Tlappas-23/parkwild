@@ -2,7 +2,7 @@
 // and which way the camera should face. Pure functions; the map page and the
 // tour panel both use them.
 import { cellPhotos, speciesPhotos, type Photo } from "./photos";
-import type { AmenitiesFile, AmenityItem, CellsFile, Landmark, LandmarksFile, PhotosCellsFile, PhotosSpeciesFile, TrailItem } from "./types";
+import type { AmenitiesFile, AmenityItem, CellsFile, Landmark, LandmarksFile, PhotosCellsFile, PhotosSpeciesFile, RoadsFile, TrailItem } from "./types";
 
 // TOUR_RADIUS_M — ASSUMED (a valley-scale neighbourhood around a viewpoint)
 // Sightings within this distance of a stop count as "recorded here". 2.5 km
@@ -112,7 +112,15 @@ export const CAMP_M = 12000;
 // PER_GROUP — ARBITRARY (a card, not a directory)
 export const PER_GROUP = 6;
 
-export interface NearItem { id: string; kind: string; label: string; detail: string; lon: number; lat: number; distM: number; }
+// A place the drawer can open: anything with a name and a point. Trails also
+// carry their length and take their geometry from the routing graph.
+export interface Place { id: string; kind: string; name: string; lon: number; lat: number; detail?: string; lengthM?: number; wiki?: string | null; tags?: Record<string, string>; }
+export interface NearItem { id: string; kind: string; label: string; detail: string; lon: number; lat: number; distM: number; lengthM?: number; wiki?: string | null; tags?: Record<string, string>; }
+export function placeOf(it: NearItem): Place { return { id: it.id, kind: it.kind, name: it.label, lon: it.lon, lat: it.lat, detail: it.detail, lengthM: it.lengthM, wiki: it.wiki, tags: it.tags }; }
+export function placeOfLandmark(l: Landmark): Place {
+  const title = l.url ? decodeURIComponent(l.url.split("/wiki/")[1] ?? "").replace(/_/g, " ") : null;
+  return { id: l.id, kind: l.kind, name: l.name, lon: l.lon, lat: l.lat, wiki: title || null, tags: l.ele_m ? { ele: String(l.ele_m) } : undefined };
+}
 export interface Things { features: NearItem[]; trails: NearItem[]; hike: NearItem[]; camp: NearItem[]; stay: NearItem[]; facilities: NearItem[]; total: number; }
 
 function campDetail(it: AmenityItem, distM: number): string {
@@ -135,17 +143,76 @@ export function thingsNear(a: AmenitiesFile | null, lon: number, lat: number): T
   if (!a) return empty;
   const near = <T extends AmenityItem | TrailItem>(list: T[], radius: number) =>
     list.map((it) => ({ it, d: haversineM(lon, lat, it.lon, it.lat) })).filter((x) => x.d <= radius).sort((x, y) => x.d - y.d);
+  const wikiOf = (it: AmenityItem) => (it.tags.wikipedia?.startsWith("en:") ? it.tags.wikipedia.slice(3) : null);
   const item = (it: AmenityItem, d: number, detail?: string): NearItem =>
-    ({ id: it.id, kind: it.kind, label: it.name, detail: detail ?? `${it.sub}${it.tags.ele ? ` · ${Math.round(+it.tags.ele).toLocaleString()} m` : ""} · ${fmtDist(d)}`, lon: it.lon, lat: it.lat, distM: d });
+    ({ id: it.id, kind: it.kind, label: it.name, detail: detail ?? `${it.sub}${it.tags.ele ? ` · ${Math.round(+it.tags.ele).toLocaleString()} m` : ""} · ${fmtDist(d)}`,
+       lon: it.lon, lat: it.lat, distM: d, wiki: wikiOf(it), tags: it.tags });
   const items = a.items;
   const features = near(items.filter((i) => i.kind === "feature"), NEAR_M).slice(0, PER_GROUP).map(({ it, d }) => item(it, d));
   const hike = near(items.filter((i) => i.kind === "trailhead"), NEAR_M).slice(0, PER_GROUP).map(({ it, d }) => item(it, d, `trailhead · ${fmtDist(d)}`));
   const trails = near(a.trails, NEAR_M).sort((x, y) => y.it.length_m - x.it.length_m).slice(0, PER_GROUP)
-    .map(({ it, d }) => ({ id: it.id, kind: "trail", label: it.name, detail: `${(it.length_m / 1000).toFixed(1)} km of trail · ${fmtDist(d)} away`, lon: it.lon, lat: it.lat, distM: d }));
+    .map(({ it, d }) => ({ id: it.id, kind: "trail", label: it.name, detail: `${(it.length_m / 1000).toFixed(1)} km of trail · ${fmtDist(d)} away`, lon: it.lon, lat: it.lat, distM: d, lengthM: it.length_m }));
   const camp = near(items.filter((i) => i.kind === "camp"), CAMP_M).slice(0, PER_GROUP).map(({ it, d }) => item(it, d, campDetail(it, d)));
   const stay = near(items.filter((i) => i.kind === "stay"), CAMP_M).slice(0, 3).map(({ it, d }) => item(it, d, `${it.sub} · ${fmtDist(d)}`));
   const facilities = near(items.filter((i) => ["viewpoint", "picnic", "info", "boat"].includes(i.kind)), NEAR_M).slice(0, PER_GROUP)
     .map(({ it, d }) => item(it, d, `${it.kind === "info" ? "visitor centre" : it.sub} · ${fmtDist(d)}`));
   const total = features.length + trails.length + hike.length + camp.length + stay.length + facilities.length;
   return { features, trails, hike, camp, stay, facilities, total };
+}
+
+
+// Every piece of a named trail in the routing graph, as polylines.
+export function trailLines(roads: RoadsFile | null, name: string): number[][][] {
+  if (!roads) return [];
+  const idx = roads.names.indexOf(name);
+  if (idx < 0) return [];
+  return roads.edges.filter((e) => e[3] === 1 && e[5] === idx).map((e) => e[6]);
+}
+
+// Distance from a point to a polyline, metres, on a local flat projection.
+function distToLineM(lon: number, lat: number, line: number[][]): number {
+  const ky = 110_540, kx = 111_320 * Math.cos((lat * Math.PI) / 180);
+  let best = Infinity;
+  for (let i = 1; i < line.length; i++) {
+    const ax = (line[i - 1][0] - lon) * kx, ay = (line[i - 1][1] - lat) * ky, bx = (line[i][0] - lon) * kx, by = (line[i][1] - lat) * ky;
+    const dx = bx - ax, dy = by - ay, len2 = dx * dx + dy * dy;
+    const t = len2 ? Math.max(0, Math.min(1, -(ax * dx + ay * dy) / len2)) : 0;
+    const px = ax + t * dx, py = ay + t * dy;
+    const d = Math.hypot(px, py);
+    if (d < best) best = d;
+  }
+  return best;
+}
+
+// TRAIL_BUFFER_M — ASSUMED (what a walker on the trail could see or hear; one cell each side)
+export const TRAIL_BUFFER_M = 300;
+
+// Species recorded in the cells a trail passes through, same shape as nearbySpecies.
+export function speciesNearLines(cells: CellsFile | null, lines: number[][][], bufferM = TRAIL_BUFFER_M, limit = 8): Nearby {
+  if (!cells || lines.length === 0) return { list: [], total: 0, cells: 0, cellIds: [] };
+  // Bounding box of the trail plus the buffer prunes most cells before the segment test.
+  let w = 180, e = -180, s = 90, n = -90;
+  for (const l of lines) for (const [x, y] of l) { w = Math.min(w, x); e = Math.max(e, x); s = Math.min(s, y); n = Math.max(n, y); }
+  const dLat = bufferM / 110_540, dLon = bufferM / (111_320 * Math.cos(((s + n) / 2) * Math.PI / 180));
+  const agg = new Map<number, NearbySpecies>();
+  const cellIds: string[] = [];
+  let total = 0, count = 0;
+  for (const f of cells.features) {
+    if (f.properties.coarsened) continue;
+    const ring = f.geometry.coordinates[0], k = ring.length - 1;
+    let cx = 0, cy = 0;
+    for (let i = 0; i < k; i++) { cx += ring[i][0]; cy += ring[i][1]; }
+    cx /= k; cy /= k;
+    if (cx < w - dLon || cx > e + dLon || cy < s - dLat || cy > n + dLat) continue;
+    if (!lines.some((l) => distToLineM(cx, cy, l) <= bufferM)) continue;
+    count++;
+    cellIds.push(f.properties.cell);
+    total += f.properties.count;
+    for (const en of f.properties.sp) {
+      const cur = agg.get(en[0]) ?? { species: cells.species_index[en[0]].n, common: cells.species_index[en[0]].c, count: 0, hv: 0, mp: 0 };
+      cur.count += en[1]; cur.hv += en[2]; cur.mp += en[3];
+      agg.set(en[0], cur);
+    }
+  }
+  return { list: [...agg.values()].sort((a, b) => b.count - a.count).slice(0, limit), total, cells: count, cellIds };
 }

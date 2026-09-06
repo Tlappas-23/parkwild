@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import PhotoCredit from "../PhotoCredit";
 import { useStore } from "../store";
-import { nearbySpecies, photoNear, thingsNear, TOUR_DWELL_MS, TOUR_RADIUS_M, tourStops, type NearItem } from "../tour";
+import { nearbySpecies, photoNear, placeOf, thingsNear, TOUR_DWELL_MS, TOUR_RADIUS_M, tourStops, type NearItem } from "../tour";
 
 // The tour bar: one stop at a time, what it is (Wikipedia, credited), and
 // which animals people have recorded within walking distance, with a
@@ -12,7 +12,7 @@ import { nearbySpecies, photoNear, thingsNear, TOUR_DWELL_MS, TOUR_RADIUS_M, tou
 // always see the map". It is now a slim bar with a "Details" toggle for the
 // full text and larger photographs.
 export default function Tour() {
-  const { tour, landmarks, cells, photosSpecies, photosCells, ensureCellPhotos, tourGo, tourNext, tourPrev, tourPlay, endTour, selectSpecies, addSite, amenities, tourTab, setTourTab } = useStore();
+  const { tour, landmarks, cells, photosSpecies, photosCells, ensureCellPhotos, tourGo, tourNext, tourPrev, tourPlay, endTour, selectSpecies, addSite, amenities, tourTab, setTourTab, selectPlace } = useStore();
   const [expanded, setExpanded] = useState(false);
   const [minimised, setMinimised] = useState(false);   // a one-line strip: name and arrows, nothing else
   const stops = useMemo(() => tourStops(landmarks), [landmarks]);
@@ -26,7 +26,7 @@ export default function Tour() {
         {list.map((it) => (
           <li key={it.id}>
             <span className={"todo-dot " + it.kind} aria-hidden="true" />
-            <span className="todo-body"><strong>{it.label}</strong><br /><span className="muted small">{it.detail}</span></span>
+            <button className="todo-body as-link" onClick={() => selectPlace(placeOf(it))} title="Open this place"><strong>{it.label}</strong><br /><span className="muted small">{it.detail}</span></button>
             <button className="chip-x add" aria-label={`Add ${it.label} to route`} title="Add to route"
               onClick={() => addSite({ id: it.id, label: it.label, lon: it.lon, lat: it.lat, kind: "landmark" })}>+</button>
           </li>

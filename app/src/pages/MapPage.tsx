@@ -3,9 +3,10 @@ import maplibregl, { type GeoJSONSource, type LngLatBoundsLike, type Map as MLMa
 import "maplibre-gl/dist/maplibre-gl.css";
 import type { FeatureCollection } from "geojson";
 import { filteredFeatures, speciesMatches, useStore } from "../store";
-import { ORBIT_DEG, ORBIT_MS, STOP_PITCH, STOP_ZOOM, stopBearing, thingsNear, tourStops } from "../tour";
+import { ORBIT_DEG, ORBIT_MS, placeOf, placeOfLandmark, STOP_PITCH, STOP_ZOOM, stopBearing, thingsNear, tourStops, trailLines, type Place } from "../tour";
 import type { BoundaryFile, LandmarksFile, Ring } from "../types";
 import CellDetail from "./CellDetail";
+import PlaceDetail from "./PlaceDetail";
 import PlanPanel from "./PlanPanel";
 import Tour from "./Tour";
 
@@ -83,13 +84,15 @@ export default function MapPage() {
   const {
     cells, species, boundary, landmarks, speciesFilter, yearRange, setSpeciesFilter, setYearRange, selectCell, selectedCell,
     reducedMotion, basemap, setBasemap, terrain3d, setTerrain3d, tour, startTour, tourGo, plan, location, openPlan, addSite, park, cameraPass,
-    amenities, tourTab, controlsOpen, setControlsOpen,
+    amenities, tourTab, controlsOpen, setControlsOpen, selectedPlace, selectPlace, roads,
   } = useStore();
   const [query, setQuery] = useState("");
   // Handlers are registered once on the map; refs keep them pointing at the live store actions.
   const selectCellRef = useRef(selectCell); selectCellRef.current = selectCell;
   const tourGoRef = useRef(tourGo); tourGoRef.current = tourGo;
   const addSiteRef = useRef(addSite); addSiteRef.current = addSite;
+  const selectPlaceRef = useRef(selectPlace); selectPlaceRef.current = selectPlace;
+  const thingsRef = useRef<Map<string, Place>>(new Map());
   const landmarksRef = useRef(landmarks); landmarksRef.current = landmarks;
 
   const features = useMemo(() => filteredFeatures(cells, speciesFilter, yearRange), [cells, speciesFilter, yearRange]);
@@ -133,6 +136,7 @@ export default function MapPage() {
       map.addSource("me", { type: "geojson", data: EMPTY });
       map.addSource("corridors", { type: "geojson", data: EMPTY });
       map.addSource("things", { type: "geojson", data: EMPTY });
+      map.addSource("focus", { type: "geojson", data: EMPTY });
 
       // Imagery sits right above the style's background so every road, river
       // and label stays on top of it; the hillshade goes under the lines.
@@ -183,6 +187,13 @@ export default function MapPage() {
       map.addLayer({ id: "corridor-label", type: "symbol", source: "corridors", minzoom: 8,
         layout: { "text-field": ["get", "label"], "text-font": ["Noto Sans Regular"], "text-size": 10.5, "text-anchor": "bottom-left", "text-offset": [0.3, -0.3], "text-max-width": 14 },
         paint: { "text-color": "#8a5200", "text-halo-color": "rgba(255,255,255,0.92)", "text-halo-width": 1.3 } });
+      // The open place: a trail drawn whole, or a ring around a point.
+      map.addLayer({ id: "focus-casing", type: "line", source: "focus", filter: ["==", ["geometry-type"], "LineString"], layout: { "line-join": "round", "line-cap": "round" },
+        paint: { "line-color": "#ffffff", "line-width": 7, "line-opacity": 0.9 } });
+      map.addLayer({ id: "focus-line", type: "line", source: "focus", filter: ["==", ["geometry-type"], "LineString"], layout: { "line-join": "round", "line-cap": "round" },
+        paint: { "line-color": "#7c2d12", "line-width": 3.5 } });
+      map.addLayer({ id: "focus-point", type: "circle", source: "focus", filter: ["==", ["geometry-type"], "Point"],
+        paint: { "circle-radius": 13, "circle-color": "rgba(124,45,18,0.15)", "circle-stroke-color": "#7c2d12", "circle-stroke-width": 2.5 } });
       // Things to do around the current stop, coloured by kind, while that tab is open.
       map.addLayer({ id: "things-dot", type: "circle", source: "things",
         paint: { "circle-radius": 5.5, "circle-stroke-color": "#ffffff", "circle-stroke-width": 1.5,
@@ -206,23 +217,19 @@ export default function MapPage() {
       const hitLayers = ["things-dot", "landmark-dot", "cells-fill", "cells-coarse"];
       map.on("click", (e) => {
         const hits = map.queryRenderedFeatures(e.point, { layers: hitLayers });
+        // A thing or a landmark opens the place drawer; a tour stop moves the tour.
         const th = hits.find((f) => f.layer.id === "things-dot");
         if (th) {
-          const p = th.properties as { label: string; detail: string; kind: string; lon: number; lat: number };
-          new maplibregl.Popup({ closeButton: false, offset: 10, maxWidth: "260px" }).setLngLat(e.lngLat)
-            .setHTML(`<strong>${esc(p.label)}</strong><br><span class="muted">${esc(p.detail)}</span>`
-              + `<br><button class="popup-add small-btn" data-lon="${p.lon}" data-lat="${p.lat}" data-label="${esc(p.label)}">+ Add to route</button>`)
-            .addTo(map);
+          const place = thingsRef.current.get(String(th.properties.id));
+          if (place) selectPlaceRef.current(place);
           return;
         }
         const lm = hits.find((f) => f.layer.id === "landmark-dot");
         if (lm) {
-          const p = lm.properties as { name: string; kind: string; tour: number; url: string };
+          const p = lm.properties as { id: string; tour: number };
           if (p.tour >= 0) { tourGoRef.current(p.tour); return; }
-          new maplibregl.Popup({ closeButton: false, offset: 10, maxWidth: "240px" }).setLngLat(e.lngLat)
-            .setHTML(`<strong>${esc(p.name)}</strong><br><span class="muted">${esc(p.kind)}</span>${p.url ? ` · <a href="${esc(p.url)}" target="_blank" rel="noreferrer">Wikipedia</a>` : ""}`
-              + `<br><button class="popup-add small-btn" data-id="${esc(String(lm.properties.id))}">+ Add to route</button>`)
-            .addTo(map);
+          const l = landmarksRef.current?.landmarks.find((x) => x.id === p.id);
+          if (l) selectPlaceRef.current(placeOfLandmark(l));
           return;
         }
         const cell = hits.find((f) => f.layer.id.startsWith("cells-"));
@@ -353,9 +360,30 @@ export default function MapPage() {
     const stop = tour.active && tourTab === "todo" ? stops[tour.stop] : undefined;
     const th = stop ? thingsNear(amenities, stop.lon, stop.lat) : null;
     const all = th ? [...th.features, ...th.trails, ...th.hike, ...th.camp, ...th.stay, ...th.facilities] : [];
+    thingsRef.current = new Map(all.map((it) => [it.id, placeOf(it)]));
     (map.getSource("things") as GeoJSONSource).setData({ type: "FeatureCollection", features: all.map((it) => ({
-      type: "Feature", properties: { label: it.label, detail: it.detail, kind: it.kind, lon: it.lon, lat: it.lat }, geometry: { type: "Point", coordinates: [it.lon, it.lat] } })) });
+      type: "Feature", properties: { id: it.id, label: it.label, detail: it.detail, kind: it.kind, lon: it.lon, lat: it.lat }, geometry: { type: "Point", coordinates: [it.lon, it.lat] } })) });
   }, [ready, tour.active, tour.stop, tourTab, stops, amenities]);
+
+  // The open place on the map: the whole trail, or a ring; the view moves to it.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!ready || !map) return;
+    const p = selectedPlace;
+    if (!p) { (map.getSource("focus") as GeoJSONSource).setData(EMPTY); return; }
+    const lines = p.kind === "trail" ? trailLines(roads, p.name) : [];
+    const fc: FeatureCollection = { type: "FeatureCollection", features: lines.length
+      ? lines.map((l) => ({ type: "Feature", properties: {}, geometry: { type: "LineString", coordinates: l } }))
+      : [{ type: "Feature", properties: {}, geometry: { type: "Point", coordinates: [p.lon, p.lat] } }] };
+    (map.getSource("focus") as GeoJSONSource).setData(fc);
+    const pad = { top: 60, bottom: 60, left: 60, right: 440 };
+    if (lines.length) {
+      const b = boundsOf(lines);
+      if (b) map.fitBounds(b, { padding: pad, maxZoom: 14.5, duration: reducedMotion ? 0 : 1200 });
+    } else {
+      map.easeTo({ center: [p.lon, p.lat], zoom: Math.max(map.getZoom(), 13.5), padding: pad, duration: reducedMotion ? 0 : 1000 });
+    }
+  }, [ready, selectedPlace, roads, reducedMotion]);
 
   // The tour camera: fly to the stop, pitched, facing the next stop. Leaving
   // the tour eases back to the whole park.
@@ -466,6 +494,7 @@ export default function MapPage() {
       </div>
 
       <CellDetail />
+      <PlaceDetail />
       <Tour />
     </div>
   );
