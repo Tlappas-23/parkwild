@@ -22,7 +22,11 @@ export default defineConfig({
       manifest: false,
       includeAssets: ["icon.svg", "manifest.webmanifest"],
       workbox: {
-        globPatterns: ["**/*.{js,css,html,svg,webmanifest}", "data/**/*.{geojson,json}"],
+        // The shell is precached; data files are not. Their URLs carry
+        // ?v=<hash>, so a content-addressed runtime cache serves each shell
+        // exactly the files it was built with, and a visitor's first load does
+        // not pull every park's data in the background (E-027).
+        globPatterns: ["**/*.{js,css,html,svg,webmanifest}"],
         maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
         // Data URLs carry ?v=<manifest hash>. Ignoring that parameter when
         // matching the precache means a cached app shell is always served its
@@ -37,6 +41,11 @@ export default defineConfig({
               || (url.hostname === "s3.amazonaws.com" && url.pathname.startsWith("/elevation-tiles-prod/")),
             handler: "CacheFirst",
             options: { cacheName: "basemap", expiration: { maxEntries: 900, maxAgeSeconds: 30 * 24 * 3600 }, cacheableResponse: { statuses: [0, 200] } },
+          },
+          {
+            urlPattern: ({ url }) => url.pathname.includes("/data/") && url.searchParams.has("v"),
+            handler: "CacheFirst",
+            options: { cacheName: "data", expiration: { maxEntries: 80, maxAgeSeconds: 60 * 24 * 3600 }, cacheableResponse: { statuses: [200] } },
           },
           {
             urlPattern: ({ url }) => url.pathname.includes("/models/"),

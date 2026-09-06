@@ -44,10 +44,11 @@ export async function fetchVerified<T>(park: string, name: string, manifest: Man
     const actual = await sha256Hex(buf);
     if (actual !== expected) {
       // Usually this means the app shell is a cached older build and the server
-      // has newer data. Ask the service worker for the new build and reload
-      // once; only if that does not resolve it is the mismatch shown.
+      // has newer data. Drop the worker and its caches and come back on a
+      // fresh URL; only if that does not resolve it is the mismatch shown.
       if (await refreshOnce()) throw new Error("A newer version is available; reloading…");
-      throw new Error(`${name} failed its integrity check (expected ${expected.slice(0, 12)}…, got ${actual.slice(0, 12)}…)`);
+      throw new Error(`${name} failed its integrity check (expected ${expected.slice(0, 12)}…, got ${actual.slice(0, 12)}…). `
+        + "This usually means a new version was published moments ago.");
     }
   } else {
     console.warn(`[parkwild] no baked manifest entry for ${name}; integrity not verified (dev build?)`);
@@ -56,20 +57,60 @@ export async function fetchVerified<T>(park: string, name: string, manifest: Man
 }
 
 const RELOAD_KEY = "parkwild:integrity-reload";
+// RELOAD_RETRY_MS — ARBITRARY (long enough for a CDN edge to pick up a deploy)
+// A second attempt inside this window would only loop; after it, the shell
+// the server hands out has almost certainly caught up with its data.
+const RELOAD_RETRY_MS = 45_000;
+const FRESH_PARAM = "fresh";
 
+// The first version (E-023) asked the worker to update and called
+// location.reload(). That still served the old shell when the browser or the
+// CDN had index.html cached, so the mismatch came straight back (E-027).
+// Now: unregister the worker, drop every cache, and navigate to a URL the
+// browser has never seen, which no cache can answer.
 async function refreshOnce(): Promise<boolean> {
-  if (typeof sessionStorage === "undefined" || sessionStorage.getItem(RELOAD_KEY)) return false;
-  sessionStorage.setItem(RELOAD_KEY, String(Date.now()));
+  try {
+    const last = Number(sessionStorage.getItem(RELOAD_KEY) ?? 0);
+    if (Date.now() - last < RELOAD_RETRY_MS) return false;
+    sessionStorage.setItem(RELOAD_KEY, String(Date.now()));
+  } catch { return false; }
+  await dropWorkerAndCaches();
+  freshNavigate();
+  return true;
+}
+
+async function dropWorkerAndCaches(): Promise<void> {
   try {
     if ("serviceWorker" in navigator) {
       const regs = await navigator.serviceWorker.getRegistrations();
-      await Promise.all(regs.map((r) => r.update()));
-      // Drop any cached shell so the reload fetches the build the server has.
-      if ("caches" in window) await Promise.all((await caches.keys()).map((k) => caches.delete(k)));
+      await Promise.all(regs.map((r) => r.unregister()));
     }
-  } catch { /* fall through to a plain reload */ }
-  location.reload();
-  return true;
+    if ("caches" in window) await Promise.all((await caches.keys()).map((k) => caches.delete(k)));
+  } catch { /* best effort; the fresh URL alone usually suffices */ }
+}
+
+function freshNavigate(): void {
+  const u = new URL(location.href);
+  u.searchParams.set(FRESH_PARAM, String(Date.now()));
+  location.replace(u.toString());
+}
+
+// The visitor's own "Reload" button: no retry window, same procedure.
+export async function hardReload(): Promise<void> {
+  try { sessionStorage.removeItem(RELOAD_KEY); } catch { /* ignore */ }
+  await dropWorkerAndCaches();
+  freshNavigate();
+}
+
+// Once a fresh load succeeded the marker parameter has done its job; take it
+// out of the address bar so shared links stay clean.
+export function stripFreshParam(): void {
+  try {
+    const u = new URL(location.href);
+    if (!u.searchParams.has(FRESH_PARAM)) return;
+    u.searchParams.delete(FRESH_PARAM);
+    history.replaceState(null, "", u.toString());
+  } catch { /* ignore */ }
 }
 
 export async function loadPark(park: string) {
