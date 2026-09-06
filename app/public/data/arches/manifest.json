@@ -1,0 +1,49 @@
+{
+  "built": "2026-09-06T18:23:42+00:00",
+  "git_commit": "257cb497e55f3ffb228f70a341b5ca4fe7bb26b9",
+  "files": {
+    "cells.geojson": {
+      "sha256": "fe7d9a815ede68b6977766ffe6c0e954ffcb106976e93d6b4d9b454072119ea6",
+      "bytes": 139760
+    },
+    "species.json": {
+      "sha256": "743211565d1bb8a92b7624722769e63015c5cf75fc9aabef9436747c7131f27d",
+      "bytes": 51416
+    },
+    "sightings.parquet": {
+      "sha256": "ecdae45e588fd1004204956d763d7e80a4521542f91df6e9925d874aadb6d7dd",
+      "bytes": 180022
+    },
+    "photos_species.json": {
+      "sha256": "942ae0051f7479c2395b495e593a262611673e50000b189322b2a27b8065f1c0",
+      "bytes": 42955
+    },
+    "photos_cells.json": {
+      "sha256": "7fbbeebffd8d61000bfd4f40dd1e83437d03efd7ce0fb070e9d8b69cbb2558af",
+      "bytes": 58519
+    },
+    "landmarks.json": {
+      "sha256": "f5d265e87c55061222ff8de4990998d381d78b6cd262f8877aa0dee72cd3fb33",
+      "bytes": 19619
+    },
+    "boundary.geojson": {
+      "sha256": "7ec231b4a14fb14fab1f5418ef50112d953411f511d956dda121c221f058aee5",
+      "bytes": 9608
+    },
+    "roads.json": {
+      "sha256": "ad30cb8cbdf3d50623df0747a1b13ef30d1d9dc168e27081e3de56122dcd8601",
+      "bytes": 121161
+    },
+    "camera_pass.json": {
+      "sha256": "869981544ba6c02ee91d34f3ef043841a72b90c463f285d2533e3b46593e9527",
+      "bytes": 436
+    },
+    "amenities.json": {
+      "sha256": "6214f5b11811c23634ad16bd13590dc3150f661654edaf5cd68bd535ec3d5c64",
+      "bytes": 22089
+    }
+  },
+  "park": "arches",
+  "name": "Arches National Park",
+  "state": "UT"
+}

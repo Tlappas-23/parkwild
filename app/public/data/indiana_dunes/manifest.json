@@ -1,0 +1,49 @@
+{
+  "built": "2026-09-06T18:14:58+00:00",
+  "git_commit": "257cb497e55f3ffb228f70a341b5ca4fe7bb26b9",
+  "files": {
+    "cells.geojson": {
+      "sha256": "ec110080281d046624c6d09e22671981fb86d8eee2b29d622f3bac53cec381c2",
+      "bytes": 299093
+    },
+    "species.json": {
+      "sha256": "564136e46f242d339eb7f1418a8b568c885c712d13baa558650db9d6679c4e88",
+      "bytes": 119777
+    },
+    "sightings.parquet": {
+      "sha256": "847808808144c89e075a8088abd3e25c693d733c5b1ebd729d139ec09c9f4326",
+      "bytes": 593564
+    },
+    "photos_species.json": {
+      "sha256": "a50dda0d576a60e88ac455322ef8b22c6fa7a44bf5e5bd0aa9b0b8cb54bd9904",
+      "bytes": 160691
+    },
+    "photos_cells.json": {
+      "sha256": "c58a471f4017a5bf2131025c2c42d277b52b155e478370421e4d91158e7c7bec",
+      "bytes": 221084
+    },
+    "landmarks.json": {
+      "sha256": "ca5c46cf610b75f1eef88054d0c890f01979e1bc0358559447d854f1618170e6",
+      "bytes": 21522
+    },
+    "boundary.geojson": {
+      "sha256": "94de726eea5321bec99e5df28aea360b23f746fdddd0facfb81afbd51d8d7c1c",
+      "bytes": 5108
+    },
+    "roads.json": {
+      "sha256": "bdfac7a652ccdb2e6177eb6d605c61bb8781f17111bdd4669a4682abff16731d",
+      "bytes": 876913
+    },
+    "camera_pass.json": {
+      "sha256": "ebc3fdce8a50f19c3f51133547e2b6a5510392d6fcf674497a63d4e67475ec50",
+      "bytes": 443
+    },
+    "amenities.json": {
+      "sha256": "eab3f7c42bb3c6751b46924734061cb520e05c11bb04b5a432b6fdf67872b59c",
+      "bytes": 22099
+    }
+  },
+  "park": "indiana_dunes",
+  "name": "Indiana Dunes National Park",
+  "state": "IN"
+}

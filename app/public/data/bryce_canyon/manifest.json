@@ -1,0 +1,49 @@
+{
+  "built": "2026-09-06T18:20:47+00:00",
+  "git_commit": "257cb497e55f3ffb228f70a341b5ca4fe7bb26b9",
+  "files": {
+    "cells.geojson": {
+      "sha256": "dfa8e4902086a47a744f0a0623d2a544075d214c73b2f1b794dfa8720548cd9d",
+      "bytes": 200498
+    },
+    "species.json": {
+      "sha256": "0b246c022057869d570e04b2bc5dcc16af0916a072134198cead7c989cb1086a",
+      "bytes": 74121
+    },
+    "sightings.parquet": {
+      "sha256": "121f67659930c0b62d87c81949c0e957a977ee29d7cd68877c23df06c071970d",
+      "bytes": 382481
+    },
+    "photos_species.json": {
+      "sha256": "aeaf47ea69d0a25e6cd722901bb32044cd84568ff58b9ccb82bb28eef09de460",
+      "bytes": 59241
+    },
+    "photos_cells.json": {
+      "sha256": "f4070b951eb559ff415ca988be88a82a3c8a3bb81fa19ebeca0c3c9585dddfcf",
+      "bytes": 98546
+    },
+    "landmarks.json": {
+      "sha256": "5bc5374f8f86de832438db451628a3376c62e11578b41bb723078774a20251c6",
+      "bytes": 3798
+    },
+    "boundary.geojson": {
+      "sha256": "307921698e343146c55f268a36f0655517e7f7dfde8a8de8654cd816a61a799c",
+      "bytes": 2022
+    },
+    "roads.json": {
+      "sha256": "39752bf9d9bc59d9fc7a5242e0a5b89c0372311e0f7b759a7ae7355a3c26e579",
+      "bytes": 143280
+    },
+    "camera_pass.json": {
+      "sha256": "65cc0232873c19e5af67c8e608fb46935f8fe76599a7d5930f836d6cbbc61239",
+      "bytes": 442
+    },
+    "amenities.json": {
+      "sha256": "5b3b109bc4065ca5bbe56392b6430612bbf8bef5225fd12e1d14f98da051f9d7",
+      "bytes": 26111
+    }
+  },
+  "park": "bryce_canyon",
+  "name": "Bryce Canyon National Park",
+  "state": "UT"
+}

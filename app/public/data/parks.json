@@ -1,9 +1,9 @@
 {
- "generated": "2026-09-06T17:48:34+00:00",
+ "generated": "2026-09-06T18:23:46+00:00",
  "attribution": "Park photographs: Wikimedia Commons, each under the licence printed on its card",
  "species_index": {
-  "sha256": "70a762da2b4bc22da464b4233495cff3170ee53357325ff68348b16cfdbea4c3",
-  "bytes": 561657
+  "sha256": "551ebd91dd38c6ab4476cc1f8f69b399ec8cbbed85710fa9973778307bfeadf4",
+  "bytes": 726580
  },
  "parks": [
   {
@@ -322,7 +322,7 @@
    "key": "gateway_arch",
    "name": "Gateway Arch National Park",
    "state": "MO",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -90.189,
     38.6192,
@@ -333,11 +333,11 @@
     -90.1857,
     38.6243
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 58,
+   "sightings": 892,
+   "cells": 8,
+   "stops": 1,
+   "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Gateway_Arch%2C_St._Louis.jpg/1280px-Gateway_Arch%2C_St._Louis.jpg",
     "page": "https://commons.wikimedia.org/wiki/File:Gateway_Arch,_St._Louis.jpg",
@@ -351,7 +351,7 @@
    "key": "hot_springs",
    "name": "Hot Springs National Park",
    "state": "AR",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -93.1135,
     34.4988,
@@ -362,11 +362,11 @@
     -93.0659,
     34.5292
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 92,
+   "sightings": 585,
+   "cells": 82,
+   "stops": 2,
+   "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Steamy_Entrance_Springs_on_Cold_Night_in_Hot_Springs_National_Park.jpg/1280px-Steamy_Entrance_Springs_on_Cold_Night_in_Hot_Springs_National_Park.jpg",
     "page": "https://commons.wikimedia.org/wiki/File:Steamy_Entrance_Springs_on_Cold_Night_in_Hot_Springs_National_Park.jpg",
@@ -380,7 +380,7 @@
    "key": "cuyahoga_valley",
    "name": "Cuyahoga Valley National Park",
    "state": "OH",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -81.6483,
     41.0897,
@@ -391,11 +391,11 @@
     -81.5697,
     41.2551
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 250,
+   "sightings": 19169,
+   "cells": 855,
+   "stops": 8,
+   "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Cuyahoga_Valley_National_Park_20.jpg/1280px-Cuyahoga_Valley_National_Park_20.jpg",
     "page": "https://commons.wikimedia.org/wiki/File:Cuyahoga_Valley_National_Park_20.jpg",
@@ -409,7 +409,7 @@
    "key": "indiana_dunes",
    "name": "Indiana Dunes National Park",
    "state": "IN",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -87.4617,
     41.5075,
@@ -420,11 +420,11 @@
     -87.1492,
     41.6123
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 281,
+   "sightings": 11315,
+   "cells": 531,
+   "stops": 8,
+   "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Indiana_Dunes_National_Lakeshore%2C_Michigan_City%2C_Indiana%2C_Estados_Unidos%2C_2012-10-20%2C_DD_03.jpg/1280px-Indiana_Dunes_National_Lakeshore%2C_Michigan_City%2C_Indiana%2C_Estados_Unidos%2C_2012-10-20%2C_DD_03.jpg",
     "page": "https://commons.wikimedia.org/wiki/File:Indiana_Dunes_National_Lakeshore,_Michigan_City,_Indiana,_Estados_Unidos,_2012-10-20,_DD_03.jpg",
@@ -438,7 +438,7 @@
    "key": "bryce_canyon",
    "name": "Bryce Canyon National Park",
    "state": "UT",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -112.2741,
     37.4421,
@@ -449,11 +449,11 @@
     -112.1787,
     37.5707
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 172,
+   "sightings": 5605,
+   "cells": 431,
+   "stops": 2,
+   "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Inspiration_Point_Bryce_Canyon_November_2018_panorama.jpg/1280px-Inspiration_Point_Bryce_Canyon_November_2018_panorama.jpg",
     "page": "https://commons.wikimedia.org/wiki/File:Inspiration_Point_Bryce_Canyon_November_2018_panorama.jpg",
@@ -467,7 +467,7 @@
    "key": "arches",
    "name": "Arches National Park",
    "state": "UT",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -109.7132,
     38.6032,
@@ -478,11 +478,11 @@
     -109.5955,
     38.725
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 120,
+   "sightings": 2319,
+   "cells": 328,
+   "stops": 6,
+   "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Delicate_arch_sunset.jpg/1280px-Delicate_arch_sunset.jpg",
     "page": "https://commons.wikimedia.org/wiki/File:Delicate_arch_sunset.jpg",
