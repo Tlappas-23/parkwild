@@ -250,6 +250,10 @@ Format: date, what, number, kept?, why, where it lives.
 - **Found:** Acadia's automatic tour had two stops, because the automatic tour only took landmarks with a Wikipedia article and Acadia's OpenStreetMap features rarely carry one.
 - **Kept:** when articles run short the tour fills from the best-ranked landmarks without one, taking the kinds in turn so a park of peaks still shows a lake and a spring. Acadia: 8 stops (Bald Hill, Bald Mountain, Acadia Mountain, Bald Peak, Maple Spring, Jordan Pond, Cadillac Mountain, Eagle Lake). Curated lists in config/parks.toml still win and are the better answer for any park someone knows.
 
+### E-043: the whole system on one map, and a legend that earns its lines
+- **What:** the owner: after opening a park you should be able to see the full map and click into a park from it, as well as from the home page; and "includes model-predicted" in the legend looked unnecessary.
+- **Kept:** the park index now carries every park the seed matched (63: 11 live, 52 not started) with a bounding box and centre, deduplicated by name against the configured ones. The home page shows the country with every park as a dot (filled for live, hollow for pending, faint for not started; a click on a live one enters it) and lists the not-started parks by name instead of 52 grey cards. On a park's map an "All parks" button drops the pan limit and the wash, frames the live parks and shows the same dots; clicking one glides into that park. The legend shows the amber swatch only in a park where the camera pass found something (today, Yellowstone), names it "roadside camera pass" with a link to the About section, and links "About the data". The About page now says what a hexagon is and when it turns amber.
+
 ## Open questions with a planned experiment
 
 - **Q-1 SpeciesNet determinism.** Answered (E-013).

@@ -27,6 +27,7 @@ import json
 import logging
 import re
 import time
+import tomllib
 from datetime import UTC, datetime
 from pathlib import Path
 from urllib.parse import unquote
@@ -56,6 +57,8 @@ ARTIST_MAX = 80
 
 # INDEX_PATH — DERIVED (imported by the app at build time, so it lives with the app's data)
 INDEX_PATH = ROOT / "app" / "public" / "data" / "parks.json"
+# SEED_PATH — DERIVED (every national park scripts/parks_seed.py could match; the ones not yet in parks.toml appear as "seed")
+SEED_PATH = ROOT / "config" / "parks.seed.toml"
 
 
 def strip_html(s: str | None) -> str:
@@ -125,16 +128,27 @@ def build_index(out_path: Path = INDEX_PATH, *, heroes: bool = True) -> dict:
         previous = {p["key"]: p for p in json.loads(out_path.read_text()).get("parks", [])}
     session = requests.Session()
     parks = []
-    for key, park in load_parks().items():
+    configured = load_parks()
+    # Parks the seed matched but nobody has configured yet: on the map as dots,
+    # on the home page as names, so the whole system is visible at once.
+    seed: dict[str, dict] = {}
+    if SEED_PATH.exists():
+        with open(SEED_PATH, "rb") as fh:
+            names = {p.name.casefold() for p in configured.values()}
+            seed = {k: v for k, v in tomllib.load(fh).items() if k not in configured and v["name"].casefold() not in names}
+    entries = [(k, p.name, p.state, [p.bbox.min_lon, p.bbox.min_lat, p.bbox.max_lon, p.bbox.max_lat], True) for k, p in configured.items()]
+    entries += [(k, v["name"], v["state"], [float(x) for x in v["bbox"]], False) for k, v in seed.items()]
+    for key, name, state, bbox, is_configured in entries:
         d = EXPORT_DIR / key
-        live = (d / "manifest.json").exists() and (d / "species.json").exists()
-        entry = {"key": key, "name": park.name, "state": park.state, "status": "live" if live else "planned",
+        live = is_configured and (d / "manifest.json").exists() and (d / "species.json").exists()
+        entry = {"key": key, "name": name, "state": state, "status": "live" if live else ("planned" if is_configured else "seed"),
+                 "bbox": [round(x, 4) for x in bbox], "center": [round((bbox[0] + bbox[2]) / 2, 4), round((bbox[1] + bbox[3]) / 2, 4)],
                  "species": None, "sightings": None, "cells": None, "stops": None, "tour_source": None, "hero": None}
         if live:
             entry.update(_counts(d))
         hero = (previous.get(key) or {}).get("hero")
         if hero is None and heroes:
-            hero = fetch_hero(park.name, session=session)
+            hero = fetch_hero(name, session=session)
             time.sleep(0.5)
         entry["hero"] = hero
         parks.append(entry)

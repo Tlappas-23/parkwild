@@ -126,7 +126,8 @@ export interface RoadsFile { park: string; fetched: string; attribution: string;
 // The home page's park index (parkwild/parksindex.py), imported at build time.
 export interface ParkHero { url: string; page: string; source_article: string; license: string; license_url: string; artist: string; }
 export interface ParkCard {
-  key: string; name: string; state: string; status: "live" | "planned";
+  key: string; name: string; state: string; status: "live" | "planned" | "seed";
+  bbox?: [number, number, number, number]; center?: [number, number];
   species: number | null; sightings: number | null; cells: number | null; stops: number | null; tour_source: string | null; hero: ParkHero | null;
 }
 export interface ParksIndex { generated: string; attribution: string; parks: ParkCard[]; }

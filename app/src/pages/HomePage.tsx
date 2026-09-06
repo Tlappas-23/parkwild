@@ -1,11 +1,14 @@
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { useStore } from "../store";
-import type { ParkCard, ParksIndex } from "../types";
+import { PARKS_INDEX } from "../parksIndex";
+import type { ParkCard } from "../types";
 
 // The front door: one card per park, live ones first. Counts come from the
 // exports; the photograph is the park's Wikipedia lead image, shown only when
 // Commons reports a reusable licence, and credited on the card (ADR-0019).
-const index = Object.values(import.meta.glob<ParksIndex>("../../public/data/parks.json", { eager: true, import: "default" }))[0] ?? { generated: "", attribution: "", parks: [] };
+// The overview map pulls in maplibre; it loads after the cards, not before them.
+const HomeMap = lazy(() => import("./HomeMap"));
+const index = PARKS_INDEX;
 
 function initials(name: string): string {
   return name.replace(/ National Park.*$/, "").split(/\s+/).map((w) => w[0]).join("").slice(0, 3).toUpperCase();
@@ -18,7 +21,8 @@ export default function HomePage() {
   const live = index.parks.filter((p) => p.status === "live" && match(p));
   // The hero is the first live park with a reusable photograph; its credit sits in the corner.
   const heroPark = index.parks.find((p) => p.status === "live" && p.hero) ?? null;
-  const planned = index.parks.filter((p) => p.status !== "live" && match(p));
+  const planned = index.parks.filter((p) => p.status === "planned" && match(p));
+  const seed = index.parks.filter((p) => p.status === "seed" && match(p));
 
   const card = (p: ParkCard) => (
     <button key={p.key} className={"park-card" + (p.status !== "live" ? " planned" : "") + (p.key === park ? " current" : "")}
@@ -57,12 +61,21 @@ export default function HomePage() {
         </div>
         {heroPark?.hero && <p className="credit">{heroPark.name.replace(/ National Park$/, "")} · <a href={heroPark.hero.page} target="_blank" rel="noreferrer">photo</a> {heroPark.hero.artist} · {heroPark.hero.license}</p>}
       </div>
-      {live.length === 0 && planned.length === 0 && <p className="muted">No park matches "{q}".</p>}
+      {live.length === 0 && planned.length === 0 && seed.length === 0 && <p className="muted">No park matches "{q}".</p>}
       <div className="park-grid">{live.map(card)}</div>
+      <h2 className="home-sub">Every park on the map</h2>
+      <p className="muted small">Filled dots are open; hollow dots are being gathered; faint dots are not started. Click a filled one to go in.</p>
+      <Suspense fallback={<div className="home-map placeholder">Loading the map…</div>}><HomeMap parks={index.parks} /></Suspense>
       {planned.length > 0 && (
         <>
           <h2 className="home-sub">Coming soon</h2>
           <div className="park-grid">{planned.map(card)}</div>
+        </>
+      )}
+      {seed.length > 0 && (
+        <>
+          <h2 className="home-sub">Not started yet · {seed.length} parks</h2>
+          <p className="park-names">{seed.map((p) => `${p.name.replace(/ National Park.*$/, "")} (${p.state})`).join(" · ")}</p>
         </>
       )}
       <p className="muted small home-foot">
