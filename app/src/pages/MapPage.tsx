@@ -76,10 +76,11 @@ export default function MapPage() {
   const fillIds = useRef<string[]>([]);          // the style's own fill layers, hidden under imagery
   const boundsRef = useRef<[[number, number], [number, number]] | null>(null);
   const wasTouring = useRef(false);
+  const fittedPark = useRef<string | null>(null);      // which park the view was last framed on
   const [ready, setReady] = useState(false);
   const {
     cells, species, boundary, landmarks, speciesFilter, yearRange, setSpeciesFilter, setYearRange, selectCell, selectedCell,
-    reducedMotion, basemap, setBasemap, terrain3d, setTerrain3d, tour, startTour, tourGo, plan, location, openPlan, addSite,
+    reducedMotion, basemap, setBasemap, terrain3d, setTerrain3d, tour, startTour, tourGo, plan, location, openPlan, addSite, park,
   } = useStore();
   const [query, setQuery] = useState("");
   // Handlers are registered once on the map; refs keep them pointing at the live store actions.
@@ -134,7 +135,10 @@ export default function MapPage() {
       map.addLayer({ id: "hillshade", type: "hillshade", source: "dem",
         paint: { "hillshade-exaggeration": 0.55, "hillshade-shadow-color": "#4d4336", "hillshade-highlight-color": "#ffffff", "hillshade-accent-color": "#6e6a5f" } }, firstLine);
       map.addLayer({ id: "mask", type: "fill", source: "mask", paint: { "fill-color": "#f4f3ee", "fill-opacity": 0.7 } }, firstSymbol);
-      map.addLayer({ id: "outline", type: "line", source: "outline", paint: { "line-color": "#2f6b3a", "line-width": 2, "line-dasharray": [3, 2] } }, firstSymbol);
+      // The park outline: a light casing under a dark dashed line, so it reads
+      // on imagery and on the paper-white style alike, at every zoom.
+      map.addLayer({ id: "outline-casing", type: "line", source: "outline", paint: { "line-color": "#ffffff", "line-width": 5, "line-opacity": 0.75 } }, firstSymbol);
+      map.addLayer({ id: "outline", type: "line", source: "outline", paint: { "line-color": "#14532d", "line-width": 2.5, "line-dasharray": [2.2, 1.4] } }, firstSymbol);
 
       const color: maplibregl.ExpressionSpecification = ["case", [">", ["get", "mp"], 0], "#b86e00", "#2a78d6"];
       // Opacity on a log scale: 1 sighting is faint, 1000 is near-solid, and the
@@ -235,11 +239,19 @@ export default function MapPage() {
     const b = boundsOf(rings) ?? boundsOf(cells?.features.map((f) => f.geometry.coordinates[0]) ?? []);
     boundsRef.current = b;
     map.setMaxBounds(null);
-    if (b) {
-      map.fitBounds(b, { padding: 36, duration: 0, pitch: 0, bearing: 0 });
-      map.setMaxBounds(padBounds(b, MAX_BOUNDS_PAD));
+    if (!b || !cells) return;
+    // Arrive on the whole park: from a higher, tilted view on first open, or
+    // gliding over from the previous park; the pan limit is set once the
+    // camera has settled so it cannot clip the approach.
+    const cam = map.cameraForBounds(b, { padding: 36 });
+    const fast = reducedMotion;
+    if (cam) {
+      if (fittedPark.current === null) map.jumpTo({ center: cam.center, zoom: (cam.zoom ?? 8) - 1.4, pitch: 38, bearing: -18 });
+      map.easeTo({ center: cam.center, zoom: cam.zoom, pitch: 0, bearing: 0, duration: fast ? 0 : fittedPark.current === null ? 1700 : 2200, essential: true });
     }
-  }, [ready, boundary, cells]);
+    fittedPark.current = park;
+    map.once("moveend", () => { if (boundsRef.current === b) map.setMaxBounds(padBounds(b, MAX_BOUNDS_PAD)); });
+  }, [ready, boundary, cells, park, reducedMotion]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -304,10 +316,13 @@ export default function MapPage() {
     wasTouring.current = true;
     const stop = stops[tour.stop];
     if (!stop) return;
-    // The stop lands in the band of map above the tour panel, whatever its height.
-    const panel = document.querySelector<HTMLElement>(".tour")?.offsetHeight ?? 200;
+    // The stop lands in the map area the tour panel leaves free: beside it on
+    // a wide screen, above it on a phone, whatever the panel's size.
+    const panel = document.querySelector<HTMLElement>(".tour");
+    const side = window.innerWidth >= 900;
+    const padding = side ? { top: 0, left: 0, right: (panel?.offsetWidth ?? 320) + 28, bottom: 0 } : { top: 0, left: 0, right: 0, bottom: (panel?.offsetHeight ?? 120) + 24 };
     map.flyTo({ center: [stop.lon, stop.lat], zoom: STOP_ZOOM, pitch: STOP_PITCH, bearing: stopBearing(stops, tour.stop),
-                duration: reducedMotion ? 0 : 2800, essential: true, padding: { top: 0, left: 0, right: 0, bottom: panel + 24 } });
+                duration: reducedMotion ? 0 : 3000, curve: 1.5, essential: true, padding });
   }, [ready, tour.active, tour.stop, stops, reducedMotion]);
 
   const options = useMemo(() => {
@@ -318,7 +333,7 @@ export default function MapPage() {
   const current = species?.species.find((s) => s.scientific_name === speciesFilter);
 
   return (
-    <div className="map-page">
+    <div className={"map-page" + (tour.active ? " touring" : "")}>
       <div ref={container} className="map" role="region" aria-label="Map of aggregated sightings" />
 
       <div className="controls" role="group" aria-label="Filters">

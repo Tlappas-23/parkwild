@@ -5,7 +5,7 @@ import type { BiasFile, BoundaryFile, CellFeature, CellsFile, LandmarksFile, Man
 import { availableParks, loadCellPhotos, loadPark, loadRoads } from "./data";
 import { MAX_SITES, planRoute, routerFor, type Mode, type PlanResult, type Site } from "./routing";
 
-export type Page = "map" | "species" | "about";
+export type Page = "home" | "map" | "species" | "about";
 export type Basemap = "terrain" | "satellite";
 export interface TourState { active: boolean; stop: number; playing: boolean; }
 export interface Location { lon: number; lat: number; accuracyM: number; }
@@ -43,6 +43,7 @@ interface State {
   selectCell: (c: string | null) => void;
   selectSpecies: (s: string | null) => void;
   setPark: (key: string) => void;
+  enterPark: (key: string) => void;    // from a home-page card: switch if needed, then the map
   setBasemap: (b: Basemap) => void;
   setTerrain3d: (on: boolean) => void;
   startTour: () => void;
@@ -77,6 +78,10 @@ function initialPark(): string {
   } catch { /* no window */ }
   return PARKS[0]?.key ?? "yellowstone";
 }
+// A link with ?park= opens that park's map; the bare site opens the home page.
+function initialPage(): Page {
+  try { return new URLSearchParams(window.location.search).has("park") ? "map" : "home"; } catch { return "home"; }
+}
 function nameOf(key: string): string { return PARKS.find((p) => p.key === key)?.name ?? key; }
 function readBasemap(): Basemap {
   try { return localStorage.getItem("parkwild:basemap") === "satellite" ? "satellite" : "terrain"; } catch { return "terrain"; }
@@ -87,7 +92,7 @@ const NO_PLAN: PlanState = { open: false, start: null, sites: [], mode: "drive",
 export const useStore = create<State>((set, get) => ({
   park: initialPark(),
   parkName: nameOf(initialPark()),
-  page: "map",
+  page: initialPage(),
   cells: null,
   species: null,
   bias: null,
@@ -125,6 +130,7 @@ export const useStore = create<State>((set, get) => ({
     try { const u = new URL(window.location.href); u.searchParams.set("park", park); window.history.replaceState(null, "", u.toString()); } catch { /* ignore */ }
     void get().load();
   },
+  enterPark: (park) => { if (park !== get().park) get().setPark(park); set({ page: "map", selectedSpecies: null }); },
   setBasemap: (basemap) => { set({ basemap }); try { localStorage.setItem("parkwild:basemap", basemap); } catch { /* ignore */ } },
   setTerrain3d: (terrain3d) => set({ terrain3d }),
   // The tour is the 3D walk: relief on and imagery under it, the way a flyover

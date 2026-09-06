@@ -69,7 +69,7 @@ export default function Tour() {
                     <span className="tour-card-name">{n.common ?? n.species}</span>
                     <span className="tour-card-count">{n.count.toLocaleString()}</span>
                   </button>
-                  {expanded && photo && <PhotoCredit photo={photo} compact />}
+                  {photo && <PhotoCredit photo={photo} compact />}
                 </li>
               );
             })}
@@ -77,7 +77,7 @@ export default function Tour() {
         ) : (
           <p className="muted small">No open-coordinate sightings near this stop.</p>
         )}
-        {expanded && nearby && <p className="muted small">{nearby.total.toLocaleString()} sightings in {nearby.cells.toLocaleString()} cells within {TOUR_RADIUS_M / 1000} km. Sensitive species are never listed by landmark. Photo credits: hover a photograph or open its species page.</p>}
+        {nearby && <p className="muted small tour-foot">{nearby.total.toLocaleString()} sightings in {nearby.cells.toLocaleString()} cells within {TOUR_RADIUS_M / 1000} km. Sensitive species are never listed by landmark.</p>}
       </div>
 
       <div className="tour-nav">

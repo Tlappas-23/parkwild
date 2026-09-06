@@ -177,6 +177,12 @@ Format: date, what, number, kept?, why, where it lives.
 - **What:** the owner: "the tour summary is a pop up and hides the map, I want it smaller so we always see the map".
 - **Kept:** a slim bar (about 110 px on a laptop, one row of small photographs, two lines of text) with a "Details" toggle that grows it for the full paragraph and credits; the camera pads the view by the bar's measured height, so the stop always sits above it.
 
+### E-030: a front door, a side dock, and arrivals
+- **What:** the owner: "a cleaner version to switch parks: a home page with badges for the park; the tour not blocking the map; see the full outline of the park first, then zoom in; cool transitions from one spot to another".
+- **Kept:** a home page with one card per park (`track_a.py index` → `app/public/data/parks.json`, imported at build time): live parks with species, sightings and stop counts, configured-but-not-exported parks as "coming soon". The card photograph is the park's Wikipedia lead image, taken only when Commons reports a reusable licence (10 of 11 parks; Glacier's is not) and credited on the card (ADR-0019). On wide screens the tour narration is a 320 px dock at the right edge with the species listed vertically and every photograph credited; the map keeps its full height and the camera pads to the side. On phones it stays a bar. The park outline got a white casing under a darker dash. Opening a park now arrives from a higher, tilted view and settles on the whole outline (1.7 s); switching parks glides across (2.2 s); stop-to-stop flights take 3 s on a wider arc.
+- **Numbers:** parks.json 7.5 KB; the dock is 320 × (viewport − 28) px against the old card's 880 × 360.
+- **Unresolved:** Commons' `Artist` field is free HTML (one credit reads "Shenandoah National Park from Virginia", the uploader's name); it is stripped to text and cut at 80 characters, not curated.
+
 ## Open questions with a planned experiment
 
 - **Q-1 SpeciesNet determinism.** Answered (E-013).

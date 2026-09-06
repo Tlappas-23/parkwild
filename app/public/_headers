@@ -2,7 +2,7 @@
 # security surface. Tiles come from OpenFreeMap (OSM), USGS and the AWS terrain
 # bucket; photos from iNaturalist's CDN; everything else is same-origin.
 /*
-  Content-Security-Policy: default-src 'self'; img-src 'self' data: blob: https://tiles.openfreemap.org https://basemap.nationalmap.gov https://s3.amazonaws.com https://inaturalist-open-data.s3.amazonaws.com https://static.inaturalist.org; connect-src 'self' https://tiles.openfreemap.org https://basemap.nationalmap.gov https://s3.amazonaws.com; font-src 'self' https://tiles.openfreemap.org; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; frame-ancestors 'none'; base-uri 'self'; form-action 'none'
+  Content-Security-Policy: default-src 'self'; img-src 'self' data: blob: https://tiles.openfreemap.org https://basemap.nationalmap.gov https://s3.amazonaws.com https://inaturalist-open-data.s3.amazonaws.com https://static.inaturalist.org https://upload.wikimedia.org; connect-src 'self' https://tiles.openfreemap.org https://basemap.nationalmap.gov https://s3.amazonaws.com; font-src 'self' https://tiles.openfreemap.org; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; frame-ancestors 'none'; base-uri 'self'; form-action 'none'
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=(self), payment=(), usb=()
