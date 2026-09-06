@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import WeatherChip from "./WeatherChip";
 import { Plus, X } from "lucide-react";
 import { cellPhotos, speciesPhotos } from "../lib/photos";
 import PhotoCredit from "./PhotoCredit";
@@ -59,6 +60,18 @@ export default function CellDetail() {
     () => (cells && selectedCell ? (cells.features.find((f) => f.properties.cell === selectedCell) ?? null) : null),
     [cells, selectedCell],
   );
+  // The hexagon's centre, for the weather there.
+  const centre = useMemo(() => {
+    if (!feature) return null;
+    const ring = feature.geometry.coordinates[0];
+    let x = 0;
+    let y = 0;
+    for (const [lng, lat] of ring) {
+      x += lng;
+      y += lat;
+    }
+    return [x / ring.length, y / ring.length] as [number, number];
+  }, [feature]);
   const allPhotos = useMemo(
     () => (selectedCell ? cellPhotos(photosCells, selectedCell) : []),
     [photosCells, selectedCell],
@@ -149,6 +162,7 @@ export default function CellDetail() {
           ) : (
             <>
               <h2>{cell.count.toLocaleString()} sightings here</h2>
+              {centre && <WeatherChip lat={centre[1]} lon={centre[0]} compact />}
               <div className="muted small">
                 {cell.y0 ?? "?"} to {cell.y1 ?? "?"} · {rows.length} species
               </div>
