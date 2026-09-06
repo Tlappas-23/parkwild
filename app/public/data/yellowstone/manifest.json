@@ -1,6 +1,6 @@
 {
-  "built": "2026-09-06T00:36:34+00:00",
-  "git_commit": "cb4cb0840d8b627121476139423ac56f4784b26b",
+  "built": "2026-09-06T02:28:45+00:00",
+  "git_commit": "4854d3b2b28f721f258550eb77f6416addf2e7c7",
   "files": {
     "cells.geojson": {
       "sha256": "35880b68779e56a866233d8f7367bf7acb0cc2ee1738e9fa8ae50c148d74cd2e",
@@ -37,6 +37,10 @@
     "roads.json": {
       "sha256": "d8d686088f833ff2003518445d930592a780d50dfdd6b2494245b961177396f7",
       "bytes": 1480110
+    },
+    "amenities.json": {
+      "sha256": "06bc48707cd418e1e68dd56975f7bee9c592fc49e804661fe384cb97462127aa",
+      "bytes": 318936
     }
   },
   "park": "yellowstone",

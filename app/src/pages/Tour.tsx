@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import PhotoCredit from "../PhotoCredit";
 import { useStore } from "../store";
-import { nearbySpecies, photoNear, TOUR_DWELL_MS, TOUR_RADIUS_M, tourStops } from "../tour";
+import { nearbySpecies, photoNear, thingsNear, TOUR_DWELL_MS, TOUR_RADIUS_M, tourStops, type NearItem } from "../tour";
 
 // The tour bar: one stop at a time, what it is (Wikipedia, credited), and
 // which animals people have recorded within walking distance, with a
@@ -12,12 +12,28 @@ import { nearbySpecies, photoNear, TOUR_DWELL_MS, TOUR_RADIUS_M, tourStops } fro
 // always see the map". It is now a slim bar with a "Details" toggle for the
 // full text and larger photographs.
 export default function Tour() {
-  const { tour, landmarks, cells, photosSpecies, photosCells, ensureCellPhotos, tourGo, tourNext, tourPrev, tourPlay, endTour, selectSpecies, addSite } = useStore();
+  const { tour, landmarks, cells, photosSpecies, photosCells, ensureCellPhotos, tourGo, tourNext, tourPrev, tourPlay, endTour, selectSpecies, addSite, amenities, tourTab, setTourTab } = useStore();
   const [expanded, setExpanded] = useState(false);
   const [minimised, setMinimised] = useState(false);   // a one-line strip: name and arrows, nothing else
   const stops = useMemo(() => tourStops(landmarks), [landmarks]);
   const stop = stops[tour.stop];
   const nearby = useMemo(() => (stop ? nearbySpecies(cells, stop.lon, stop.lat) : null), [cells, stop]);
+  const things = useMemo(() => (stop ? thingsNear(amenities, stop.lon, stop.lat) : null), [amenities, stop]);
+  const group = (title: string, list: NearItem[]) => list.length > 0 && (
+    <div className="todo-group">
+      <div className="eyebrow">{title}</div>
+      <ul className="todo-list">
+        {list.map((it) => (
+          <li key={it.id}>
+            <span className={"todo-dot " + it.kind} aria-hidden="true" />
+            <span className="todo-body"><strong>{it.label}</strong><br /><span className="muted small">{it.detail}</span></span>
+            <button className="chip-x add" aria-label={`Add ${it.label} to route`} title="Add to route"
+              onClick={() => addSite({ id: it.id, label: it.label, lon: it.lon, lat: it.lat, kind: "landmark" })}>+</button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 
   // The cell strips hold the photographs taken near each stop; fetch them once.
   useEffect(() => { if (tour.active) void ensureCellPhotos(); }, [tour.active, ensureCellPhotos]);
@@ -73,7 +89,29 @@ export default function Tour() {
         ) : null}
       </div>
 
-      <div className="tour-wild">
+      <div className="tour-tabs" role="tablist" aria-label="Stop details">
+        <button role="tab" aria-selected={tourTab === "wildlife"} className={tourTab === "wildlife" ? "on" : ""} onClick={() => setTourTab("wildlife")}>Wildlife</button>
+        <button role="tab" aria-selected={tourTab === "todo"} className={tourTab === "todo" ? "on" : ""} onClick={() => setTourTab("todo")}>Things to do{things && things.total ? ` · ${things.total}` : ""}</button>
+      </div>
+
+      {tourTab === "todo" && (
+        <div className="tour-todo">
+          {things && things.total > 0 ? (
+            <>
+              {group("Key features", things.features)}
+              {group("Hike", [...things.trails, ...things.hike])}
+              {group("Camp", things.camp)}
+              {group("Stay", things.stay)}
+              {group("Also here", things.facilities)}
+              <p className="muted small tour-foot">OpenStreetMap data; fees, capacities and seasons as tagged there. Check nps.gov for current status and reservations.</p>
+            </>
+          ) : (
+            <p className="muted small">{amenities ? "Nothing tagged within reach of this stop." : "Things to do are not exported for this park yet."}</p>
+          )}
+        </div>
+      )}
+
+      <div className="tour-wild" hidden={tourTab !== "wildlife"}>
         {nearby && nearby.list.length > 0 ? (
           <ul className="tour-species" aria-label={`Recorded within ${TOUR_RADIUS_M / 1000} km`}>
             {nearby.list.slice(0, expanded ? 6 : 3).map((n) => {   // one row unless Details is open

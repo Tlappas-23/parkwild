@@ -1,6 +1,6 @@
 {
-  "built": "2026-09-06T00:36:36+00:00",
-  "git_commit": "cb4cb0840d8b627121476139423ac56f4784b26b",
+  "built": "2026-09-06T02:28:48+00:00",
+  "git_commit": "4854d3b2b28f721f258550eb77f6416addf2e7c7",
   "files": {
     "cells.geojson": {
       "sha256": "4326865a199071aa50f0ac2f01dce8f69fe847798bc4e0eb401bdb20a916e3ad",
@@ -33,6 +33,10 @@
     "roads.json": {
       "sha256": "f54d443011138c3cd585102cdd37125ed967c22f6ba95121674ce4647456434a",
       "bytes": 612865
+    },
+    "amenities.json": {
+      "sha256": "4f6adfb45762177aa6aca429e1b114c1b8c0e9c942b2f398e9385d5f9cdc03c6",
+      "bytes": 51964
     }
   },
   "park": "grand_teton",

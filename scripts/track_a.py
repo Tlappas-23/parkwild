@@ -9,6 +9,7 @@ Track A driver: reference sightings from iNaturalist and GBIF.
     track_a.py summary --park yellowstone
     track_a.py landmarks --park yellowstone   # boundary.geojson + landmarks.json for the tour
     track_a.py roads     --park yellowstone   # roads.json: OSM roads + trails graph for directions
+    track_a.py amenities --park yellowstone   # amenities.json: things to do, camping, trails
     track_a.py index                          # app/public/data/parks.json for the home page (all parks)
     track_a.py all     --park yellowstone      # ingest all + dedupe + export
 
@@ -26,6 +27,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from parkwild import gbif  # noqa: E402
+from parkwild.amenities import build_amenities  # noqa: E402
 from parkwild.bias import render_bias_markdown, road_bias, seasonal_bias  # noqa: E402
 from parkwild.config import EXPORT_DIR, RESULTS_MD, get_corridor, get_park  # noqa: E402
 from parkwild.decisionlog import print_decision_summary  # noqa: E402
@@ -125,6 +127,14 @@ def cmd_index(args):
     print(json.dumps(build_index(heroes=not args.no_heroes), indent=2))
 
 
+def cmd_amenities(args):
+    """Things to do around the park's places: OSM campsites, lodging,
+    trailheads, viewpoints, picnic sites, visitor centres, boat launches,
+    named features, and named trails from roads.json (network, no database)."""
+    park = get_park(args.park)
+    print(json.dumps(build_amenities(park, EXPORT_DIR / park.key), indent=2))
+
+
 def cmd_all(args):
     args.source = "all"
     args.gbif_counts_only = False
@@ -181,6 +191,10 @@ def build_parser():
     p = sub.add_parser("roads", help="OSM roads and trails as a routing graph for the app (network, no database)")
     p.add_argument("--park", required=True)
     p.set_defaults(func=cmd_roads)
+
+    p = sub.add_parser("amenities", help="amenities.json: things to do, camping, trails around the park's places (network, no database)")
+    p.add_argument("--park", required=True)
+    p.set_defaults(func=cmd_amenities)
 
     p = sub.add_parser("index", help="app/public/data/parks.json: every park, counts, credited hero image (network, no database)")
     p.add_argument("--no-heroes", action="store_true")
