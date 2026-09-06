@@ -112,7 +112,7 @@ node app/scripts/tour-probe.mjs "https://tlappas-23.github.io/parkwild/?park=zio
 ```
 
 Track B needs `make setup-ml` (PyTorch and SpeciesNet, several GB) and runs
-on CPU. The runbook is in `docs/USER-GUIDE.md` under "For the owner".
+on CPU. The runbook is in `docs/USER-GUIDE.md` under "Maintaining the site".
 
 ## Data sources and licences
 

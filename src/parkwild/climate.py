@@ -1,6 +1,6 @@
 """Typical weather by month at a park's centre: climate.json.
 
-The places page says when people go; the owner also wanted the weather. Live
+The places page says when people go; I also wanted the weather. Live
 conditions come from the browser at view time (Open-Meteo forecast API, free
 and keyless). What can be precomputed is the climate: ten years of daily
 weather at the park's busiest place (or its centre) from the Open-Meteo archive (ERA5),

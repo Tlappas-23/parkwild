@@ -100,9 +100,9 @@ Map layers, bottom to top: imagery (satellite mode) · hillshade · vector landc
 - Service worker (vite-plugin-pwa): the shell is precached; data files are cached by content hash; a new worker takes over at install; the app reloads early or shows a "newer version" pill (E-034).
 - Public reads, locked writes: the repository is public so branch protection applies; no token is in the page (Mapillary's is used by the pipeline only).
 
-## Background jobs and the owner's loop
+## Background jobs and the maintenance loop
 
-Long runs are shell chains in the session scratchpad (recorded in memory and E-033): ingest batches, then landmarks/roads/export per park, then the imagery pass per corridor, then the species review sample. The owner's recurring jobs: review the sample CSV (`data/review/species/perspective/review_me.csv`), run `phase0.py species-report`, and paste the Ask page's "Measure it" table into `docs/ai-eval.md`.
+Long runs are shell chains in the session scratchpad (recorded in memory and E-033): ingest batches, then landmarks/roads/export per park, then the imagery pass per corridor, then the species review sample. My recurring jobs: review the sample CSV (`data/review/species/perspective/review_me.csv`), run `phase0.py species-report`, and paste the Ask page's "Measure it" table into `docs/ai-eval.md`.
 
 ## Where things stand (2026-09-06)
 

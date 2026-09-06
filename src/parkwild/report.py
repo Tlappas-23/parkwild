@@ -442,7 +442,7 @@ def dump_json(n: dict) -> str:
 
 # SPECIES_TARGET / SPECIES_MIN_N — ASSUMED (a name is worth printing when it is
 # right at least 60% of the time, the same bar Phase 0 used for "primary", and
-# 15 reviewed boxes is the least that can show it; owner's call, E-033)
+# 15 reviewed boxes is the least that can show it; my call, E-033)
 SPECIES_TARGET = 0.6
 SPECIES_MIN_N = 15
 

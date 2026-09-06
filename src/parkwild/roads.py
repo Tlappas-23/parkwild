@@ -1,7 +1,7 @@
 """Park roads and trails as a small graph, so the app can give directions
 inside the park without a routing service.
 
-PROBLEM: the owner wants "based on current location, click which sites and
+PROBLEM: I want to stand somewhere, pick sites, and get the best route ("click which sites and
 get the best route". Every hosted router is either paid, keyed (a key in a
 static site is public), or a demo server that asks not to be used in
 production. The brief is zero cost and no backend.

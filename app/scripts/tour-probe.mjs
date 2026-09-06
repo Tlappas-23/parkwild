@@ -1,5 +1,5 @@
-// Headless check of the tour camera, because the browser the assistant drives
-// keeps its tab hidden and no animation runs there (E-021). Starts the real
+// Headless check of the tour camera, because the browser tab the checks run
+// in stays hidden and no animation runs there (E-021). Starts the real
 // Chrome headless with software WebGL, opens the site, starts the tour,
 // presses Next at a chosen second (and again at NEXT2 if set), and writes a
 // camera sample every 200 ms plus a screenshot every SHOT_MS to outdir. No

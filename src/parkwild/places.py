@@ -1,7 +1,7 @@
 """Places: every named trail, site, viewpoint, campground and facility in a
 park, with what people recorded within reach of it: places.json.
 
-The owner wanted the trails and sites of a park sorted by how popular they
+I wanted the trails and sites of a park sorted by how popular they
 are, with the best times to see them, and a page for each like the species
 pages. Nobody publishes visitor counts per trail for free, so the measure
 here is the one this project already has: how many sightings people recorded

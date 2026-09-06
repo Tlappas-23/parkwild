@@ -43,7 +43,7 @@ import {
 // photograph each. The camera work lives in MapPage; this is the narration.
 //
 // The first version was a two-column card that covered a third of the
-// screen; the owner's review: "it hides the map, I want it smaller so we
+// screen; my review: "it hides the map, I want it smaller so we
 // always see the map". It is now a slim bar with a "Details" toggle for the
 // full text and larger photographs.
 export default function Tour() {

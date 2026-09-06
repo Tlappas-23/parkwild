@@ -1,7 +1,7 @@
 """One index of every park the config knows, for the app's home page.
 
 PROBLEM: switching parks from a dropdown says nothing about what is behind
-each name; the owner wants a home page with a card per park. The app only
+each name; I want a home page with a card per park. The app only
 knows the parks baked into it, and nothing about the ones still ingesting.
 
 CURRENT: `track_a.py index` walks config/parks.toml, reads the exported

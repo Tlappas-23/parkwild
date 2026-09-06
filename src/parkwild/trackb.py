@@ -44,7 +44,7 @@ log = logging.getLogger(__name__)
 #     0.8+         1 tp / 0 fp   (n=1)
 # 0.5 keeps the band where a box is more often an animal than not. n is tiny;
 # the interval on 4/6 runs from 30% to 90%.
-# REVISIT IF: the owner's review pass or a larger sample moves the band curve.
+# REVISIT IF: my review pass or a larger sample moves the band curve.
 MIN_CONF = 0.5
 
 # EXCLUDED_LABELS — MEASURED (same review)
