@@ -1,0 +1,53 @@
+{
+  "built": "2026-09-06T18:42:08+00:00",
+  "git_commit": "9516669c4c40d94d1d560de3846434254858c006",
+  "files": {
+    "cells.geojson": {
+      "sha256": "0b37a71355193a9a6c1014b597e6cb491bd4c1555826f7d941b4512989f18d10",
+      "bytes": 827508
+    },
+    "species.json": {
+      "sha256": "26d40eb5fa5e44392af169191b09781bc03319a8aa1dbfd18a354bf3b2bccbe4",
+      "bytes": 97746
+    },
+    "sightings.parquet": {
+      "sha256": "c8d4e313158eeb26df359d8e0d9c80766c89d1c61d57e21d34e20240aba85e47",
+      "bytes": 1022148
+    },
+    "photos_species.json": {
+      "sha256": "accf9315c217136b57b3d0559a235fe81de5b350d7aaf53d3fd111dfcb86e2b5",
+      "bytes": 115386
+    },
+    "photos_cells.json": {
+      "sha256": "a514bba20e7f2e8b7ddd7f155e3c76290a34155c65a686048ddf0d75a32d1001",
+      "bytes": 381723
+    },
+    "places.json": {
+      "sha256": "960ca334375a1ec4c5178e77558f6c66a076a44f9d90deaf733c671c62a06710",
+      "bytes": 128044
+    },
+    "landmarks.json": {
+      "sha256": "dac2a900eb10560ce2dd72e9b7ee7d5a7f6e0e5999b9ee59d28637680d6cfaec",
+      "bytes": 27171
+    },
+    "boundary.geojson": {
+      "sha256": "10c4da610a8e229513794d2a2724e58de11ef3eaa59cd5d21a4bf0d987e4a50e",
+      "bytes": 4717
+    },
+    "roads.json": {
+      "sha256": "a3237c683b1e9d010180e57bc453d2af166a94f839847d00a219d4998087d8d1",
+      "bytes": 1147455
+    },
+    "camera_pass.json": {
+      "sha256": "04895fac4a5ac23231c15f295279c819f1d08ac2ca5da4a43fa8ecaf9647cda8",
+      "bytes": 441
+    },
+    "amenities.json": {
+      "sha256": "3a370238104a1d2aab38421939601f09bd4b8b8c3bd818e11a830db264f1f098",
+      "bytes": 46728
+    }
+  },
+  "park": "joshua_tree",
+  "name": "Joshua Tree National Park",
+  "state": "CA"
+}

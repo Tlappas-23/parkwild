@@ -1,0 +1,53 @@
+{
+  "built": "2026-09-06T19:53:59+00:00",
+  "git_commit": "a9617339daa4a1be67801a0feeb458aa80e9fcea",
+  "files": {
+    "cells.geojson": {
+      "sha256": "cbcb7b74420b03689a787389c62c7c1bcc9f2c85f83b6051106c9369b61fe933",
+      "bytes": 1860016
+    },
+    "species.json": {
+      "sha256": "c6c4f72d9c39d6fba26acd77a50e3ab59fbc21486b5d6a55b20d736c81c15bcc",
+      "bytes": 162998
+    },
+    "sightings.parquet": {
+      "sha256": "7948e782a8248ef8cb95ac95b4c2065925d54ef9be764bac7cd69f1d0c74853e",
+      "bytes": 2902082
+    },
+    "photos_species.json": {
+      "sha256": "e33b2499672b93d80464b24c60fdb83becb614a816710b2eb8584d71d310945b",
+      "bytes": 221275
+    },
+    "photos_cells.json": {
+      "sha256": "4d63d10efd2ca59e6651ea55a8b722d73cb3e6037180438622c00135809ebdfd",
+      "bytes": 817033
+    },
+    "places.json": {
+      "sha256": "0b3414a271c5f9e79ea73ac69c548024e53c2d09ce944e4da449bc2bb1e7776b",
+      "bytes": 84307
+    },
+    "landmarks.json": {
+      "sha256": "aa48feb125ad9784bafc85ffdfdb3b1a615a812827d46b4896380fda2728024d",
+      "bytes": 13214
+    },
+    "boundary.geojson": {
+      "sha256": "1c8f9536bc811edb651a6add430bc947da6a263cc2d2f578d67ed86916c1eab1",
+      "bytes": 1231
+    },
+    "roads.json": {
+      "sha256": "7e01636a421768b9eb6fbf12e5fc522963595a1972a1bb2cca2cb15940c21b31",
+      "bytes": 915660
+    },
+    "camera_pass.json": {
+      "sha256": "677358e1a3efa230b487be96ab8d771bfb4a8b0e4137fc46ddf0520314dcf818",
+      "bytes": 440
+    },
+    "amenities.json": {
+      "sha256": "3dcf52f0cf5950137106792cea52c0accd97c842ec6da656b7ceb4e0a7aa8a96",
+      "bytes": 46468
+    }
+  },
+  "park": "everglades",
+  "name": "Everglades National Park",
+  "state": "FL"
+}

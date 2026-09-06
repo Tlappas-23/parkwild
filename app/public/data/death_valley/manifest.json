@@ -1,0 +1,53 @@
+{
+  "built": "2026-09-06T19:01:36+00:00",
+  "git_commit": "dc7b1e0e1f3b519c4b16f22b52df0e8d3c8bfbf4",
+  "files": {
+    "cells.geojson": {
+      "sha256": "5aaa6894c99535aa243af59588e92a71db6416e454b35daf02aa138beb901bea",
+      "bytes": 510144
+    },
+    "species.json": {
+      "sha256": "05ba603dd34c563a79641232741d8eda489af37bebbf81d20b715ab5f1ba1841",
+      "bytes": 131474
+    },
+    "sightings.parquet": {
+      "sha256": "2b60e0e312ca42bdcb9d7798d59aae390a59d8c13cbfd0582157fe8b212ee59b",
+      "bytes": 454351
+    },
+    "photos_species.json": {
+      "sha256": "ce3849014fa797e8db39a4198fb40de56ba2e269babd17004e06d11c0798a00a",
+      "bytes": 145483
+    },
+    "photos_cells.json": {
+      "sha256": "4928ed290c7e02cb1a4932b117b9f3c74ab3553c238ccbd1ca68e9053a260dab",
+      "bytes": 179537
+    },
+    "places.json": {
+      "sha256": "6b27c224ea1f2224b106c808195b0e5fd154ba27f99d939424bd9a3ea1ac172b",
+      "bytes": 167225
+    },
+    "landmarks.json": {
+      "sha256": "cc6ff78889c5e5b6a776de9dd9c4af8781c4967bdc536ce52029eae79be54a5f",
+      "bytes": 34626
+    },
+    "boundary.geojson": {
+      "sha256": "8ce8bb66effac5f39db8c558234eb543da70b05be1e40b37ecc42727b7c7ab91",
+      "bytes": 2448
+    },
+    "roads.json": {
+      "sha256": "b375a29801be79ca6cf4f262212ba8d28acc1c190bb7bfcc7e7cfcf3f7edad30",
+      "bytes": 1653521
+    },
+    "camera_pass.json": {
+      "sha256": "48178af2d2822490f5c15ed63b5f3ae12bcfdf57b62fcc1e0fa04269beb4af5e",
+      "bytes": 442
+    },
+    "amenities.json": {
+      "sha256": "f8cf4efd319607e03e57fa40f255c9d25e43447780a1f4613a5f1593b9158c96",
+      "bytes": 104163
+    }
+  },
+  "park": "death_valley",
+  "name": "Death Valley National Park",
+  "state": "CA"
+}

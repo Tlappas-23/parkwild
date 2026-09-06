@@ -1,0 +1,53 @@
+{
+  "built": "2026-09-06T18:54:11+00:00",
+  "git_commit": "dc7b1e0e1f3b519c4b16f22b52df0e8d3c8bfbf4",
+  "files": {
+    "cells.geojson": {
+      "sha256": "8d00911b90ae1dc15c45a0aa53ac0f8ef0061c1787949862da0c9c920b592103",
+      "bytes": 501229
+    },
+    "species.json": {
+      "sha256": "544596555d327acbe4d3205c078aa286e2576adeb22847df59ecd7cb9e365a06",
+      "bytes": 87030
+    },
+    "sightings.parquet": {
+      "sha256": "acc36964e9104ca3c56ad4a48c4073e702a52de686e934031ce6d0f821227f32",
+      "bytes": 527577
+    },
+    "photos_species.json": {
+      "sha256": "7f380c0b3f9d050af90a523eeae76bda5e239be2dddcf99d9c0c8e607f5c2f8b",
+      "bytes": 107868
+    },
+    "photos_cells.json": {
+      "sha256": "1e8ad8e4e69dbf100a3e4ef229ae5ae450dd75c68c7a682782ba9fe499d5b109",
+      "bytes": 233890
+    },
+    "places.json": {
+      "sha256": "900de46d8a83d5652136d18f6927abd0df32a5a7b3ede9d42e74d8a89f9fab35",
+      "bytes": 114062
+    },
+    "landmarks.json": {
+      "sha256": "c3d281e5c934fe08ee0dd017fec17bb1f2e25c7dbc49e453858deaa9f49f9c6c",
+      "bytes": 33172
+    },
+    "boundary.geojson": {
+      "sha256": "8c7b66e87408aaed400ea4b43e0b840fabb50603d38a3595ca861c9c480ae816",
+      "bytes": 6358
+    },
+    "roads.json": {
+      "sha256": "041d73b02754186b7f01149f32a697eea63761d149c8391c5705f743b54ca35c",
+      "bytes": 664154
+    },
+    "camera_pass.json": {
+      "sha256": "da3904cf9a80c322b08e3f4d593431d70783ad08cc7da15c33c9a3f8c0026bbb",
+      "bytes": 437
+    },
+    "amenities.json": {
+      "sha256": "8c7f06ed59f013b9160bf0533c3f172305ef9743f2ed93e8634695d47bb8b2c5",
+      "bytes": 61039
+    }
+  },
+  "park": "sequoia",
+  "name": "Sequoia National Park",
+  "state": "CA"
+}

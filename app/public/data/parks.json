@@ -1,9 +1,9 @@
 {
- "generated": "2026-09-06T18:45:46+00:00",
+ "generated": "2026-09-06T19:54:03+00:00",
  "attribution": "Park photographs: Wikimedia Commons, each under the licence printed on its card",
  "species_index": {
-  "sha256": "44c33dcdd64e0c28ca2d017df01c80d15c5ac8472e937126c4d7e4920cf9bb35",
-  "bytes": 726580
+  "sha256": "efcda73d3161a383ca58d4d905591a29f366ded7cf0bd8fcf9c5ba7959984dd3",
+  "bytes": 985049
  },
  "parks": [
   {
@@ -525,7 +525,7 @@
    "key": "sequoia",
    "name": "Sequoia National Park",
    "state": "CA",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -118.9196,
     36.2914,
@@ -536,11 +536,11 @@
     -118.5772,
     36.4961
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 199,
+   "sightings": 8136,
+   "cells": 1203,
+   "stops": 8,
+   "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/General_Sherman_Tree_in_Sequoia_National_Park_-_June_2022.jpg/1280px-General_Sherman_Tree_in_Sequoia_National_Park_-_June_2022.jpg",
     "page": "https://commons.wikimedia.org/wiki/File:General_Sherman_Tree_in_Sequoia_National_Park_-_June_2022.jpg",
@@ -554,7 +554,7 @@
    "key": "kings_canyon",
    "name": "Kings Canyon National Park",
    "state": "CA",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -118.9832,
     36.5929,
@@ -565,11 +565,11 @@
     -118.6585,
     36.9153
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 142,
+   "sightings": 3123,
+   "cells": 862,
+   "stops": 8,
+   "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/KingsCanyonNP.JPG/1280px-KingsCanyonNP.JPG",
     "page": "https://commons.wikimedia.org/wiki/File:KingsCanyonNP.JPG",
@@ -583,7 +583,7 @@
    "key": "death_valley",
    "name": "Death Valley National Park",
    "state": "CA",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -118.001,
     35.6335,
@@ -594,11 +594,11 @@
     -117.1388,
     36.4915
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 316,
+   "sightings": 7685,
+   "cells": 1248,
+   "stops": 8,
+   "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Mesquite_Sand_Dunes_in_Death_Valley.jpg/1280px-Mesquite_Sand_Dunes_in_Death_Valley.jpg",
     "page": "https://commons.wikimedia.org/wiki/File:Mesquite_Sand_Dunes_in_Death_Valley.jpg",
@@ -612,7 +612,7 @@
    "key": "mount_rainier",
    "name": "Mount Rainier National Park",
    "state": "WA",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -122.1295,
     46.7078,
@@ -623,11 +623,11 @@
     -121.7862,
     46.8544
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 182,
+   "sightings": 12999,
+   "cells": 1130,
+   "stops": 8,
+   "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/Mount_Rainier_from_above_Myrtle_Falls_in_August.JPG/1280px-Mount_Rainier_from_above_Myrtle_Falls_in_August.JPG",
     "page": "https://commons.wikimedia.org/wiki/File:Mount_Rainier_from_above_Myrtle_Falls_in_August.JPG",
@@ -641,7 +641,7 @@
    "key": "everglades",
    "name": "Everglades National Park",
    "state": "FL",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -81.5183,
     24.85,
@@ -652,11 +652,11 @@
     -80.9535,
     25.37
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 379,
+   "sightings": 50849,
+   "cells": 4486,
+   "stops": 8,
+   "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Sunset_over_the_River_of_Grass%2C_NPSphoto%2C_G.Gardner_%289255157507%29.jpg/1280px-Sunset_over_the_River_of_Grass%2C_NPSphoto%2C_G.Gardner_%289255157507%29.jpg",
     "page": "https://commons.wikimedia.org/wiki/File:Sunset_over_the_River_of_Grass,_NPSphoto,_G.Gardner_(9255157507).jpg",
