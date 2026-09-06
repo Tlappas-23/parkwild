@@ -183,6 +183,16 @@ Format: date, what, number, kept?, why, where it lives.
 - **Numbers:** parks.json 7.5 KB; the dock is 320 × (viewport − 28) px against the old card's 880 × 360.
 - **Unresolved:** Commons' `Artist` field is free HTML (one credit reads "Shenandoah National Park from Virginia", the uploader's name); it is stripped to text and cut at 80 characters, not curated.
 
+### E-031: every species peaks in June, and every model count is zero
+- **What:** the owner, reading Grand Teton species pages: "are all of the models 0 and all the main months June or July?"
+- **Model.** Yes, by construction. The imagery pass (Track B) ran on one corridor, Yellowstone's Lamar Valley, and confidently named three animals, all bison; 28 more are the unnamed-mammal bucket. Grand Teton and Great Smoky have no imagery pass at all. The badge now appears only in parks where a pass ran; elsewhere the page says "no imagery pass here yet".
+- **Months.** Mostly yes, and it is effort, not biology: 64% of all Yellowstone sightings fall in June to August (63% Grand Teton, 45% Great Smoky). Of the 147 Yellowstone species with 20 or more records, 90 peak in June, 21 in July, 13 in September, 11 in August, 10 in May, 2 in January. Dividing a species' share of each month by everyone's share separates the two: bison ×1.7 in December, wapiti ×2.0 in November, pronghorn ×3.6 in November, coyote ×4.6 in January (Yellowstone); moose ×3.5 in December, Uinta ground squirrel ×1.9 in April, mule deer ×1.4 in September (Grand Teton); white-tailed deer ×3.4 in December, wapiti ×3.3 in October (Great Smoky). 69, 41 and 43 species respectively have their effort-adjusted peak outside summer.
+- **Kept:** the species page shows "busiest month" and "seen more than usual" side by side, with a second bar row for the ratio (needs 30 records; fewer makes any month look special) and one sentence saying which is which. The ratio is a share of a share: it says when, not how many.
+
+### E-032: the tour dock was still a wall
+- **What:** the owner, on the 320 px full-height dock: "the tour block is also too big and covers the map so we lose sight of where everything is".
+- **Kept:** a content-sized translucent card in the top-right corner (300 px wide, about 380 px tall, blurred backdrop so the map shows through), three-column thumbnails with tiny credits, three lines of text, and a minimise button that leaves a one-line strip with the stop name and the arrows. The camera pads only by the card's width. The phone bar is unchanged.
+
 ## Open questions with a planned experiment
 
 - **Q-1 SpeciesNet determinism.** Answered (E-013).

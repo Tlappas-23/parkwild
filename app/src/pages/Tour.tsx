@@ -15,6 +15,7 @@ import { nearbySpecies, TOUR_DWELL_MS, TOUR_RADIUS_M, tourStops } from "../tour"
 export default function Tour() {
   const { tour, landmarks, cells, photosSpecies, tourGo, tourNext, tourPrev, tourPlay, endTour, selectSpecies, addSite } = useStore();
   const [expanded, setExpanded] = useState(false);
+  const [minimised, setMinimised] = useState(false);   // a one-line strip: name and arrows, nothing else
   const stops = useMemo(() => tourStops(landmarks), [landmarks]);
   const stop = stops[tour.stop];
   const nearby = useMemo(() => (stop ? nearbySpecies(cells, stop.lon, stop.lat) : null), [cells, stop]);
@@ -40,6 +41,19 @@ export default function Tour() {
   if (!tour.active || !stop) return null;
   const last = tour.stop === stops.length - 1;
 
+  if (minimised) {
+    return (
+      <section className="tour min" aria-label="Virtual tour" aria-live="polite">
+        <button onClick={tourPrev} disabled={tour.stop === 0} aria-label="Previous stop">‹</button>
+        <button className="tour-min-title" onClick={() => setMinimised(false)} title="Show the stop">
+          <span className="eyebrow">{tour.stop + 1}/{stops.length}</span> {stop.name}
+        </button>
+        <button onClick={last ? () => tourGo(0) : tourNext} aria-label={last ? "Back to the first stop" : "Next stop"}>{last ? "↺" : "›"}</button>
+        <button className="ghost small-btn" onClick={endTour} aria-label="Exit tour">×</button>
+      </section>
+    );
+  }
+
   return (
     <section className={"tour" + (expanded ? " expanded" : "")} aria-label="Virtual tour" aria-live="polite">
       <div className="tour-main">
@@ -60,7 +74,7 @@ export default function Tour() {
       <div className="tour-wild">
         {nearby && nearby.list.length > 0 ? (
           <ul className="tour-species" aria-label={`Recorded within ${TOUR_RADIUS_M / 1000} km`}>
-            {nearby.list.map((n) => {
+            {nearby.list.slice(0, expanded ? 6 : 3).map((n) => {   // one row unless Details is open
               const photo = speciesPhotos(photosSpecies, n.species)[0];
               return (
                 <li key={n.species}>
@@ -85,6 +99,7 @@ export default function Tour() {
         <button className="primary" onClick={() => tourPlay(!tour.playing)} aria-pressed={tour.playing}>{tour.playing ? "Pause" : last ? "Replay" : "Play"}</button>
         <button onClick={last ? () => tourGo(0) : tourNext} aria-label={last ? "Back to the first stop" : "Next stop"}>{last ? "↺" : "›"}</button>
         <button className="ghost small-btn" onClick={() => setExpanded((v) => !v)} aria-expanded={expanded}>{expanded ? "Less" : "Details"}</button>
+        <button className="ghost small-btn" onClick={() => setMinimised(true)} title="Shrink to a strip">–</button>
         <button className="ghost small-btn" onClick={() => addSite({ id: stop.id, label: stop.name, lon: stop.lon, lat: stop.lat, kind: "stop" })} title="Add this stop to a route">+ Route</button>
         <button className="ghost small-btn" onClick={endTour}>Exit</button>
         <div className="dots" role="tablist" aria-label="Stops">

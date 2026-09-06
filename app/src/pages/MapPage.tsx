@@ -320,7 +320,7 @@ export default function MapPage() {
     // a wide screen, above it on a phone, whatever the panel's size.
     const panel = document.querySelector<HTMLElement>(".tour");
     const side = window.innerWidth >= 900;
-    const padding = side ? { top: 0, left: 0, right: (panel?.offsetWidth ?? 320) + 28, bottom: 0 } : { top: 0, left: 0, right: 0, bottom: (panel?.offsetHeight ?? 120) + 24 };
+    const padding = side ? { top: 0, left: 0, right: (panel?.offsetWidth ?? 300) + 28, bottom: 0 } : { top: 0, left: 0, right: 0, bottom: (panel?.offsetHeight ?? 120) + 24 };
     map.flyTo({ center: [stop.lon, stop.lat], zoom: STOP_ZOOM, pitch: STOP_PITCH, bearing: stopBearing(stops, tour.stop),
                 duration: reducedMotion ? 0 : 3000, curve: 1.5, essential: true, padding });
   }, [ready, tour.active, tour.stop, stops, reducedMotion]);
