@@ -16,6 +16,8 @@ export default function HomePage() {
   const [q, setQ] = useState("");
   const match = (p: ParkCard) => !q.trim() || `${p.name} ${p.state}`.toLowerCase().includes(q.trim().toLowerCase());
   const live = index.parks.filter((p) => p.status === "live" && match(p));
+  // The hero is the first live park with a reusable photograph; its credit sits in the corner.
+  const heroPark = index.parks.find((p) => p.status === "live" && p.hero) ?? null;
   const planned = index.parks.filter((p) => p.status !== "live" && match(p));
 
   const card = (p: ParkCard) => (
@@ -44,7 +46,7 @@ export default function HomePage() {
 
   return (
     <div className="page home">
-      <div className="home-hero">
+      <div className="home-hero" style={heroPark?.hero ? { backgroundImage: `url(${heroPark.hero.url})` } : undefined}>
         <h1>Where the animals are.</h1>
         <p className="lede">
           Every recorded sighting in America's national parks, from people who were there, on a 3D map you can tour, filter by species, and plan a route through.
@@ -53,6 +55,7 @@ export default function HomePage() {
         <div className="search home-search">
           <input type="search" placeholder="Find a park…" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Find a park" autoComplete="off" autoFocus />
         </div>
+        {heroPark?.hero && <p className="credit">{heroPark.name.replace(/ National Park$/, "")} · <a href={heroPark.hero.page} target="_blank" rel="noreferrer">photo</a> {heroPark.hero.artist} · {heroPark.hero.license}</p>}
       </div>
       {live.length === 0 && planned.length === 0 && <p className="muted">No park matches "{q}".</p>}
       <div className="park-grid">{live.map(card)}</div>

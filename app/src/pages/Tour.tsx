@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { Bed, ChevronLeft, ChevronRight, Compass, Eye, Footprints, Info, Maximize2, Minimize2, Minus, Mountain, Pause, Play, Plus, RotateCcw, Sailboat, Signpost, Tent, UtensilsCrossed, X } from "lucide-react";
 import PhotoCredit from "../PhotoCredit";
 import { useStore } from "../store";
 import { nearbySpecies, photoNear, placeOf, thingsNear, TOUR_DWELL_MS, TOUR_RADIUS_M, tourStops, type NearItem } from "../tour";
@@ -19,16 +20,21 @@ export default function Tour() {
   const stop = stops[tour.stop];
   const nearby = useMemo(() => (stop ? nearbySpecies(cells, stop.lon, stop.lat) : null), [cells, stop]);
   const things = useMemo(() => (stop ? thingsNear(amenities, stop.lon, stop.lat) : null), [amenities, stop]);
+  const KindIcon = ({ kind }: { kind: string }) => {
+    const I = kind === "camp" ? Tent : kind === "stay" ? Bed : kind === "trail" ? Footprints : kind === "trailhead" ? Signpost : kind === "feature" ? Mountain
+      : kind === "viewpoint" ? Eye : kind === "picnic" ? UtensilsCrossed : kind === "boat" ? Sailboat : Info;
+    return <I className="todo-ico" aria-hidden="true" />;
+  };
   const group = (title: string, list: NearItem[]) => list.length > 0 && (
     <div className="todo-group">
       <div className="eyebrow">{title}</div>
       <ul className="todo-list">
         {list.map((it) => (
           <li key={it.id}>
-            <span className={"todo-dot " + it.kind} aria-hidden="true" />
+            <KindIcon kind={it.kind} />
             <button className="todo-body as-link" onClick={() => selectPlace(placeOf(it))} title="Open this place"><strong>{it.label}</strong><br /><span className="muted small">{it.detail}</span></button>
             <button className="chip-x add" aria-label={`Add ${it.label} to route`} title="Add to route"
-              onClick={() => addSite({ id: it.id, label: it.label, lon: it.lon, lat: it.lat, kind: "landmark" })}>+</button>
+              onClick={() => addSite({ id: it.id, label: it.label, lon: it.lon, lat: it.lat, kind: "landmark" })}><Plus className="ico" aria-hidden="true" /></button>
           </li>
         ))}
       </ul>
@@ -62,12 +68,12 @@ export default function Tour() {
   if (minimised) {
     return (
       <section className="tour min" aria-label="Virtual tour" aria-live="polite">
-        <button onClick={tourPrev} disabled={tour.stop === 0} aria-label="Previous stop">‹</button>
+        <button className="icon-btn" onClick={tourPrev} disabled={tour.stop === 0} aria-label="Previous stop"><ChevronLeft className="ico" aria-hidden="true" /></button>
         <button className="tour-min-title" onClick={() => setMinimised(false)} title="Show the stop">
           <span className="eyebrow">{tour.stop + 1}/{stops.length}</span> {stop.name}
         </button>
-        <button onClick={last ? () => tourGo(0) : tourNext} aria-label={last ? "Back to the first stop" : "Next stop"}>{last ? "↺" : "›"}</button>
-        <button className="ghost small-btn" onClick={endTour} aria-label="Exit tour">×</button>
+        <button className="icon-btn" onClick={last ? () => tourGo(0) : tourNext} aria-label={last ? "Back to the first stop" : "Next stop"}>{last ? <RotateCcw className="ico" aria-hidden="true" /> : <ChevronRight className="ico" aria-hidden="true" />}</button>
+        <button className="icon-btn" onClick={endTour} aria-label="Exit tour"><X className="ico" aria-hidden="true" /></button>
       </section>
     );
   }
@@ -101,7 +107,7 @@ export default function Tour() {
         <div className="tour-photos">
           {stop.street && (
             <a className="street-link" href={stop.street.url} target="_blank" rel="noreferrer">
-              <span>◎ Look around from here on Mapillary</span>
+              <span><Compass className="ico" aria-hidden="true" /> Look around from here on Mapillary</span>
               <span className="muted small">{stop.street.is_pano ? "360° photo" : "street-level photo"} · {stop.street.dist_m} m away{stop.street.captured_at ? ` · ${stop.street.captured_at.slice(0, 4)}` : ""}{stop.street.username ? ` · © ${stop.street.username}` : ""} · {stop.street.license}</span>
             </a>
           )}
@@ -165,13 +171,13 @@ export default function Tour() {
       </div>
 
       <div className="tour-nav">
-        <button onClick={tourPrev} disabled={tour.stop === 0} aria-label="Previous stop">‹</button>
-        <button className="primary" onClick={() => tourPlay(!tour.playing)} aria-pressed={tour.playing}>{tour.playing ? "Pause" : last ? "Replay" : "Play"}</button>
-        <button onClick={last ? () => tourGo(0) : tourNext} aria-label={last ? "Back to the first stop" : "Next stop"}>{last ? "↺" : "›"}</button>
-        <button className="ghost small-btn" onClick={() => setExpanded((v) => !v)} aria-expanded={expanded}>{expanded ? "Less" : "Details"}</button>
-        <button className="ghost small-btn" onClick={() => setMinimised(true)} title="Shrink to a strip">–</button>
-        <button className="ghost small-btn" onClick={() => addSite({ id: stop.id, label: stop.name, lon: stop.lon, lat: stop.lat, kind: "stop" })} title="Add this stop to a route">+ Route</button>
-        <button className="ghost small-btn" onClick={endTour}>Exit</button>
+        <button className="icon-btn" onClick={tourPrev} disabled={tour.stop === 0} aria-label="Previous stop"><ChevronLeft className="ico" aria-hidden="true" /></button>
+        <button className="primary" onClick={() => tourPlay(!tour.playing)} aria-pressed={tour.playing}>{tour.playing ? <Pause className="ico" aria-hidden="true" /> : <Play className="ico" aria-hidden="true" />}{tour.playing ? "Pause" : last ? "Replay" : "Play"}</button>
+        <button className="icon-btn" onClick={last ? () => tourGo(0) : tourNext} aria-label={last ? "Back to the first stop" : "Next stop"}>{last ? <RotateCcw className="ico" aria-hidden="true" /> : <ChevronRight className="ico" aria-hidden="true" />}</button>
+        <button className="icon-btn" onClick={() => setExpanded((v) => !v)} aria-expanded={expanded} aria-label={expanded ? "Less detail" : "More detail"} title={expanded ? "Less" : "Details"}>{expanded ? <Minimize2 className="ico" aria-hidden="true" /> : <Maximize2 className="ico" aria-hidden="true" />}</button>
+        <button className="icon-btn" onClick={() => setMinimised(true)} aria-label="Shrink to a strip" title="Minimise"><Minus className="ico" aria-hidden="true" /></button>
+        <button className="icon-btn" onClick={() => addSite({ id: stop.id, label: stop.name, lon: stop.lon, lat: stop.lat, kind: "stop" })} aria-label="Add this stop to a route" title="Add to route"><Plus className="ico" aria-hidden="true" /></button>
+        <button className="icon-btn" onClick={endTour} aria-label="Exit tour" title="Exit tour"><X className="ico" aria-hidden="true" /></button>
         <div className="dots" role="tablist" aria-label="Stops">
           {stops.map((s, i) => <button key={s.id} role="tab" aria-selected={i === tour.stop} className={i === tour.stop ? "on" : ""} aria-label={`${i + 1}. ${s.name}`} title={s.name} onClick={() => tourGo(i)} />)}
         </div>

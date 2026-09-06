@@ -6,7 +6,7 @@
     <meta name="color-scheme" content="light dark" />
     <!-- GitHub Pages cannot set response headers; this carries the CSP instead
          (frame-ancestors is header-only and is dropped here). -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: blob: https://tiles.openfreemap.org https://basemap.nationalmap.gov https://s3.amazonaws.com https://inaturalist-open-data.s3.amazonaws.com https://static.inaturalist.org https://upload.wikimedia.org; connect-src 'self' https://tiles.openfreemap.org https://basemap.nationalmap.gov https://s3.amazonaws.com https://en.wikipedia.org https://commons.wikimedia.org; font-src 'self' https://tiles.openfreemap.org; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; base-uri 'self'; form-action 'none'" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; img-src 'self' data: blob: https://tiles.openfreemap.org https://basemap.nationalmap.gov https://s3.amazonaws.com https://inaturalist-open-data.s3.amazonaws.com https://static.inaturalist.org https://upload.wikimedia.org; connect-src 'self' https://tiles.openfreemap.org https://basemap.nationalmap.gov https://s3.amazonaws.com https://en.wikipedia.org https://commons.wikimedia.org https://huggingface.co https://*.hf.co https://raw.githubusercontent.com; font-src 'self' https://tiles.openfreemap.org; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; base-uri 'self'; form-action 'none'" />
     <link rel="icon" href="./icon.svg" type="image/svg+xml" />
     <link rel="manifest" href="./manifest.webmanifest" />
     <meta name="theme-color" content="#fcfcfb" />

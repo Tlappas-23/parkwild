@@ -352,6 +352,36 @@ rise if and only if the numbers allow. Recall stays unmeasured.
 
 ---
 
+## ADR-0021: AI runs on the visitor's device and may only write from the record
+
+**Context.** The owner wants the site to "incorporate AI" and stay free.
+Hosted models cost money or need a key; a key in a static site is public;
+and a model that knows things is a model that invents things.
+**Decision.** Two models run in the browser after an explicit download:
+Qwen2.5 1.5B Instruct (Apache-2.0, 4-bit, about 1 GB) through WebLLM over
+WebGPU, and CLIP ViT-B/32 (MIT, about 150 MB) through Transformers.js. The
+language model answers only from numbered facts assembled from the park's
+own exports (species counts and seasons, busiest cells named by the nearest
+landmark, landmarks and their Wikipedia lines, trails, campsites, the camera
+pass numbers, and a computed route plan when asked for one); it must cite a
+fact for every sentence and must say "the data doesn't say" otherwise. The
+answer view shows which facts were cited and flags any number the model
+wrote that is in no fact. The image model ranks a photograph against the
+park's species names and is labelled a suggestion, never an identification.
+Nothing typed or photographed leaves the device. A fixed question set is
+run and its results recorded (docs/ai-eval.md) before any change to the
+prompt, the facts or the model.
+**Rejected.** Hosted APIs (cost, keys, data leaving the device); a larger
+on-device model (download and memory on phones); retrieval by embeddings
+(a second model to download for a gain the name matching does not need
+yet); letting the model answer from its own knowledge (unfalsifiable here).
+**Consequence.** Three CSP additions (wasm evaluation, the model hosts),
+two lazy chunks that ship only when enabled, the onnx runtime copied into
+the app at build time so no CDN is called at run time, and a documented
+ceiling: a 1.5B model misreads facts sometimes; the facts stay on screen.
+
+---
+
 ## Open decisions (owner's call; recorded here so nothing is decided by drift)
 
 | # | Decision | Default until decided | Where |

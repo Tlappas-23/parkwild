@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { Plus, X } from "lucide-react";
 import { cellPhotos, speciesPhotos } from "../photos";
 import PhotoCredit from "../PhotoCredit";
 import { useStore } from "../store";
@@ -104,7 +105,7 @@ export default function CellDetail() {
             </>
           )}
         </div>
-        <button className="icon-btn" onClick={() => selectCell(null)} aria-label="Close">×</button>
+        <button className="icon-btn" onClick={() => selectCell(null)} aria-label="Close"><X className="ico" aria-hidden="true" /></button>
       </div>
 
       {focus && (
@@ -128,7 +129,7 @@ export default function CellDetail() {
         let x = 0, y = 0;
         for (let i = 0; i < k; i++) { x += ring[i][0]; y += ring[i][1]; }
         addSite({ id: `cell:${cell.cell}`, label: focus ? `${focus.common ?? focus.species} spot · ${focus.count.toLocaleString()} sightings` : `Wildlife spot · ${cell.count.toLocaleString()} sightings`, lon: x / k, lat: y / k, kind: "cell" });
-      }}>+ Add this spot to a route</button>
+      }}><Plus className="ico" aria-hidden="true" /> Add this spot to a route</button>
 
       {/* The check-it-yourself link: the same box, the same species, on the source. */}
       <a className="verify" href={observationsUrl(feature, focusMeta)} target="_blank" rel="noreferrer">

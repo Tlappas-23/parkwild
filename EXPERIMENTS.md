@@ -234,6 +234,17 @@ Format: date, what, number, kept?, why, where it lives.
 - **Numbers:** 108 of Yellowstone's 1,640 places carry a Wikipedia tag; the rest go through the name search. Species along a trail come from the cells its line passes through, so a 10 km trail is tens of cells, not one.
 - **Unresolved:** the name search can miss (a trail named after a creek lands on the creek's article, which is usually what a reader wants) or decline; both are shown as they are. Photographs are nearest-first, not best-first.
 
+### E-040: the design system pass
+- **What:** the owner: "how would this be approved by Apple… this needs to be better… the best". Measured against what a senior design review flags: four button styles, ad-hoc unicode glyphs for icons, five semantic colours for place kinds, credits at 9 px, a home page without a hero, panels that were containers of controls rather than designed surfaces.
+- **Kept:** one token set (one accent, one warning colour for the model, neutrals; a type scale from 11 to 32; an 8-pt spacing scale; three radii; one shadow; one easing), one button family (pill, small, icon; primary, ghost, toggle, segmented), Lucide icons everywhere a glyph was, credits at 11 px minimum, focus rings on every control, enter animations for panels and tab content that respect reduced motion, places in one slate colour with the kind carried by an icon, the route in the accent and the open place in ink, the home page opening on a full-bleed credited photograph of a live park with the park search inside it, and the left panel starting folded on phones.
+- **Not done yet:** a designed logo and share image; bottom-sheet gestures on phones; a Lighthouse and axe pass in CI (Phase 7).
+
+### E-041: AI on the visitor's device, measured before it is trusted
+- **What:** the owner: "incorporate AI and be a good source, all free". Built as ADR-0021: a language model and an image model run in the browser after an opt-in download; the language model may only write from numbered facts built from the park's own data and must cite them; the image model ranks a photograph against the park's species names as a suggestion.
+- **Measured:** the eval set (docs/ai-eval.md) ran end to end in the automation browser only with a 360M model, because that profile refuses to store more than about 300 MB per origin in Cache storage, the private file system or IndexedDB (the download itself ran at 20 MB/s). The run exercised the fact builder, the citation parsing, the streaming and the checks, and showed the 360M model misreading facts freely; it is not offered to visitors. The default 1.5B model's table is pending the first run on the live site, which the Ask page's "Measure it" control produces for anyone.
+- **Fixed on the way:** species matching now goes by distinctive words with plurals ("bison" → American Bison, "elk" → Wapiti, "bear" → both bears; a bare generic word only when unambiguous); the invention check ignores list numerals and citation markers and counts numbers of three or more digits; the model store falls back from Cache storage to the private file system to IndexedDB on quota refusals; storage failures read as one plain sentence.
+- **Unresolved:** made-up words pass the number check ("Trumpeter SQUARE"); a name check against the fact text is the next addition. The WebLLM chunk is 2.1 MB gzipped and loads only when Ask is enabled.
+
 ## Open questions with a planned experiment
 
 - **Q-1 SpeciesNet determinism.** Answered (E-013).

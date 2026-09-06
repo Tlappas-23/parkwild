@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { LocateFixed, Plus, X } from "lucide-react";
 import { directionsUrl, FAR_SNAP_M, fmtKm, fmtTime, MAX_SITES, SPEED_DRIVE_MS, type Site } from "../routing";
 import { useStore } from "../store";
 import { tourStops } from "../tour";
@@ -44,11 +45,11 @@ export default function PlanPanel() {
 
   return (
     <div className="plan" role="region" aria-label="Plan a visit">
-      <div className="plan-head"><strong>Plan a visit</strong><button className="icon-btn" onClick={closePlan} aria-label="Close planner">×</button></div>
+      <div className="plan-head"><strong>Plan a visit</strong><button className="icon-btn" onClick={closePlan} aria-label="Close planner"><X className="ico" aria-hidden="true" /></button></div>
 
       <div className="plan-row">
         <span className="eyebrow">Start</span>
-        <button className={"toggle" + (startIsMe ? " on" : "")} onClick={() => void locate()} aria-pressed={startIsMe}>◎ My location</button>
+        <button className={"toggle small-btn" + (startIsMe ? " on" : "")} onClick={() => void locate()} aria-pressed={startIsMe}><LocateFixed className="ico" aria-hidden="true" /> My location</button>
         <select aria-label="Or start at a place" value={plan.start && !startIsMe ? plan.start.id : ""}
           onChange={(e) => { const l = landmarks?.landmarks.find((x) => x.id === e.target.value); setPlanStart(l ? siteOf(l) : null); }}>
           <option value="">or start at…</option>
@@ -69,7 +70,7 @@ export default function PlanPanel() {
 
       <div className="plan-row wrap">
         <span className="eyebrow">See</span>
-        {stops.length > 0 && <button className="ghost small-btn" onClick={() => stops.forEach((s) => addSite(siteOf(s)))}>+ all tour stops</button>}
+        {stops.length > 0 && <button className="ghost small-btn" onClick={() => stops.forEach((s) => addSite(siteOf(s)))}><Plus className="ico" aria-hidden="true" /> all tour stops</button>}
         {hotspots.map((h) => <button key={h.id} className="ghost small-btn" onClick={() => addSite(h)}>+ {h.label}</button>)}
       </div>
       <div className="search">

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { ExternalLink, Plus, X } from "lucide-react";
 import PhotoCredit from "../PhotoCredit";
 import { useStore } from "../store";
 import { fmtDist, nearbySpecies, photoNear, speciesNearLines, TRAIL_BUFFER_M, trailLines } from "../tour";
@@ -54,13 +55,13 @@ export default function PlaceDetail() {
           <h2>{p.name}</h2>
           {facts.length > 0 && <div className="muted small">{facts.join(" · ")}</div>}
         </div>
-        <button className="icon-btn" onClick={() => selectPlace(null)} aria-label="Close">×</button>
+        <button className="icon-btn" onClick={() => selectPlace(null)} aria-label="Close"><X className="ico" aria-hidden="true" /></button>
       </div>
 
       <div className="place-actions">
-        <button className="primary small-btn" onClick={() => addSite({ id: p.id, label: p.name, lon: p.lon, lat: p.lat, kind: "landmark" })}>+ Add to route</button>
-        {p.tags?.website && <a className="ghost small-btn as-btn" href={p.tags.website} target="_blank" rel="noreferrer">Website ↗</a>}
-        {summary && <a className="ghost small-btn as-btn" href={summary.url} target="_blank" rel="noreferrer">Wikipedia ↗</a>}
+        <button className="primary small-btn" onClick={() => addSite({ id: p.id, label: p.name, lon: p.lon, lat: p.lat, kind: "landmark" })}><Plus className="ico" aria-hidden="true" /> Add to route</button>
+        {p.tags?.website && <a className="ghost small-btn as-btn" href={p.tags.website} target="_blank" rel="noreferrer">Website <ExternalLink className="ico" aria-hidden="true" /></a>}
+        {summary && <a className="ghost small-btn as-btn" href={summary.url} target="_blank" rel="noreferrer">Wikipedia <ExternalLink className="ico" aria-hidden="true" /></a>}
       </div>
 
       <section className="place-sec">

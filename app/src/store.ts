@@ -6,7 +6,7 @@ import { availableParks, loadCellPhotos, loadPark, loadRoads } from "./data";
 import { MAX_SITES, planRoute, routerFor, type Mode, type PlanResult, type Site } from "./routing";
 import type { Place } from "./tour";
 
-export type Page = "home" | "map" | "species" | "about";
+export type Page = "home" | "map" | "species" | "ask" | "about";
 export type Basemap = "terrain" | "satellite";
 export interface TourState { active: boolean; stop: number; playing: boolean; }
 export interface Location { lon: number; lat: number; accuracyM: number; }
@@ -115,7 +115,7 @@ export const useStore = create<State>((set, get) => ({
   amenities: null,
   tourTab: "wildlife",
   setTourTab: (tourTab) => set({ tourTab }),
-  controlsOpen: true,
+  controlsOpen: typeof window === "undefined" || window.innerWidth >= 900,   // phones start with the map
   controlsBeforeTour: true,
   selectedPlace: null,
   selectPlace: (selectedPlace) => { set({ selectedPlace, selectedCell: selectedPlace ? null : get().selectedCell }); if (selectedPlace) { void get().ensureCellPhotos(); if (selectedPlace.kind === "trail") void get().ensureRoads(); } },
