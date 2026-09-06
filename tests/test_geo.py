@@ -72,9 +72,11 @@ def test_path_length_clipping():
 
 def test_overpass_requests_identify_themselves():
     """overpass-api.de returns 406 to the default python-requests User-Agent."""
+    from urllib.parse import urlparse
+
     from parkwild.overpass import HEADERS, OVERPASS_URLS
     assert "parkwild" in HEADERS["User-Agent"]
-    assert OVERPASS_URLS[0].startswith("https://lz4.overpass-api.de")
+    assert urlparse(OVERPASS_URLS[0]).netloc == "lz4.overpass-api.de"
 
 
 def test_point_in_geometry_polygon_and_multipolygon():
