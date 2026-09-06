@@ -1,0 +1,53 @@
+{
+  "built": "2026-09-06T21:42:52+00:00",
+  "git_commit": "e6ce3024dc1d328e1ca135d942a6f4df7b6baa9c",
+  "files": {
+    "cells.geojson": {
+      "sha256": "3cc69b1ac1b703a68dedbd840c01775e4d6d720994fae819b98a036c4f2aad30",
+      "bytes": 678895
+    },
+    "species.json": {
+      "sha256": "9caaa677c38e467eb6c08604621e9d9bd7ff7fe287ea312f1267accae663755d",
+      "bytes": 159658
+    },
+    "sightings.parquet": {
+      "sha256": "946d8a70ddb9c2191532230709149bf3a867e4f36d5f96df8a9b4f657f20dd61",
+      "bytes": 1101882
+    },
+    "photos_species.json": {
+      "sha256": "539644851c167a526b443ccfc25aa56897984f0f512ff67a0c6f709acdb0c0be",
+      "bytes": 218847
+    },
+    "photos_cells.json": {
+      "sha256": "b4772566dc003cb2d43208de8aaa0f6705e1ba01939c976bcda9f221dd7e4a9e",
+      "bytes": 399610
+    },
+    "places.json": {
+      "sha256": "e2edc5d1973f67a01337e7640fcb7ff0d9db318081c4a0eb9caf03a6f56204de",
+      "bytes": 86468
+    },
+    "landmarks.json": {
+      "sha256": "59cd5b7305536b9cdfdeb2d44b4306fdde68732328fe6c55e198912583503237",
+      "bytes": 7531
+    },
+    "boundary.geojson": {
+      "sha256": "a8e3d5414274b44af0e540e0e96721c5e86c57e5231636a127d128e0f7145b1f",
+      "bytes": 6913
+    },
+    "roads.json": {
+      "sha256": "249be13c53aeb326374a03a87f2a11df91209091bf183efdcbaba67e89a90384",
+      "bytes": 442828
+    },
+    "camera_pass.json": {
+      "sha256": "9e592f752520a3cef6d2b3ab14e56fd036869c384d822f2b61c614d03079da16",
+      "bytes": 438
+    },
+    "amenities.json": {
+      "sha256": "250cdbd8eaa9b3938c26cb775301ffdfe7c1927e7deee32b3465cf1faf132fe1",
+      "bytes": 41716
+    }
+  },
+  "park": "big_bend",
+  "name": "Big Bend National Park",
+  "state": "TX"
+}
