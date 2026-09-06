@@ -1,0 +1,49 @@
+{
+  "built": "2026-09-06T06:44:53+00:00",
+  "git_commit": "fa38be70aabf9dbd62e6c617618c3e6dd606f7c5",
+  "files": {
+    "cells.geojson": {
+      "sha256": "887bafffab37159f7a8bbef30b3c17b7e6d64decba9a7ffcdc58d0bef61436fa",
+      "bytes": 684619
+    },
+    "species.json": {
+      "sha256": "54f002877e7680e2838b5524b52302df56571cef4654083c5622297af0d0ff0c",
+      "bytes": 115476
+    },
+    "sightings.parquet": {
+      "sha256": "bb2c1d85bdfe881db1463a5e280065ab0e0dc1aaa4420f6730abf323229e2633",
+      "bytes": 1308775
+    },
+    "photos_species.json": {
+      "sha256": "79f394c0b0939ca4c075617117b7018094ada93d7cfbadb1285cddf11caa157d",
+      "bytes": 142097
+    },
+    "photos_cells.json": {
+      "sha256": "c17251d1c1a55da61f15ca2fac9adcc3fd5d0dfc1b3f90450426ed84fcbcc93d",
+      "bytes": 356895
+    },
+    "landmarks.json": {
+      "sha256": "5effbaf58fffbb36b3f2e20851a2a8f7ad2a42a8a59821115d87f7227abc4f9c",
+      "bytes": 35776
+    },
+    "boundary.geojson": {
+      "sha256": "d5ae4ee54663caf31709b2d717cb5d96c2f74a0583424017c3193a139aa26b35",
+      "bytes": 6236
+    },
+    "roads.json": {
+      "sha256": "b250e795214cce14734b6cb87ca45492d119e550efcd5d3ff1937de4068e3c9f",
+      "bytes": 1023223
+    },
+    "camera_pass.json": {
+      "sha256": "d01186bf079d9bd743b26cc14a70680c0556aae8f0422cd69bc8f556873978f9",
+      "bytes": 442
+    },
+    "amenities.json": {
+      "sha256": "501bc504db803fb6aefbff16c266c272f41b0e70a54bc963f3dc1955bbfc2117",
+      "bytes": 91580
+    }
+  },
+  "park": "grand_canyon",
+  "name": "Grand Canyon National Park",
+  "state": "AZ"
+}

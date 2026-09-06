@@ -1,0 +1,49 @@
+{
+  "built": "2026-09-06T06:46:33+00:00",
+  "git_commit": "fa38be70aabf9dbd62e6c617618c3e6dd606f7c5",
+  "files": {
+    "cells.geojson": {
+      "sha256": "c125a9434b7357a629c593cf3f9066161bf8009d6f4b939f3a9479e08be60863",
+      "bytes": 1404405
+    },
+    "species.json": {
+      "sha256": "4fde92c41bac92da1c9f6a2f1c3d033b002ffaecb845a91c13544786f42254bc",
+      "bytes": 116610
+    },
+    "sightings.parquet": {
+      "sha256": "f4a8a9b52239c7851eb8cc7d0dba8c1cbe81366e3d30545272f75f13ec951978",
+      "bytes": 934388
+    },
+    "photos_species.json": {
+      "sha256": "9292fa41616a654b51801b3a255c7cd6d6f676f32ca44a1d55f11e4f2e630cce",
+      "bytes": 143080
+    },
+    "photos_cells.json": {
+      "sha256": "cc564961e1a24c0bfbd0b9df7a2c2cc2c002c3f400f08327118215672bbc3910",
+      "bytes": 266256
+    },
+    "landmarks.json": {
+      "sha256": "64d6cb0c8930d0bbfc4b06eab6f52634cca129c7ff7b29a50d4e76f9a4c76cde",
+      "bytes": 9790
+    },
+    "boundary.geojson": {
+      "sha256": "b305e6e8e8e11dec92fd8a5ccd6902db8b7853e033e6993de26ba1b7a1f21cfb",
+      "bytes": 18633
+    },
+    "roads.json": {
+      "sha256": "c4d39ddbd7bb866697e6e26cab9e7777cfba2ea1cb200ff51016353af7f82d04",
+      "bytes": 444647
+    },
+    "camera_pass.json": {
+      "sha256": "4c08d70a4680c3da728e579ef554a3cb6123cc9fe7d60b0368f9817e8a4bd7c8",
+      "bytes": 436
+    },
+    "amenities.json": {
+      "sha256": "2eea00eaf2f8358ff912154d8199b9ee3a92818650a01bed0e80bca4ac999077",
+      "bytes": 54160
+    }
+  },
+  "park": "acadia",
+  "name": "Acadia National Park",
+  "state": "ME"
+}

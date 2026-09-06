@@ -1,0 +1,49 @@
+{
+  "built": "2026-09-06T06:44:55+00:00",
+  "git_commit": "fa38be70aabf9dbd62e6c617618c3e6dd606f7c5",
+  "files": {
+    "cells.geojson": {
+      "sha256": "5c528a9ca0f367a594980d1e5c0cc2b018156ee9b05d0c524f157be94551ff58",
+      "bytes": 345787
+    },
+    "species.json": {
+      "sha256": "af4936f0612bf011627d903db4d9ab973ddd9f87d5607d30018c7615ee0a84c5",
+      "bytes": 87646
+    },
+    "sightings.parquet": {
+      "sha256": "1daf70bf9d7b7d3f6f8c6047117e903bd76af7b01f082ad41ec5fce6232aa8ae",
+      "bytes": 637836
+    },
+    "photos_species.json": {
+      "sha256": "385572f6c4bfbc9972b3251b9fbd454aeb29105c135d21a786a669bee55751f2",
+      "bytes": 99600
+    },
+    "photos_cells.json": {
+      "sha256": "485096fdb6b6c63510d71346efcbfd34c771564a45b7c60bb0400e67099e8094",
+      "bytes": 174447
+    },
+    "landmarks.json": {
+      "sha256": "59dc5d45b56e26b46dd88d0693928028cd6f114e9d341734c7dc115da07c7b4e",
+      "bytes": 25458
+    },
+    "boundary.geojson": {
+      "sha256": "8ba0d0d0f1ee0d63574c072b31ff0abb92c871c3a610fca515260414b4be06e4",
+      "bytes": 1848
+    },
+    "roads.json": {
+      "sha256": "e88859f0cabfb062f053ce9269cc30dab68b4bab18f4a1d537674f12004f5b19",
+      "bytes": 275540
+    },
+    "camera_pass.json": {
+      "sha256": "b4c4e427705bde0af36506b1122243381c420dfc82bc65372b2cfc32c65b0285",
+      "bytes": 434
+    },
+    "amenities.json": {
+      "sha256": "27e0d8223f7c33372498c6717ad4a96103da8bd452125660789b8400a73e45eb",
+      "bytes": 54645
+    }
+  },
+  "park": "zion",
+  "name": "Zion National Park",
+  "state": "UT"
+}
