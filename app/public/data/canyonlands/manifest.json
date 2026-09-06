@@ -1,0 +1,53 @@
+{
+  "built": "2026-09-06T19:57:27+00:00",
+  "git_commit": "a9617339daa4a1be67801a0feeb458aa80e9fcea",
+  "files": {
+    "cells.geojson": {
+      "sha256": "2a1cd498f8d2a2fc95d0d2c145acac6c067db9e84c403fa7c3b2aa808711444c",
+      "bytes": 160649
+    },
+    "species.json": {
+      "sha256": "24b91305a4ff53f257becc4d3182673e1ea67d51581e6afe09465638b4da6b74",
+      "bytes": 49781
+    },
+    "sightings.parquet": {
+      "sha256": "7887bd42774296c69b672746a4b06b54b148a816ed09e29fc012edf00fe5638b",
+      "bytes": 109573
+    },
+    "photos_species.json": {
+      "sha256": "bc474ec1b4ffaddb451225b8701eb9ea51c9a86098093b8d5dff834ef5593a30",
+      "bytes": 41757
+    },
+    "photos_cells.json": {
+      "sha256": "b918c91072b8d2de6d758e79cf25d99257397ec27a53584b1377c872f932f297",
+      "bytes": 48831
+    },
+    "places.json": {
+      "sha256": "bd544e34377d6635945a2a046a90cc7171c9fd756705a9c8f65fefb2452cb5a5",
+      "bytes": 98579
+    },
+    "landmarks.json": {
+      "sha256": "de80bbe461a602f504ae2ff943fb058968096c76cef8e8c644e7489b66faa9c7",
+      "bytes": 12204
+    },
+    "boundary.geojson": {
+      "sha256": "62ce26c566495397da74fe7503477bd8675d4aab6768a66e770fe74f9535110b",
+      "bytes": 3632
+    },
+    "roads.json": {
+      "sha256": "34faf58f9a75f0349831fb0746c89741e158e1dfba6ea584ba0c7d23b011ba4f",
+      "bytes": 387474
+    },
+    "camera_pass.json": {
+      "sha256": "205eedd818070efc0db2697f9476bd74468932d59b95e95811e218b7d4f53d14",
+      "bytes": 441
+    },
+    "amenities.json": {
+      "sha256": "094fa9b71fdfe0f8b437decff44130db4c015daf79f51979f3c5c898aff9c026",
+      "bytes": 62220
+    }
+  },
+  "park": "canyonlands",
+  "name": "Canyonlands National Park",
+  "state": "UT"
+}

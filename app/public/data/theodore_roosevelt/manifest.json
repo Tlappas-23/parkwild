@@ -1,0 +1,53 @@
+{
+  "built": "2026-09-06T20:29:50+00:00",
+  "git_commit": "74777f72d19d7261a82a618cf7b909cadc58e0ee",
+  "files": {
+    "cells.geojson": {
+      "sha256": "ead17b092f36b400e7699cf40cc26e8b2fd71494572a9cfca79f3cbc09187958",
+      "bytes": 289690
+    },
+    "species.json": {
+      "sha256": "db0f744797afca4db8eb2337f8aa1c650bde44274752cb13087005a4848dd4b8",
+      "bytes": 60824
+    },
+    "sightings.parquet": {
+      "sha256": "ac7da93a83faafe678c5138bb2abd4e82c63d4170f9e1c0df707d3e805e008e6",
+      "bytes": 271121
+    },
+    "photos_species.json": {
+      "sha256": "2794a003b6b317ad24770ff19558b71c187b5c19890a42af74cfc0e85e10193a",
+      "bytes": 70838
+    },
+    "photos_cells.json": {
+      "sha256": "005344f21fa7884058afcc26fb33c7ad72ac9d9d628d4dc397b0cf822ccbdf7c",
+      "bytes": 143564
+    },
+    "places.json": {
+      "sha256": "5f8f3d6c2c6067ddfac2136bce397790979419393ecd22fff8485fb6462f7e16",
+      "bytes": 23200
+    },
+    "landmarks.json": {
+      "sha256": "788e563a79fc9fefe541c7872b7d09c03a12ce158204ad11ed45190aa58c2f60",
+      "bytes": 273
+    },
+    "boundary.geojson": {
+      "sha256": "43347f12d8a0d5bf66e102cbc835ecfde0b1c7748bade76874b0256e3cdb4800",
+      "bytes": 2459
+    },
+    "roads.json": {
+      "sha256": "5ae9c091b3822be0963766677c31c72d147bd8df5d40f09e5ea38ba94ef4c552",
+      "bytes": 245407
+    },
+    "camera_pass.json": {
+      "sha256": "96e2e39149af57abe45b57527c2d42162c199964d4c1fc0a65222cd36b7054f0",
+      "bytes": 448
+    },
+    "amenities.json": {
+      "sha256": "60754e80821400a56ba46b3967edf29c87f0402f3e28dcb5af99b92c6acf3e1e",
+      "bytes": 12101
+    }
+  },
+  "park": "theodore_roosevelt",
+  "name": "Theodore Roosevelt National Park",
+  "state": "ND"
+}
