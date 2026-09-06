@@ -1,9 +1,9 @@
 {
- "generated": "2026-09-06T21:07:09+00:00",
+ "generated": "2026-09-06T21:13:50+00:00",
  "attribution": "Park photographs: Wikimedia Commons, each under the licence printed on its card",
  "species_index": {
-  "sha256": "f3e930583c8cd671b93d07d9a3e32c4f98acacbb0cc5b8997b42b6ef6a6061fe",
-  "bytes": 1132312
+  "sha256": "108d6c2ec75bc89e148d545867cd320b00ad7a6366e2dd91afd7c3a1b569fe8a",
+  "bytes": 1281539
  },
  "parks": [
   {
@@ -945,8 +945,8 @@
    "species": 107,
    "sightings": 753,
    "cells": 185,
-   "stops": null,
-   "tour_source": null,
+   "stops": 2,
+   "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Great_Sand_Dunes_National_Park_and_Preserve%2C_United_States_%28Unsplash%29.jpg/1280px-Great_Sand_Dunes_National_Park_and_Preserve%2C_United_States_%28Unsplash%29.jpg",
     "page": "https://commons.wikimedia.org/wiki/File:Great_Sand_Dunes_National_Park_and_Preserve,_United_States_(Unsplash).jpg",
@@ -960,7 +960,7 @@
    "key": "mesa_verde",
    "name": "Mesa Verde National Park",
    "state": "CO",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -108.5547,
     37.1564,
@@ -971,11 +971,11 @@
     -108.4472,
     37.2535
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 112,
+   "sightings": 1362,
+   "cells": 246,
+   "stops": 5,
+   "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Cliff_Palace-Colorado-Mesa_Verde_NP.jpg/1280px-Cliff_Palace-Colorado-Mesa_Verde_NP.jpg",
     "page": "https://commons.wikimedia.org/wiki/File:Cliff_Palace-Colorado-Mesa_Verde_NP.jpg",
@@ -989,7 +989,7 @@
    "key": "black_canyon_of_the_gunnison",
    "name": "Black Canyon of the Gunnison National Park",
    "state": "CO",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -107.8295,
     38.503,
@@ -1000,11 +1000,11 @@
     -107.724,
     38.5721
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 115,
+   "sightings": 1145,
+   "cells": 165,
+   "stops": 0,
+   "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Black_Canyon_and_Gunnison_River_2008.jpg/1280px-Black_Canyon_and_Gunnison_River_2008.jpg",
     "page": "https://commons.wikimedia.org/wiki/File:Black_Canyon_and_Gunnison_River_2008.jpg",

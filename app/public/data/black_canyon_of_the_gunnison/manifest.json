@@ -1,0 +1,53 @@
+{
+  "built": "2026-09-06T21:13:47+00:00",
+  "git_commit": "8979b5e263b5dd25911b9dc114bc54beaf48a1ad",
+  "files": {
+    "cells.geojson": {
+      "sha256": "e78a10203cf3ec70db0a8affa54c7e09a727728396572e6d3080c51d92e5139c",
+      "bytes": 78271
+    },
+    "species.json": {
+      "sha256": "5cfced211cb07be4655d4e99c27ce056babc03b9164e32eef0724aaff0804635",
+      "bytes": 48342
+    },
+    "sightings.parquet": {
+      "sha256": "d70307b99784e4740be3bf55c168d4f940506fe0696ad4e528db64499951cef0",
+      "bytes": 88320
+    },
+    "photos_species.json": {
+      "sha256": "74835c4d6f82a98217143c390de231181d83fd2453054810f3c16c760953fabe",
+      "bytes": 44348
+    },
+    "photos_cells.json": {
+      "sha256": "71db75a0d6866a9a6c9fc6abfb91d17f6291615c4cfabcedd00594351235ea8e",
+      "bytes": 39014
+    },
+    "places.json": {
+      "sha256": "4c144b11c84363b7efb0d03563980082c7dccefeef2f5ac24b1eee778a164202",
+      "bytes": 18088
+    },
+    "landmarks.json": {
+      "sha256": "24cffb9a52234ffa4494a42d8c3d8bc4b58ed3e42cfb3ad3067de089b482a1d2",
+      "bytes": 283
+    },
+    "boundary.geojson": {
+      "sha256": "ab5a30a745b49f32948b4ee0170256f93be3ccb58fa29d38954b8ba6c87c64de",
+      "bytes": 2558
+    },
+    "roads.json": {
+      "sha256": "cac90f2393e456eef0bb7531a3468610f7a3a2f3e52653377b85132ac9e00276",
+      "bytes": 103896
+    },
+    "camera_pass.json": {
+      "sha256": "b96df4c7411c81c887cdb9d64f67cd65eb56ad4e97ab860dc9447cf9e12383d9",
+      "bytes": 458
+    },
+    "amenities.json": {
+      "sha256": "001b2e811388bca8c3dd2a143164abcc4470cacfe91652ba45a9a9dec17cb341",
+      "bytes": 8887
+    }
+  },
+  "park": "black_canyon_of_the_gunnison",
+  "name": "Black Canyon of the Gunnison National Park",
+  "state": "CO"
+}
