@@ -7,6 +7,7 @@ import type {
   BoundaryFile,
   CameraPassFile,
   CellFeature,
+  ClimateFile,
   CellsFile,
   LandmarksFile,
   Manifest,
@@ -57,6 +58,7 @@ interface State {
   boundary: BoundaryFile | null;
   cameraPass: CameraPassFile | null; // Track B per corridor; null where it never ran
   amenities: AmenitiesFile | null; // things to do around places; null until exported
+  climate: ClimateFile | null; // typical weather by month at the park's busiest place; null until built
   places: PlacesFile | null; // named trails, sites, camps and facilities with what people recorded within reach; loaded on first need
   placesState: "idle" | "loading" | "ready" | "missing";
   ensurePlaces: () => Promise<void>;
@@ -182,6 +184,7 @@ export const useStore = create<State>((set, get) => ({
   boundary: null,
   cameraPass: null,
   amenities: null,
+  climate: null,
   places: null,
   placesState: "idle",
   ensurePlaces: async () => {
@@ -312,6 +315,7 @@ export const useStore = create<State>((set, get) => ({
       boundary: null,
       cameraPass: null,
       amenities: null,
+      climate: null,
       places: null,
       placesState: "idle",
       selectedPlaceId: null,
@@ -468,7 +472,7 @@ export const useStore = create<State>((set, get) => ({
   load: async () => {
     const park = get().park;
     try {
-      const { cells, species, bias, photosSpecies, landmarks, boundary, cameraPass, amenities, manifest } =
+      const { cells, species, bias, photosSpecies, landmarks, boundary, cameraPass, amenities, climate, manifest } =
         await loadPark(park);
       if (get().park !== park) return; // the visitor switched parks while this one was loading
       let lo = 2100,
@@ -486,6 +490,7 @@ export const useStore = create<State>((set, get) => ({
         boundary,
         cameraPass,
         amenities,
+        climate,
         manifest,
         error: null,
         yearRange: lo <= hi ? [lo, hi] : [1900, 2100],

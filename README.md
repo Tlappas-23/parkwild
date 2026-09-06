@@ -27,6 +27,9 @@ Live site: https://tlappas-23.github.io/parkwild/
 - **Places.** Every named trail, site, campground and facility, ordered by
   how many sightings people recorded within reach, with its busiest months,
   photographs, Wikipedia summary and the animals seen there.
+- **Weather.** Conditions now and the next three days at the park and at
+  each place, from Open-Meteo in your browser, and what each month is
+  usually like there from ten years of its archive.
 - **Species.** Search one park or all parks at once. Every species page shows
   where people see the animal, park by park, with a button that opens that
   park's map on the animal's busiest cell.
@@ -135,9 +138,9 @@ Content Security Policy with no third-party scripts, and hashed data files.
 
 ## Status
 
-Eleven parks live: Yellowstone, Grand Teton, Great Smoky Mountains, Grand
-Canyon, Zion, Yosemite, Rocky Mountain, Glacier, Acadia, Olympic and
-Shenandoah. The other 52 are in a batch that runs unattended and opens a
-data pull request after every six parks; the home page shows each park's
-status. Open questions and the reasoning behind every choice are in
+Parks go live from a batch that runs unattended and opens a data pull
+request after every six; the home page shows each park's status. A
+fortnightly refresh (`scripts/refresh.sh`, cron on the 1st and 15th) pulls
+only the sightings that changed, rebuilds places and climate, and publishes
+the same way. Open questions and the reasoning behind every choice are in
 [DECISIONS.md](DECISIONS.md).

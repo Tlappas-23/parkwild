@@ -37,7 +37,7 @@ import json
 import logging
 import time
 from collections.abc import Iterator
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 
 import requests
 
@@ -149,12 +149,15 @@ def iter_occurrences(
     max_records: int | None = None,
     session: requests.Session | None = None,
     _depth: int = 0,
+    since: str | None = None,
 ) -> Iterator[dict]:
     """Yield raw occurrences, optionally restricted to `dataset_keys`. If a
     query would exceed the offset cap it is split by year (then by
     half-ranges of years) until each piece fits."""
     session = session or requests.Session()
     extra: dict = {"year": year} if year else {}
+    if since:
+        extra["lastInterpreted"] = f"{since},{date.today().isoformat()}"   # records GBIF touched since the last refresh
     if dataset_keys:
         extra["datasetKey"] = list(dataset_keys)
     total = count(bbox, class_key, **extra)

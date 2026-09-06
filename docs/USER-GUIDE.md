@@ -14,6 +14,7 @@ You arrive on the whole park outline. Blue hexagons are places where people reco
 - **Species** search: type "elk", "bison", a scientific name or an old name; the map keeps only cells with that species and the counts switch to that species.
 - **Years** two sliders bound the span.
 - **Tap a hexagon** for its drawer: sightings and years, the photographs taken in that cell (credited), and a link that opens the same box on iNaturalist so you can check it yourself. With a species filter on, the drawer leads with that species and folds the rest away. "Add this spot to a route" sends it to the planner.
+- **Weather** at the top of the left panel: conditions now and the next three days at the park's busiest place, and what this month is usually like there (ten-year normals). Fetched by your browser from Open-Meteo when you look; nothing is stored.
 - **Rotate and tilt** with the four buttons above the zoom control, or a right-drag (two fingers on a phone). The compass resets north.
 - **All parks** zooms out to the country; click another park's dot to glide into it.
 - The panel folds with the chevron; the "Filters" pill brings it back. It folds on its own when a tour starts.
@@ -38,7 +39,7 @@ Choose a start (your location, asked once and never stored, or any landmark), Dr
 
 ## Places
 
-Every named trail, site, viewpoint, campground and facility in the park, ordered by how many sightings people recorded within reach of it (500 m of a point, 300 m of a trail). That is where observers went, the only free measure of where visitors go; it is not a visitor count. Filter by kind, search, or sort by longest trail, by Wikipedia readers a month (landmarks with an article), or A to Z. Each row shows a twelve-month sparkline and its busiest months. Open a place for its photograph and Wikipedia summary, the month-by-month chart, the animals people recorded there with a photograph each, and buttons to show it on the map or add it to a route. The file loads when you first open the page.
+Every named trail, site, viewpoint, campground and facility in the park, ordered by how many sightings people recorded within reach of it (500 m of a point, 300 m of a trail). That is where observers went, the only free measure of where visitors go; it is not a visitor count. Filter by kind, search, or sort by longest trail, by Wikipedia readers a month (landmarks with an article), or A to Z. Each row shows a twelve-month sparkline and its busiest months. Open a place for its photograph and Wikipedia summary, the weather there now and this month's typical weather, the month-by-month chart, the animals people recorded there with a photograph each, and buttons to show it on the map or add it to a route. The file loads when you first open the page.
 
 ## Species
 
@@ -54,6 +55,7 @@ Per park: what the hexagons mean, what the map cannot tell you, sensitive specie
 
 ## For the owner
 
+- **Keep the data fresh:** `scripts/refresh.sh` runs from cron on the 1st and 15th at 03:00: for every live park it pulls only the sightings that changed since the last run, re-exports, rebuilds the places, refreshes the climate normals when they are older than a season, and opens one data PR. It refuses to start while the park batch holds the database. `SINCE=2026-08-01 scripts/refresh.sh` forces a window.
 - **Bring parks live unattended:** `nohup scripts/parks_batch.sh arches bryce_canyon ... > data/batch/batch.log 2>&1 &` runs sightings, export, landmarks, roads and things to do per park and opens a data PR after every six (`GROUP=` to change). `scripts/publish_data.sh "title" park ...` publishes exports on their own. Neither touches the working tree: the PR is built in a fresh worktree.
 - **Check the tour camera without eyes on it:** `node app/scripts/tour-probe.mjs "https://tlappas-23.github.io/parkwild/?park=zion" /tmp/probe 44 8` starts headless Chrome, runs the tour, presses Next at 8 s, and leaves camera samples and screenshots in the folder (E-048).
 

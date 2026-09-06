@@ -2599,3 +2599,41 @@ nav button.active {
     height: 48px;
   }
 }
+
+/* the weather chip: now, three days, and what the month is usually like */
+.weather {
+  display: grid;
+  gap: 6px;
+  margin: 8px 0 12px;
+}
+.weather-now {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-size: var(--t-14);
+}
+.weather-now strong {
+  font-size: var(--t-17);
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+.weather-days {
+  display: flex;
+  gap: 12px;
+}
+.weather-day {
+  display: grid;
+  justify-items: center;
+  gap: 1px;
+  font-variant-numeric: tabular-nums;
+}
+.weather.compact {
+  margin: 4px 0 8px;
+}
+.weather.compact .weather-now {
+  font-size: var(--t-13);
+}
+.weather.compact .weather-now strong {
+  font-size: var(--t-14);
+}

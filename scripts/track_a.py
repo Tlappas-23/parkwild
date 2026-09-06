@@ -29,6 +29,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from parkwild import gbif  # noqa: E402
 from parkwild.amenities import build_amenities  # noqa: E402
 from parkwild.bias import render_bias_markdown, road_bias, seasonal_bias  # noqa: E402
+from parkwild.climate import build_climate  # noqa: E402
 from parkwild.config import EXPORT_DIR, RESULTS_MD, get_corridor, get_park  # noqa: E402
 from parkwild.decisionlog import print_decision_summary  # noqa: E402
 from parkwild.export import export_park  # noqa: E402
@@ -55,7 +56,7 @@ def cmd_ingest(args):
     classes = tuple(c.strip() for c in args.classes.split(","))
     with Store() as store:
         if args.source in ("inaturalist", "all"):
-            r = ingest_inaturalist(store, park.key, place_id=park.inat_place_id, bbox=None, max_records=args.max_records)
+            r = ingest_inaturalist(store, park.key, place_id=park.inat_place_id, bbox=None, max_records=args.max_records, since=getattr(args, "since", None))
             print("inaturalist:", json.dumps(r))
         if args.source in ("gbif", "all"):
             if args.gbif_counts_only:
@@ -67,7 +68,7 @@ def cmd_ingest(args):
                         print(f"    {n:>8,}  {ds}{tag}")
                 return
             skip = (gbif.INAT_DATASET_KEY,) if args.include_ebird else (gbif.INAT_DATASET_KEY, gbif.EBIRD_DATASET_KEY)
-            r = ingest_gbif(store, park.key, park.bbox, classes=classes, max_records=args.max_records, skip_datasets=skip)
+            r = ingest_gbif(store, park.key, park.bbox, classes=classes, max_records=args.max_records, skip_datasets=skip, since=getattr(args, "since", None))
             print("gbif:", json.dumps(r))
 
 
@@ -130,6 +131,13 @@ def cmd_index(args):
     print(json.dumps(build_index(heroes=not args.no_heroes, **kw), indent=2))
 
 
+def cmd_climate(args):
+    """climate.json: ten years of daily weather at the park's centre from the
+    Open-Meteo archive, folded into monthly normals (network, no database, no key)."""
+    park = get_park(args.park)
+    print(json.dumps(build_climate(park), indent=2))
+
+
 def cmd_park_places(args):
     """places.json: every named trail, site, campground and facility with the
     sightings people recorded within reach, by species and month, and the
@@ -180,6 +188,7 @@ def build_parser():
     p.add_argument("--source", choices=["inaturalist", "gbif", "all"], default="all")
     p.add_argument("--classes", default="Mammalia,Aves", help="GBIF classes to pull (iNaturalist always gets both)")
     p.add_argument("--max-records", type=int, default=None, help="cap per source/class, for trial runs")
+    p.add_argument("--since", default=None, help="YYYY-MM-DD: only records changed since then (the fortnightly refresh)")
     p.add_argument("--gbif-counts-only", action="store_true", help="print GBIF counts by dataset and exit")
     p.add_argument("--include-ebird", action="store_true",
                    help="also pull eBird checklists from GBIF (421,940 records for Yellowstone; off until decided, ADR-0011)")
@@ -216,6 +225,10 @@ def build_parser():
     p = sub.add_parser("amenities", help="amenities.json: things to do, camping, trails around the park's places (network, no database)")
     p.add_argument("--park", required=True)
     p.set_defaults(func=cmd_amenities)
+
+    p = sub.add_parser("climate", help="climate.json: monthly normals at the park centre from the Open-Meteo archive (network, no key)")
+    p.add_argument("--park", required=True)
+    p.set_defaults(func=cmd_climate)
 
     p = sub.add_parser("park-places", help="places.json: named trails, sites, camps and facilities with sightings within reach (no database)")
     p.add_argument("--park", required=True)

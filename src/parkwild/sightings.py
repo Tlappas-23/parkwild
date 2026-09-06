@@ -49,12 +49,13 @@ DEDUPE_DIST_M = 200.0
 DEDUPE_WINDOW_S = 3600.0
 
 
-def ingest_inaturalist(store: Store, park: str, *, place_id: int | None, bbox: BBox | None, max_records: int | None = None, batch: int = 500) -> dict:
+def ingest_inaturalist(store: Store, park: str, *, place_id: int | None, bbox: BBox | None, max_records: int | None = None, batch: int = 500,
+                       since: str | None = None) -> dict:
     """Pull research-grade Mammalia + Aves observations and upsert them."""
     rows: list[dict] = []
     n_raw = n_written = 0
     status_counts: dict[str, int] = {}
-    for obs in inaturalist.iter_observations(place_id=place_id, bbox=bbox, max_records=max_records):
+    for obs in inaturalist.iter_observations(place_id=place_id, bbox=bbox, max_records=max_records, updated_since=since):
         n_raw += 1
         row = inaturalist.normalize(obs, park)
         status_counts[row["coordinate_status"]] = status_counts.get(row["coordinate_status"], 0) + 1
@@ -72,7 +73,8 @@ def ingest_inaturalist(store: Store, park: str, *, place_id: int | None, bbox: B
 
 
 def ingest_gbif(store: Store, park: str, bbox: BBox, *, classes: Iterable[str] = ("Mammalia", "Aves"),
-                max_records: int | None = None, skip_datasets: tuple[str, ...] = (gbif.INAT_DATASET_KEY,), batch: int = 500) -> dict:
+                max_records: int | None = None, skip_datasets: tuple[str, ...] = (gbif.INAT_DATASET_KEY,), batch: int = 500,
+                since: str | None = None) -> dict:
     """Pull GBIF occurrences for each class inside the park bbox, querying only
     the datasets that are wanted (the iNaturalist mirror and, by decision,
     eBird are never downloaded; E-015)."""
@@ -90,7 +92,7 @@ def ingest_gbif(store: Store, park: str, bbox: BBox, *, classes: Iterable[str] =
             log_filter("track_a.gbif", f"{cls}: no wanted datasets", n_skipped, 0, park=park, taxon_class=cls, skipped_by_dataset=skipped_by)
             summary[cls] = {"fetched": 0, "skipped_mirror": n_skipped, "written": 0, "coordinate_status": {}}
             continue
-        for occ in gbif.iter_occurrences(bbox, class_key, dataset_keys=[ds for ds, _ in wanted], max_records=max_records):
+        for occ in gbif.iter_occurrences(bbox, class_key, dataset_keys=[ds for ds, _ in wanted], max_records=max_records, since=since):
             n_raw += 1
             ds = occ.get("datasetKey")
             if ds in skip_datasets:   # belt and braces; the query should never return these

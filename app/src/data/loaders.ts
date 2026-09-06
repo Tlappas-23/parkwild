@@ -10,6 +10,7 @@ import type {
   BiasFile,
   BoundaryFile,
   CameraPassFile,
+  ClimateFile,
   CellsFile,
   LandmarksFile,
   Manifest,
@@ -157,7 +158,7 @@ export function stripFreshParam(): void {
 
 export async function loadPark(park: string) {
   const manifest = bakedManifest(park);
-  const [cells, species, bias, photosSpecies, landmarks, boundary, cameraPass, amenities] = await Promise.all([
+  const [cells, species, bias, photosSpecies, landmarks, boundary, cameraPass, amenities, climate] = await Promise.all([
     fetchVerified<CellsFile>(park, "cells.geojson", manifest),
     fetchVerified<SpeciesFile>(park, "species.json", manifest),
     fetchVerified<BiasFile>(park, "bias.json", manifest).catch(() => null),
@@ -166,8 +167,9 @@ export async function loadPark(park: string) {
     fetchVerified<BoundaryFile>(park, "boundary.geojson", manifest).catch(() => null),
     fetchVerified<CameraPassFile>(park, "camera_pass.json", manifest).catch(() => null), // the roadside pass: optional
     fetchVerified<AmenitiesFile>(park, "amenities.json", manifest).catch(() => null), // things to do: optional
+    fetchVerified<ClimateFile>(park, "climate.json", manifest).catch(() => null), // typical weather by month: optional
   ]);
-  return { cells, species, bias, photosSpecies, landmarks, boundary, cameraPass, amenities, manifest };
+  return { cells, species, bias, photosSpecies, landmarks, boundary, cameraPass, amenities, climate, manifest };
 }
 
 // Places are a few hundred KB in a big park and only the Places page needs
