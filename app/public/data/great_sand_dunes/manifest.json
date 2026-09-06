@@ -1,0 +1,53 @@
+{
+  "built": "2026-09-06T21:07:34+00:00",
+  "git_commit": "063bd1482f099d4cb5af7911fa70be8b0fa654e5",
+  "files": {
+    "cells.geojson": {
+      "sha256": "b450d4373dd5181fa78bcf02c6a467d2286c068bd830ddd89443919c187a8bb5",
+      "bytes": 80295
+    },
+    "species.json": {
+      "sha256": "56e25de4032357be2d50e7246a6be367b42aa4bde6606968247119e673797c39",
+      "bytes": 44517
+    },
+    "sightings.parquet": {
+      "sha256": "fc58687097d81fd769409ee9783e052d302c55585b5b1a3fc43c1dc0c677e57c",
+      "bytes": 65771
+    },
+    "photos_species.json": {
+      "sha256": "c870c4cb3907808bda9ccbb4682718b6f8a49cf359f69464c7a5cc5336774acd",
+      "bytes": 42073
+    },
+    "photos_cells.json": {
+      "sha256": "ffb6068326c4e3d63c97b6950ad0b7f937410a816e82eba86c22322c1a36774e",
+      "bytes": 33072
+    },
+    "places.json": {
+      "sha256": "e1637d58f3fb02c2f1d1b751f92edc1858580e30e7bde19c20b6fbf68f2d9c93",
+      "bytes": 11681
+    },
+    "landmarks.json": {
+      "sha256": "8c43aa8c7ac0a0597bf647cd22fbe892fa3dbfb95c3a6a4b1f75dd535b50e8ee",
+      "bytes": 5037
+    },
+    "boundary.geojson": {
+      "sha256": "f73ca640a928b087a060c2fe811e1e52e5a03552011efa8a77b4893953f3ce47",
+      "bytes": 8905
+    },
+    "roads.json": {
+      "sha256": "4d5c7a5b57b06468da5eda8d49b4802aac9e10f7042c7bbf1bd6863554be5bf4",
+      "bytes": 103747
+    },
+    "camera_pass.json": {
+      "sha256": "3e1e550109f583c6a4f6ee4b2be380b6b3463dd242a493c4845319b5f80cb007",
+      "bytes": 446
+    },
+    "amenities.json": {
+      "sha256": "cc8f353af7e11436ddba7332dd767959a65aca42e060d1314e2c5f9fa9cd7917",
+      "bytes": 6472
+    }
+  },
+  "park": "great_sand_dunes",
+  "name": "Great Sand Dunes National Park",
+  "state": "CO"
+}

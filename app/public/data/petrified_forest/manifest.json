@@ -1,0 +1,53 @@
+{
+  "built": "2026-09-06T20:47:22+00:00",
+  "git_commit": "066b4ecdb64cd98ebf93b298a7abefefbd29f932",
+  "files": {
+    "cells.geojson": {
+      "sha256": "09ff34bc40adbcba8d17a82b259824904ba1e1782619747e9d6677f0d44b9dbe",
+      "bytes": 272493
+    },
+    "species.json": {
+      "sha256": "6a475e3c8df3ba1be33735c8130bfc93b4a210b9d8509c99b37cbd2bda17c209",
+      "bytes": 90101
+    },
+    "sightings.parquet": {
+      "sha256": "89a279250328c6c7f0b410249b86d4c22d69ba1bbfb6636775e94d995fe23f27",
+      "bytes": 261075
+    },
+    "photos_species.json": {
+      "sha256": "b2f506fc8f43f7e1183dc63b33110ad9495f4217589c2ecf8d37c9e2c5f31b00",
+      "bytes": 125684
+    },
+    "photos_cells.json": {
+      "sha256": "ea6bce89e733c5034587c41847fdb6c854bbde40fcd63060952b8dc9e444fcb2",
+      "bytes": 118458
+    },
+    "places.json": {
+      "sha256": "0437125ad1598f48a53b5ffa3bc498e5058d8890c8e8c4e82711a4f557c524f6",
+      "bytes": 18478
+    },
+    "landmarks.json": {
+      "sha256": "d48f9991b8652e062b850c1c15216cabb0165078e0b5ce9173df6284b2c630e9",
+      "bytes": 24856
+    },
+    "boundary.geojson": {
+      "sha256": "27c6e323cc2766f26c53dffcb99324094cc832c8b456bc0ef2abdf39a36e0092",
+      "bytes": 2050
+    },
+    "roads.json": {
+      "sha256": "e71e0a51bb746e58006b3a13422fa2e27a3d6fa849ca344b0d56430abd9ced92",
+      "bytes": 123112
+    },
+    "camera_pass.json": {
+      "sha256": "1e8ef5dfe363f6c5b3150beaea0616d8f0cea1ca50931cdc0601e27c935667a6",
+      "bytes": 446
+    },
+    "amenities.json": {
+      "sha256": "d668c65f2aae9e66f59a46269ae727ec1d1476d06c409fb5a9093fd3ee62367f",
+      "bytes": 8874
+    }
+  },
+  "park": "petrified_forest",
+  "name": "Petrified Forest National Park",
+  "state": "AZ"
+}

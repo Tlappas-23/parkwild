@@ -1,0 +1,53 @@
+{
+  "built": "2026-09-06T21:11:11+00:00",
+  "git_commit": "8979b5e263b5dd25911b9dc114bc54beaf48a1ad",
+  "files": {
+    "cells.geojson": {
+      "sha256": "51039cdeb5b1b4dcb4fa1ee0ab420da8f8d33e3c2f6e6583fd286457de1cf920",
+      "bytes": 108280
+    },
+    "species.json": {
+      "sha256": "3d36c6b65bf7274c6fa312e630244012ffcd72f2852719d492b7f2c02dee4a7e",
+      "bytes": 47023
+    },
+    "sightings.parquet": {
+      "sha256": "f5a573a7c38295835b450aa7f25da810d3a923abff770edd819dfc43de0b260c",
+      "bytes": 103716
+    },
+    "photos_species.json": {
+      "sha256": "6b5e5265e61fc86f820040798f71ad1eb9f9be161be5f51fd5824e76d1775588",
+      "bytes": 51170
+    },
+    "photos_cells.json": {
+      "sha256": "9791cb12009ed3eee3e6d5dc0042164b05066f74a0789cfc69c3a3a56a874e12",
+      "bytes": 53136
+    },
+    "places.json": {
+      "sha256": "db417cc5dad022aaf39adae0736482263e76469f3bb2a19c2c21cd6b119ae5c5",
+      "bytes": 27255
+    },
+    "landmarks.json": {
+      "sha256": "da8a3c45810db24c528a9acd175c13cb77dc20f52cf2f79f8343b5ce06dfae83",
+      "bytes": 15538
+    },
+    "boundary.geojson": {
+      "sha256": "fce666b68cbf9dc52f83cede0ef8699c18e74a72abc8480f451a923a27163ecf",
+      "bytes": 2025
+    },
+    "roads.json": {
+      "sha256": "83d7454e01512d830e60a101459db9f2214631574869e04d6602604715de4d83",
+      "bytes": 100833
+    },
+    "camera_pass.json": {
+      "sha256": "10152613aa56d43cabe24b8b8d2a40ed9a7cd733d607922fe5d1c245ac44da5d",
+      "bytes": 440
+    },
+    "amenities.json": {
+      "sha256": "d50c2036da906991848150353f6e77fe19970cf16c4a8d44304eeda0b4eea499",
+      "bytes": 13625
+    }
+  },
+  "park": "mesa_verde",
+  "name": "Mesa Verde National Park",
+  "state": "CO"
+}

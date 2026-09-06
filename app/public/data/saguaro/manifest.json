@@ -1,0 +1,53 @@
+{
+  "built": "2026-09-06T21:05:12+00:00",
+  "git_commit": "cc310051eb1715ee5f44f2ccc99e7112867d9433",
+  "files": {
+    "cells.geojson": {
+      "sha256": "9c9245cabec514ee2e3b07000c824167dd6dced3e69100e9a97eb40ed470e969",
+      "bytes": 554203
+    },
+    "species.json": {
+      "sha256": "b4e98b2a757661c1e6b4d5c755ffde1dca71fc0a39346b1f8b41f7936bb84dca",
+      "bytes": 141309
+    },
+    "sightings.parquet": {
+      "sha256": "9a6dd6255f91147a6f255a022a168cd62058ebf4e0b1c9d35245d761837254e8",
+      "bytes": 704584
+    },
+    "photos_species.json": {
+      "sha256": "8f0c3e97e1099dfc77b1825712b12d934554fa970b5901109a41ead57a8d8487",
+      "bytes": 107552
+    },
+    "photos_cells.json": {
+      "sha256": "623c09ef96e8b16dd7d793976ee918679183e83fd6ea3b20f468527ad9493640",
+      "bytes": 249379
+    },
+    "places.json": {
+      "sha256": "ccbc0ead834512fadfd498416c8a78a8da5c8f9d6be40dad1076f58a9aaa26a3",
+      "bytes": 93198
+    },
+    "landmarks.json": {
+      "sha256": "00cc8a5ece3cda9b9ff91ab0f5529015ccce47dfe3f49193b285f600228d98fb",
+      "bytes": 6809
+    },
+    "boundary.geojson": {
+      "sha256": "8acac1ae5a91b1aeb33fb8d12449d4ed2477c828898b6adec4b816b9e43fc4c8",
+      "bytes": 2083
+    },
+    "roads.json": {
+      "sha256": "63636aecb7e516d0784476041c9a425889b0ec87badbc7e855074784a6460f52",
+      "bytes": 1458992
+    },
+    "camera_pass.json": {
+      "sha256": "fd274363d37c42bbd8ecd44fd22356e5e2c6a10e0d38291f5f55c0686daa9f7b",
+      "bytes": 437
+    },
+    "amenities.json": {
+      "sha256": "e396d55380d5a043a419c56f20c8b7bd77865db21a2fc2a834829d6f5bc7fb7c",
+      "bytes": 51683
+    }
+  },
+  "park": "saguaro",
+  "name": "Saguaro National Park",
+  "state": "AZ"
+}
