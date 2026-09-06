@@ -60,3 +60,61 @@ tour = ["Sugarlands Visitor Center", "Laurel Falls", "Cades Cove", "Chimney Tops
 "Cataloochee@wiki" = "Cataloochee_(Great_Smoky_Mountains)"
 "Sugarlands Visitor Center@wiki" = "Sugarlands"
 "Oconaluftee Visitor Center@wiki" = "Oconaluftee_(Great_Smoky_Mountains)"
+
+# Second batch (2026-09-05), from scripts/parks_seed.py; tours are automatic until curated.
+
+[grand_canyon]
+name          = "Grand Canyon National Park"
+state         = "AZ"
+inat_place_id = 69216
+bbox          = [-113.979854, 35.750081, -111.58704, 36.865558]
+# no curated tour yet: landmarks picks stops automatically (tour_source = auto)
+
+[zion]
+name          = "Zion National Park"
+state         = "UT"
+inat_place_id = 50634
+bbox          = [-113.228286, 37.14135, -112.863148, 37.504284]
+# no curated tour yet: landmarks picks stops automatically (tour_source = auto)
+
+[yosemite]
+name          = "Yosemite National Park"
+state         = "CA"
+inat_place_id = 68542
+bbox          = [-119.886282, 37.4947, -119.196421, 38.185139]
+# no curated tour yet: landmarks picks stops automatically (tour_source = auto)
+
+[rocky_mountain]
+name          = "Rocky Mountain National Park"
+state         = "CO"
+inat_place_id = 49676
+bbox          = [-105.913714, 40.158089, -105.493583, 40.553787]
+# no curated tour yet: landmarks picks stops automatically (tour_source = auto)
+
+[glacier]
+name          = "Glacier National Park"
+state         = "MT"
+inat_place_id = 72841
+bbox          = [-114.475516, 48.233688, -113.241977, 49.000949]
+# no curated tour yet: landmarks picks stops automatically (tour_source = auto)
+
+[acadia]
+name          = "Acadia National Park"
+state         = "ME"
+inat_place_id = 49610
+bbox          = [-68.661044, 44.00296, -68.029921, 44.429853]
+# no curated tour yet: landmarks picks stops automatically (tour_source = auto)
+
+[olympic]
+name          = "Olympic National Park"
+state         = "WA"
+inat_place_id = 69094
+bbox          = [-124.771497, 47.469707, -123.120462, 48.382894]
+# no curated tour yet: landmarks picks stops automatically (tour_source = auto)
+
+[shenandoah]
+name          = "Shenandoah National Park"
+state         = "VA"
+inat_place_id = 9012
+bbox          = [-78.851575, 38.040909, -78.150074, 38.910371]
+# no curated tour yet: landmarks picks stops automatically (tour_source = auto)

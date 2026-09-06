@@ -8,6 +8,7 @@ Track A driver: reference sightings from iNaturalist and GBIF.
     track_a.py export  --park yellowstone      # data/export/<park>/{cells.geojson,species.json,sightings.parquet,manifest.json}
     track_a.py summary --park yellowstone
     track_a.py landmarks --park yellowstone   # boundary.geojson + landmarks.json for the tour
+    track_a.py roads     --park yellowstone   # roads.json: OSM roads + trails graph for directions
     track_a.py all     --park yellowstone      # ingest all + dedupe + export
 
 Every step is idempotent: re-running refreshes the mirror and re-derives the
@@ -31,6 +32,7 @@ from parkwild.export import export_park  # noqa: E402
 from parkwild.inaturalist import find_places  # noqa: E402
 from parkwild.landmarks import build_landmarks  # noqa: E402
 from parkwild.report import update_results_md  # noqa: E402
+from parkwild.roads import build_roads  # noqa: E402
 from parkwild.sightings import dedupe, ingest_gbif, ingest_inaturalist, park_summary  # noqa: E402
 from parkwild.storage import Store  # noqa: E402
 
@@ -108,6 +110,13 @@ def cmd_landmarks(args):
     print(json.dumps(build_landmarks(park, EXPORT_DIR / park.key, summaries=not args.no_summaries), indent=2))
 
 
+def cmd_roads(args):
+    """Roads and trails inside the park bbox as a routing graph (network:
+    Overpass; no database). Rehashes the manifest afterwards."""
+    park = get_park(args.park)
+    print(json.dumps(build_roads(park, EXPORT_DIR / park.key), indent=2))
+
+
 def cmd_all(args):
     args.source = "all"
     args.gbif_counts_only = False
@@ -160,6 +169,10 @@ def build_parser():
     p.add_argument("--park", required=True)
     p.add_argument("--no-summaries", action="store_true", help="skip the Wikipedia excerpts")
     p.set_defaults(func=cmd_landmarks)
+
+    p = sub.add_parser("roads", help="OSM roads and trails as a routing graph for the app (network, no database)")
+    p.add_argument("--park", required=True)
+    p.set_defaults(func=cmd_roads)
 
     p = sub.add_parser("all", help="ingest all sources, dedupe, export, summarise")
     p.add_argument("--park", required=True)

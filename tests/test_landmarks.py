@@ -2,7 +2,7 @@
 talk to iNaturalist, Overpass and Wikipedia and are exercised by the real run."""
 from parkwild.config import Park
 from parkwild.geo import BBox
-from parkwild.landmarks import KINDS, MAX_PER_KIND, _kind, cap_by_kind, match_tour
+from parkwild.landmarks import AUTO_TOUR_STOPS, KINDS, MAX_PER_KIND, _kind, auto_tour, cap_by_kind, match_tour
 
 
 def _lm(id_, name, kind="geyser", rank=0):
@@ -36,3 +36,13 @@ def test_cap_keeps_tour_stops_past_the_kind_limit():
     stops = [geysers[-1]]          # the alphabetically last one is on the tour
     kept, dropped = cap_by_kind(geysers, stops)
     assert len(kept) == MAX_PER_KIND + 1 and geysers[-1] in kept and dropped == 4
+
+
+def test_auto_tour_prefers_articles_and_distinct_kinds_in_a_chain():
+    lms = [dict(_lm(f"node/{i}", f"Geyser {i}", "geyser", 0), url="https://en.wikipedia.org/wiki/G", lon=-110.9 + 0.01 * i) for i in range(12)]
+    lms.append(dict(_lm("node/50", "Big Lake", "lake", 5), url="https://en.wikipedia.org/wiki/L", lon=-110.5))
+    lms.append(dict(_lm("node/51", "No Article Peak", "peak", 4), url=None, lon=-110.4))
+    stops = auto_tour(lms)
+    assert len(stops) == AUTO_TOUR_STOPS and stops[0]["lon"] == -110.9         # westernmost first, then the nearest each time
+    assert "Big Lake" in [s["name"] for s in stops] and "No Article Peak" not in [s["name"] for s in stops]
+    assert [s["tour"] for s in stops] == list(range(AUTO_TOUR_STOPS))

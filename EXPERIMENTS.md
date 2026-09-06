@@ -167,6 +167,16 @@ Format: date, what, number, kept?, why, where it lives.
 - **Kept:** the recovery now unregisters the worker, drops every cache and navigates to the same page with a `?fresh=<timestamp>` parameter, which nothing has cached; it may try again after 45 s and the error box has a Reload button that does the same by hand. Data files left the precache: each URL carries `?v=<hash>`, so a content-addressed runtime cache hands every shell exactly the files it was built with, and a first visit no longer downloads three parks in the background (precache 12 MB → 2.2 MB, shell only).
 - **Unresolved:** a stale CDN edge can still serve an old index.html for up to ten minutes after a deploy; the fresh URL bypasses the edge for the document but the old bundle it references may be gone (404) in that window. Not seen yet; it would show as a blank page, not an integrity error.
 
+### E-028: directions inside the park without a routing service
+- **What:** the owner wants "based on current location, click which sites and get the best route". No hosted router fits the brief: OSRM's public server is a demo that asks not to be used in production, GraphHopper and OpenRouteService need a key (public in a static site), Valhalla is a backend, Google is forbidden. So the park's own OpenStreetMap roads and trails are baked into a graph (`parkwild/roads.py`, `track_a.py roads`) and the browser runs Dijkstra and the visiting order itself (`app/src/routing.ts`: exact Held-Karp up to 9 sites, nearest-neighbour plus 2-opt beyond).
+- **First pass:** every highway in the park's bounding box. Great Smoky came out at 8,000 km of road, 64k nodes and 8.9 MB: the streets of Gatlinburg, Pigeon Forge and Cherokee. Fix: outside the park polygon only motorway-to-tertiary roads survive, and service roads, living streets and parking aisles are dropped everywhere.
+- **Numbers after the fix:** Yellowstone 2,510 ways (1,144 outside the boundary and 1,383 service dropped), 10,099 nodes, 721 km road + 1,824 km trail, 1.48 MB (403 KB gzipped); Grand Teton 4,299 nodes, 613 KB; Great Smoky 13,474 nodes, 2,071 km road + 1,421 km trail, 2.0 MB (562 KB gzipped). Loaded only when someone plans a route. Edges are cut every 300 m so a site snaps to a node at most 150 m off the road. Yellowstone Lake's landmark point is the lake's centre, 7.5 km from any road; the first pass called it unreachable, now the leg goes to the nearest road and says how far the point is.
+- **Unresolved:** no closures, no seasons, no grades; the panel says so and links nps.gov. Speeds are assumed (35 mph, 5 km/h). One-way roads are honoured; turn restrictions are not. The device position is asked for only on a tap and never stored.
+
+### E-029: the tour panel hid the map
+- **What:** the owner: "the tour summary is a pop up and hides the map, I want it smaller so we always see the map".
+- **Kept:** a slim bar (about 110 px on a laptop, one row of small photographs, two lines of text) with a "Details" toggle that grows it for the full paragraph and credits; the camera pads the view by the bar's measured height, so the stop always sits above it.
+
 ## Open questions with a planned experiment
 
 - **Q-1 SpeciesNet determinism.** Answered (E-013).

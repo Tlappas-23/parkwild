@@ -112,3 +112,8 @@ export interface BoundaryFile {
   geometry: { type: "Polygon"; coordinates: Ring[] } | { type: "MultiPolygon"; coordinates: Ring[][] };
   properties: { park: string; name: string; source: string; place_id: number; source_url: string };
 }
+
+// The park's roads and trails as a graph (parkwild/roads.py). An edge is
+// [from, to, length_m, kind (0 road, 1 trail), oneway (0/1), name_index, coords].
+export type RoadEdge = [number, number, number, number, number, number, number[][]];
+export interface RoadsFile { park: string; fetched: string; attribution: string; nodes: number[][]; edges: RoadEdge[]; names: string[]; }

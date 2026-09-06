@@ -1,6 +1,6 @@
 {
-  "built": "2026-09-05T23:56:37+00:00",
-  "git_commit": "00758fd45fc6393700585d6672d82c4fcf952cbf",
+  "built": "2026-09-06T00:36:43+00:00",
+  "git_commit": "cb4cb0840d8b627121476139423ac56f4784b26b",
   "files": {
     "cells.geojson": {
       "sha256": "9ce81f40ddae487f733ab0b238e5501be23bd2ae0622a3e063b0a3f9891d32ad",
@@ -29,6 +29,10 @@
     "boundary.geojson": {
       "sha256": "7b6447a72a712c4718875b538b54dcc633bb05a0b27e74828841599378da9f82",
       "bytes": 17209
+    },
+    "roads.json": {
+      "sha256": "6b80f9707d8231192f7d78e7897c75080868c142a98b530770ca8667010aeb6c",
+      "bytes": 2042834
     }
   },
   "park": "great_smoky",

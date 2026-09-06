@@ -1,0 +1,379 @@
+# Seed stanzas from scripts/parks_seed.py; copy into parks.toml after a glance.
+
+[acadia]
+name          = "Acadia National Park"
+state         = "ME"
+inat_place_id = 49610
+bbox          = [-68.661044, 44.00296, -68.029921, 44.429853]
+
+[arches]
+name          = "Arches National Park"
+state         = "UT"
+inat_place_id = 53642
+bbox          = [-109.713199, 38.603166, -109.477713, 38.846933]
+
+[badlands]
+name          = "Badlands National Park"
+state         = "SD"
+inat_place_id = 72792
+bbox          = [-102.898088, 43.476726, -101.889781, 43.922314]
+
+[big_bend]
+name          = "Big Bend National Park"
+state         = "TX"
+inat_place_id = 55071
+bbox          = [-103.782241, 28.971887, -102.83999, 29.695091]
+
+[biscayne]
+name          = "Biscayne National Park"
+state         = "FL"
+inat_place_id = 95108
+bbox          = [-80.347196, 25.291431, -80.089433, 25.671111]
+
+[black_canyon_of_the_gunnison]
+name          = "Black Canyon of the Gunnison National Park"
+state         = "CO"
+inat_place_id = 72635
+bbox          = [-107.829538, 38.503026, -107.618422, 38.641185]
+
+[bryce_canyon]
+name          = "Bryce Canyon National Park"
+state         = "UT"
+inat_place_id = 69110
+bbox          = [-112.274098, 37.442082, -112.083237, 37.699268]
+
+[canyonlands]
+name          = "Canyonlands National Park"
+state         = "UT"
+inat_place_id = 95131
+bbox          = [-110.235245, 37.959909, -109.663923, 38.508067]
+
+[capitol_reef]
+name          = "Capitol Reef National Park"
+state         = "UT"
+inat_place_id = 69282
+bbox          = [-111.423284, 37.598567, -110.862161, 38.534444]
+
+[carlsbad_caverns]
+name          = "Carlsbad Caverns National Park"
+state         = "NM"
+inat_place_id = 69109
+bbox          = [-104.684774, 32.040844, -104.370758, 32.199223]
+
+[channel_islands]
+name          = "Channel Islands National Park"
+state         = "CA"
+inat_place_id = 3157
+bbox          = [-120.472995, 33.448088, -119.008001, 34.249224]
+
+[congaree]
+name          = "Congaree National Park"
+state         = "SC"
+inat_place_id = 53620
+bbox          = [-80.868365, 33.743332, -80.601278, 33.844432]
+
+[crater_lake]
+name          = "Crater Lake National Park"
+state         = "OR"
+inat_place_id = 52923
+bbox          = [-122.302452, 42.768596, -121.966079, 43.08878]
+
+[cuyahoga_valley]
+name          = "Cuyahoga Valley National Park"
+state         = "OH"
+inat_place_id = 72639
+bbox          = [-81.648262, 41.089688, -81.491114, 41.420448]
+
+[death_valley]
+name          = "Death Valley National Park"
+state         = "CA"
+inat_place_id = 4504
+bbox          = [-118.001032, 35.633538, -116.276524, 37.349445]
+
+[denali]
+name          = "Denali National Park"
+state         = "AK"
+inat_place_id = 71077
+bbox          = [-152.884593, 62.292652, -148.777831, 64.073172]
+
+[dry_tortugas]
+name          = "Dry Tortugas National Park"
+state         = "FL"
+inat_place_id = 70571
+bbox          = [-82.967886, 24.565329, -81.755516, 24.726119]
+
+[everglades]
+name          = "Everglades National Park"
+state         = "FL"
+inat_place_id = 53957
+bbox          = [-81.518309, 24.849977, -80.388684, 25.889944]
+
+[gates_of_the_arctic]
+name          = "Gates of the Arctic National Park"
+state         = "AK"
+inat_place_id = 69111
+bbox          = [-156.999396, 66.649638, -149.528879, 68.655385]
+
+[gateway_arch]
+name          = "Gateway Arch National Park"
+state         = "MO"
+inat_place_id = 137962
+bbox          = [-90.188999, 38.619184, -90.182476, 38.629511]
+
+[glacier]
+name          = "Glacier National Park"
+state         = "MT"
+inat_place_id = 72841
+bbox          = [-114.475516, 48.233688, -113.241977, 49.000949]
+
+[glacier_bay]
+name          = "Glacier Bay National Park"
+state         = "AK"
+inat_place_id = 69113
+bbox          = [-138.588178, 58.159191, -135.316732, 59.48305]
+
+[grand_canyon]
+name          = "Grand Canyon National Park"
+state         = "AZ"
+inat_place_id = 69216
+bbox          = [-113.979854, 35.750081, -111.58704, 36.865558]
+
+[grand_teton]
+name          = "Grand Teton National Park"
+state         = "WY"
+inat_place_id = 69099
+bbox          = [-110.948417, 43.537923, -110.422751, 44.084006]
+
+[great_basin]
+name          = "Great Basin National Park"
+state         = "NV"
+inat_place_id = 69699
+bbox          = [-114.356054, 38.818435, -114.132459, 39.06474]
+
+[great_sand_dunes]
+name          = "Great Sand Dunes National Park"
+state         = "CO"
+inat_place_id = 53632
+bbox          = [-105.728207, 37.662762, -105.428461, 37.956323]
+
+[great_smoky_mountains]
+name          = "Great Smoky Mountains National Park"
+state         = "TN"
+inat_place_id = 72645
+bbox          = [-84.013892, 35.426901, -82.998041, 35.841393]
+
+[guadalupe_mountains]
+name          = "Guadalupe Mountains National Park"
+state         = "TX"
+inat_place_id = 69313
+bbox          = [-105.025353, 31.813187, -104.711184, 32.000401]
+
+[hot_springs]
+name          = "Hot Springs National Park"
+state         = "AR"
+inat_place_id = 56706
+bbox          = [-93.113546, 34.498776, -93.01825, 34.559541]
+
+[isle_royale]
+name          = "Isle Royale National Park"
+state         = "MI"
+inat_place_id = 95245
+bbox          = [-89.414306, 47.758584, -88.174755, 48.30205]
+
+[joshua_tree]
+name          = "Joshua Tree National Park"
+state         = "CA"
+inat_place_id = 3680
+bbox          = [-116.458031, 33.670186, -115.262237, 34.129343]
+
+[katmai]
+name          = "Katmai National Park"
+state         = "AK"
+inat_place_id = 95257
+bbox          = [-156.528502, 57.873322, -153.250378, 59.273966]
+
+[kenai_fjords]
+name          = "Kenai Fjords National Park"
+state         = "AK"
+inat_place_id = 95258
+bbox          = [-150.97666, 59.288901, -149.516508, 60.304237]
+
+[kings_canyon]
+name          = "Kings Canyon National Park"
+state         = "CA"
+inat_place_id = 3378
+bbox          = [-118.983208, 36.592912, -118.333887, 37.237613]
+
+[kobuk_valley]
+name          = "Kobuk Valley National Park"
+state         = "AK"
+inat_place_id = 69115
+bbox          = [-160.296402, 66.911819, -157.829764, 67.870893]
+
+[lake_clark]
+name          = "Lake Clark National Park"
+state         = "AK"
+inat_place_id = 69114
+bbox          = [-155.005011, 59.851268, -152.198678, 61.512836]
+
+[lassen_volcanic]
+name          = "Lassen Volcanic National Park"
+state         = "CA"
+inat_place_id = 4509
+bbox          = [-121.620075, 40.344503, -121.246768, 40.58502]
+
+[mammoth_cave]
+name          = "Mammoth Cave National Park"
+state         = "KY"
+inat_place_id = 72649
+bbox          = [-86.267037, 37.097446, -86.023803, 37.270453]
+
+[mesa_verde]
+name          = "Mesa Verde National Park"
+state         = "CO"
+inat_place_id = 69108
+bbox          = [-108.554707, 37.156422, -108.339595, 37.350528]
+
+[mount_rainier]
+name          = "Mount Rainier National Park"
+state         = "WA"
+inat_place_id = 8838
+bbox          = [-122.129533, 46.707817, -121.442875, 47.001077]
+
+[new_river_gorge]
+name          = "New River Gorge National Park and Preserve"
+state         = "WV"
+inat_place_id = 95209
+bbox          = [-81.156523, 37.674211, -80.856163, 38.118753]
+
+[north_cascades]
+name          = "North Cascades National Park"
+state         = "WA"
+inat_place_id = 69097
+bbox          = [-121.639389, 48.369427, -120.631784, 49.000926]
+
+[olympic]
+name          = "Olympic National Park"
+state         = "WA"
+inat_place_id = 69094
+bbox          = [-124.771497, 47.469707, -123.120462, 48.382894]
+
+[petrified_forest]
+name          = "Petrified Forest National Park"
+state         = "AZ"
+inat_place_id = 57573
+bbox          = [-109.968693, 34.778705, -109.576726, 35.170567]
+
+[pinnacles]
+name          = "Pinnacles National Park"
+state         = "CA"
+inat_place_id = 5737
+bbox          = [-121.245521, 36.4084, -121.101211, 36.564157]
+
+[redwood]
+name          = "Redwood National Park"
+state         = "CA"
+inat_place_id = 6021
+bbox          = [-124.160157, 41.080628, -123.849502, 41.839811]
+
+[rocky_mountain]
+name          = "Rocky Mountain National Park"
+state         = "CO"
+inat_place_id = 49676
+bbox          = [-105.913714, 40.158089, -105.493583, 40.553787]
+
+[saguaro]
+name          = "Saguaro National Park"
+state         = "AZ"
+inat_place_id = 65739
+bbox          = [-111.243831, 32.104028, -110.498503, 32.352062]
+
+[sequoia]
+name          = "Sequoia National Park"
+state         = "CA"
+inat_place_id = 95321
+bbox          = [-118.919577, 36.291376, -118.234767, 36.70081]
+
+[shenandoah]
+name          = "Shenandoah National Park"
+state         = "VA"
+inat_place_id = 9012
+bbox          = [-78.851575, 38.040909, -78.150074, 38.910371]
+
+[theodore_roosevelt]
+name          = "Theodore Roosevelt National Park"
+state         = "ND"
+inat_place_id = 72793
+bbox          = [-103.630758, 46.888276, -103.242968, 47.631632]
+
+[virgin_islands]
+name          = "Virgin Islands National Park"
+state         = "VI"
+inat_place_id = 95336
+bbox          = [-64.802361, 18.296623, -64.677358, 18.377175]
+
+[voyageurs]
+name          = "Voyageurs National Park"
+state         = "MN"
+inat_place_id = 69101
+bbox          = [-93.203599, 48.299297, -92.453938, 48.631509]
+
+[white_sands]
+name          = "White Sands National Park"
+state         = "NM"
+inat_place_id = 62621
+bbox          = [-106.47965, 32.656211, -106.136859, 32.873159]
+
+[wind_cave]
+name          = "Wind Cave National Park"
+state         = "SD"
+inat_place_id = 72794
+bbox          = [-103.550635, 43.497197, -103.336808, 43.640484]
+
+[wrangell_st_elias]
+name          = "Wrangell-St. Elias National Park"
+state         = "AK"
+inat_place_id = 72658
+bbox          = [-145.435024, 59.692613, -139.061187, 62.717987]
+
+[yellowstone]
+name          = "Yellowstone National Park"
+state         = "WY"
+inat_place_id = 10211
+bbox          = [-111.155986, 44.132584, -109.82418, 45.108957]
+
+[yosemite]
+name          = "Yosemite National Park"
+state         = "CA"
+inat_place_id = 68542
+bbox          = [-119.886282, 37.4947, -119.196421, 38.185139]
+
+[zion]
+name          = "Zion National Park"
+state         = "UT"
+inat_place_id = 50634
+bbox          = [-113.228286, 37.14135, -112.863148, 37.504284]
+
+[american_samoa]
+name          = "National Park of American Samoa"
+state         = "AS"
+inat_place_id = 73645
+bbox          = [-170.727879, -14.283655, -169.417547, -14.168008]
+
+[haleakala]
+name          = "Haleakala National Park"
+state         = "HI"
+inat_place_id = 56788
+bbox          = [-156.256743, 20.626379, -156.040399, 20.772441]
+
+[hawaii_volcanoes]
+name          = "Hawaii Volcanoes National Park"
+state         = "HI"
+inat_place_id = 7222
+bbox          = [-155.800683, 19.0583, -155.015862, 19.54759]
+
+[indiana_dunes]
+name          = "Indiana Dunes National Lakeshore"
+state         = "IN"
+inat_place_id = 95241
+bbox          = [-87.461746, 41.507535, -86.836559, 41.717129]

@@ -6,6 +6,7 @@ import { filteredFeatures, speciesMatches, useStore } from "../store";
 import { STOP_PITCH, STOP_ZOOM, stopBearing, tourStops } from "../tour";
 import type { BoundaryFile, LandmarksFile, Ring } from "../types";
 import CellDetail from "./CellDetail";
+import PlanPanel from "./PlanPanel";
 import Tour from "./Tour";
 
 // Map sources, all free and keyless (BUILD_SPEC: zero cost; never Google):
@@ -78,12 +79,14 @@ export default function MapPage() {
   const [ready, setReady] = useState(false);
   const {
     cells, species, boundary, landmarks, speciesFilter, yearRange, setSpeciesFilter, setYearRange, selectCell, selectedCell,
-    reducedMotion, basemap, setBasemap, terrain3d, setTerrain3d, tour, startTour, tourGo,
+    reducedMotion, basemap, setBasemap, terrain3d, setTerrain3d, tour, startTour, tourGo, plan, location, openPlan, addSite,
   } = useStore();
   const [query, setQuery] = useState("");
   // Handlers are registered once on the map; refs keep them pointing at the live store actions.
   const selectCellRef = useRef(selectCell); selectCellRef.current = selectCell;
   const tourGoRef = useRef(tourGo); tourGoRef.current = tourGo;
+  const addSiteRef = useRef(addSite); addSiteRef.current = addSite;
+  const landmarksRef = useRef(landmarks); landmarksRef.current = landmarks;
 
   const features = useMemo(() => filteredFeatures(cells, speciesFilter, yearRange), [cells, speciesFilter, yearRange]);
   const years = useMemo(() => {
@@ -121,6 +124,9 @@ export default function MapPage() {
       map.addSource("outline", { type: "geojson", data: EMPTY });
       map.addSource("cells", { type: "geojson", data: EMPTY });
       map.addSource("landmarks", { type: "geojson", data: EMPTY });
+      map.addSource("route", { type: "geojson", data: EMPTY });
+      map.addSource("route-stops", { type: "geojson", data: EMPTY });
+      map.addSource("me", { type: "geojson", data: EMPTY });
 
       // Imagery sits right above the style's background so every road, river
       // and label stays on top of it; the hillshade goes under the lines.
@@ -141,6 +147,11 @@ export default function MapPage() {
         paint: { "fill-color": color, "fill-opacity": opacity(1), "fill-outline-color": "rgba(255,255,255,0.5)" } }, firstSymbol);
       map.addLayer({ id: "cells-selected", type: "line", source: "cells", filter: ["==", ["get", "cell"], ""],
         paint: { "line-color": "#0b0b0b", "line-width": 2 } }, firstSymbol);
+      // The planned route: a cased line so it reads on imagery and on paper-white alike.
+      map.addLayer({ id: "route-casing", type: "line", source: "route", layout: { "line-join": "round", "line-cap": "round" },
+        paint: { "line-color": "#ffffff", "line-width": 8, "line-opacity": 0.9 } }, firstSymbol);
+      map.addLayer({ id: "route-line", type: "line", source: "route", layout: { "line-join": "round", "line-cap": "round" },
+        paint: { "line-color": "#c2410c", "line-width": 4 } }, firstSymbol);
 
       // Landmarks: tour stops are numbered and always labelled; the rest are
       // small dots that get a name once you are close enough for it to fit.
@@ -156,6 +167,13 @@ export default function MapPage() {
       });
       label("landmark-label-stops", true, 7);
       label("landmark-label", false, 10.5);
+      map.addLayer({ id: "route-stop-dot", type: "circle", source: "route-stops",
+        paint: { "circle-radius": 11, "circle-color": "#c2410c", "circle-stroke-color": "#ffffff", "circle-stroke-width": 2 } });
+      map.addLayer({ id: "route-stop-n", type: "symbol", source: "route-stops",
+        layout: { "text-field": ["get", "n"], "text-font": ["Noto Sans Bold"], "text-size": 12, "text-allow-overlap": true },
+        paint: { "text-color": "#ffffff" } });
+      map.addLayer({ id: "me-halo", type: "circle", source: "me", paint: { "circle-radius": 16, "circle-color": "#1a73e8", "circle-opacity": 0.18 } });
+      map.addLayer({ id: "me-dot", type: "circle", source: "me", paint: { "circle-radius": 7, "circle-color": "#1a73e8", "circle-stroke-color": "#ffffff", "circle-stroke-width": 2.5 } });
 
       // A tall sky so the pitched tour view has a horizon instead of a void.
       map.setSky({ "sky-color": "#a8c8e8", "horizon-color": "#e6edf3", "fog-color": "#dfe6ec", "fog-ground-blend": 0.55,
@@ -170,7 +188,8 @@ export default function MapPage() {
           const p = lm.properties as { name: string; kind: string; tour: number; url: string };
           if (p.tour >= 0) { tourGoRef.current(p.tour); return; }
           new maplibregl.Popup({ closeButton: false, offset: 10, maxWidth: "240px" }).setLngLat(e.lngLat)
-            .setHTML(`<strong>${esc(p.name)}</strong><br><span class="muted">${esc(p.kind)}</span>${p.url ? ` · <a href="${esc(p.url)}" target="_blank" rel="noreferrer">Wikipedia</a>` : ""}`)
+            .setHTML(`<strong>${esc(p.name)}</strong><br><span class="muted">${esc(p.kind)}</span>${p.url ? ` · <a href="${esc(p.url)}" target="_blank" rel="noreferrer">Wikipedia</a>` : ""}`
+              + `<br><button class="popup-add small-btn" data-id="${esc(String(lm.properties.id))}">+ Add to route</button>`)
             .addTo(map);
           return;
         }
@@ -182,11 +201,20 @@ export default function MapPage() {
       mapRef.current = map;
       setReady(true);
     });
+    // Popup buttons are plain HTML, so one delegated listener turns "+ Add to
+    // route" clicks into store actions.
+    const onDocClick = (ev: MouseEvent) => {
+      const btn = (ev.target as HTMLElement | null)?.closest?.(".popup-add") as HTMLElement | null;
+      if (!btn) return;
+      const l = landmarksRef.current?.landmarks.find((x) => x.id === btn.dataset.id);
+      if (l) addSiteRef.current({ id: l.id, label: l.name, lon: l.lon, lat: l.lat, kind: l.tour !== undefined ? "stop" : "landmark" });
+    };
+    document.addEventListener("click", onDocClick);
     // The container reaches its final size after fonts and layout settle; MapLibre
     // sized its canvas earlier. Follow the container, not the first measurement.
     const ro = new ResizeObserver(() => map.resize());
     ro.observe(container.current);
-    return () => { ro.disconnect(); map.remove(); mapRef.current = null; };
+    return () => { document.removeEventListener("click", onDocClick); ro.disconnect(); map.remove(); mapRef.current = null; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -241,6 +269,25 @@ export default function MapPage() {
     if (map?.getLayer("cells-selected")) map.setFilter("cells-selected", ["==", ["get", "cell"], selectedCell ?? ""]);
   }, [selectedCell]);
 
+  // The planned route and its numbered stops; the view frames the whole route.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!ready || !map) return;
+    const r = plan.result;
+    (map.getSource("route") as GeoJSONSource).setData(r ? { type: "FeatureCollection", features: r.legs.map((l, i) => ({ type: "Feature", properties: { n: i + 1 }, geometry: { type: "LineString", coordinates: l.coords } })) } : EMPTY);
+    (map.getSource("route-stops") as GeoJSONSource).setData(r ? { type: "FeatureCollection", features: r.order.map((s, i) => ({ type: "Feature", properties: { n: String(i + 1), label: s.label }, geometry: { type: "Point", coordinates: [s.lon, s.lat] } })) } : EMPTY);
+    if (r && r.legs.length) {
+      const pts: Ring = [[r.legs[0].from.lon, r.legs[0].from.lat], ...r.legs.flatMap((l) => l.coords)];
+      const b = boundsOf([pts]);
+      if (b) map.fitBounds(b, { padding: { top: 60, bottom: 60, left: 360, right: 60 }, pitch: 0, maxZoom: 14, duration: reducedMotion ? 0 : 900 });
+    }
+  }, [ready, plan.result, reducedMotion]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (ready && map) (map.getSource("me") as GeoJSONSource).setData(location ? { type: "FeatureCollection", features: [{ type: "Feature", properties: {}, geometry: { type: "Point", coordinates: [location.lon, location.lat] } }] } : EMPTY);
+  }, [ready, location]);
+
   // The tour camera: fly to the stop, pitched, facing the next stop. Leaving
   // the tour eases back to the whole park.
   useEffect(() => {
@@ -282,6 +329,7 @@ export default function MapPage() {
             <button className={basemap === "satellite" ? "on" : ""} aria-pressed={basemap === "satellite"} onClick={() => setBasemap("satellite")}>Satellite</button>
           </div>
           <button className={"toggle" + (terrain3d ? " on" : "")} aria-pressed={terrain3d} onClick={() => setTerrain3d(!terrain3d)}>3D</button>
+          {!plan.open && <button className="toggle" onClick={openPlan}>◎ Plan a visit</button>}
         </div>
         <div className="control">
           <label htmlFor="species-search">Species</label>
@@ -319,6 +367,7 @@ export default function MapPage() {
           </div>
         </div>
         <p className="muted small stat">{total.toLocaleString()} sightings in {features.length.toLocaleString()} cells</p>
+        {plan.open && <PlanPanel />}
       </div>
 
       <div className="legend" aria-label="Legend">
