@@ -41,7 +41,7 @@ Track B never blocks the app: a park with no imagery pass simply has no amber ce
 | `track_a.py park-places --park K` | landmarks.json, amenities.json, roads.json, sightings.parquet; Wikimedia pageviews | places.json, manifest | readers only | none |
 | `track_a.py climate --park K` | Open-Meteo archive (ten years daily at the park's busiest place) | climate.json, manifest | yes | none |
 | `track_a.py ingest --since D` | iNaturalist `updated_since`, GBIF `lastInterpreted` | only records changed since D | yes | none |
-| `scripts/refresh.sh` | every live park: ingest since last run, dedupe, export, places, climate when stale, one data PR | cron, 1st and 15th 03:00 | yes | none |
+| `scripts/refresh.sh` | every live park: ingest since last run, dedupe, export (photographs included), places, landmarks and amenities monthly, climate seasonally, one data PR | cron, 1st and 15th 03:00 | yes | none |
 | `track_a.py species-index` | the shipped park folders | `app/public/data/species_index.json` | no | none |
 | `scripts/parks_batch.sh K1 K2 ...` | everything above per park (Track A, landmarks, roads, amenities, places; finished work skipped), then `publish_data.sh` after every six | live parks, unattended; logs in `data/batch/` | yes | none |
 | `scripts/publish_data.sh "title" K1 ...` | `data/export/<park>` | a data-only PR from a fresh worktree: park folders, species index, park index; `sightings.parquet` is not shipped | no | none |
