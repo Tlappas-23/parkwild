@@ -19,7 +19,7 @@
     "@huggingface/transformers": "^4.2.0",
     "@mlc-ai/web-llm": "^0.2.84",
     "lucide-react": "^1.41.0",
-    "maplibre-gl": "^5",
+    "maplibre-gl": "^6",
     "react": "^19",
     "react-dom": "^19",
     "zustand": "^5"
