@@ -1,0 +1,49 @@
+{
+  "built": "2026-09-06T06:45:58+00:00",
+  "git_commit": "fa38be70aabf9dbd62e6c617618c3e6dd606f7c5",
+  "files": {
+    "cells.geojson": {
+      "sha256": "a2eef99a6aa83588f2244c34045d70029a02fce33cacdab69f956b50485cc6c0",
+      "bytes": 1032948
+    },
+    "species.json": {
+      "sha256": "684ef02f77dd8d4aebf1ab3d739d72ff0b5f943bebd66c806ca148fe71b00bf0",
+      "bytes": 119129
+    },
+    "sightings.parquet": {
+      "sha256": "e7c1202443163cd60e2919eb536a78da2369008e09ef522d9e26d889ab6010da",
+      "bytes": 1003785
+    },
+    "photos_species.json": {
+      "sha256": "c28dea432c3bad46500e71d30875b8230a0b3c4a7ab40c7cee456ec890243410",
+      "bytes": 136480
+    },
+    "photos_cells.json": {
+      "sha256": "2958180e492ee2668ad3a95b82c103569527a6998550c755aceb39dfa35e8554",
+      "bytes": 420816
+    },
+    "landmarks.json": {
+      "sha256": "5c243a968c9ea04711147d28db8caf47be0219e7d61d1df9ec78dc26290627fc",
+      "bytes": 24178
+    },
+    "boundary.geojson": {
+      "sha256": "e81d5a3c46dd3d7fa491199f43d68b3181ae89c31e09e19d9d36d082be431038",
+      "bytes": 6627
+    },
+    "roads.json": {
+      "sha256": "7cecce734c9bcba27c3484798e4b7b95cc510f6bc4bbeb617a7df2d3961c622d",
+      "bytes": 1113481
+    },
+    "camera_pass.json": {
+      "sha256": "097990430a6dfa5405cb330464a2ae92541d71fbce97a0d163ff551dd4c70b59",
+      "bytes": 437
+    },
+    "amenities.json": {
+      "sha256": "b76a0786b0aaaf185119b48d10e9124c9e397d546de235be79d05a1516931781",
+      "bytes": 112902
+    }
+  },
+  "park": "glacier",
+  "name": "Glacier National Park",
+  "state": "MT"
+}

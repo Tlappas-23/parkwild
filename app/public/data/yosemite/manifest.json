@@ -1,0 +1,49 @@
+{
+  "built": "2026-09-06T06:45:06+00:00",
+  "git_commit": "fa38be70aabf9dbd62e6c617618c3e6dd606f7c5",
+  "files": {
+    "cells.geojson": {
+      "sha256": "0fed1bc9c656a831de4998411a46097cbf794ae471f6a6488fe9e5d2a0d44536",
+      "bytes": 1207138
+    },
+    "species.json": {
+      "sha256": "36f150c5dbda68de7f36375877b409165cd8d6c0aca5f00ed0f05f5696e58957",
+      "bytes": 118282
+    },
+    "sightings.parquet": {
+      "sha256": "46300dbd6c9574c5c88a6e8d6376b0789751cd7b640040cb471a0603e4f8015e",
+      "bytes": 2222695
+    },
+    "photos_species.json": {
+      "sha256": "9f250cae8d8009b176845a7e5ff724219fc02ec9bc87c1a27e6050c30fa2bc46",
+      "bytes": 145132
+    },
+    "photos_cells.json": {
+      "sha256": "549f10b64cde1ee69794f28128e40d2edd5619603c1b372027b91716532aaa55",
+      "bytes": 575181
+    },
+    "landmarks.json": {
+      "sha256": "a0545d20486e96e08f4c0fd206e98d007fff6ed397ad6d90e4a09a3dd4039dd0",
+      "bytes": 29127
+    },
+    "boundary.geojson": {
+      "sha256": "03c59444a08b5e775eca728e39b9e45da26dd623d202f1d55b010e74381ccad1",
+      "bytes": 6126
+    },
+    "roads.json": {
+      "sha256": "6e0afcf62e2df333f0bc127f90381ec3557d22b79ab6e59440d451d833be1ca0",
+      "bytes": 1290466
+    },
+    "camera_pass.json": {
+      "sha256": "2e9fa665622ebfa98d5d0de86c5397ffc0e4c4c2c8d7b945251c745cc2f255b6",
+      "bytes": 438
+    },
+    "amenities.json": {
+      "sha256": "730aef0b17b1c080be2e028ffa85ddafcfeb3cbf466a9351d930af0b87cc0c37",
+      "bytes": 110386
+    }
+  },
+  "park": "yosemite",
+  "name": "Yosemite National Park",
+  "state": "CA"
+}

@@ -1,0 +1,49 @@
+{
+  "built": "2026-09-06T06:45:27+00:00",
+  "git_commit": "fa38be70aabf9dbd62e6c617618c3e6dd606f7c5",
+  "files": {
+    "cells.geojson": {
+      "sha256": "6541a8c666ad095f650810ec9e56b5741dfa6640d7529098f6fa5ecd5ea88739",
+      "bytes": 1049052
+    },
+    "species.json": {
+      "sha256": "449741c6e73d09fdedd2cbaaf1c90dd69251bc9e676b0365a80fcaca78a04ca7",
+      "bytes": 103648
+    },
+    "sightings.parquet": {
+      "sha256": "0d4df04ff5f7fc73fb522710e3a1315a420fd9437535202692498d7812e594ff",
+      "bytes": 1838536
+    },
+    "photos_species.json": {
+      "sha256": "e935ff0965379859ea27c0cdef3c8507721998939357da918f7243929e7dd54a",
+      "bytes": 130518
+    },
+    "photos_cells.json": {
+      "sha256": "2562c55742c49c82175f49eb3dacb90b554f82b3b906b6d6ef954591ebbc5338",
+      "bytes": 612976
+    },
+    "landmarks.json": {
+      "sha256": "08974cca7bd3f1e2318c49a763adbf7423b641c39e09c4bbd60a2d96bc14e920",
+      "bytes": 22914
+    },
+    "boundary.geojson": {
+      "sha256": "54c842549c398583507a552bb4135891d20452ed5ee6fee24e086c614962328b",
+      "bytes": 6363
+    },
+    "roads.json": {
+      "sha256": "fb6479729a1b506b7a34fe1e297e0ec6a641e33299d6347f177160ca3ffc358e",
+      "bytes": 683129
+    },
+    "camera_pass.json": {
+      "sha256": "3b5712fec66604cea4ebf37f2f725762f5521747e6aeeb37b089371d57f7016e",
+      "bytes": 444
+    },
+    "amenities.json": {
+      "sha256": "5c5f6494ab3e60403905e3d3d89ce28f1fb3e66a86c814dd2f77973a1bc506a0",
+      "bytes": 98949
+    }
+  },
+  "park": "rocky_mountain",
+  "name": "Rocky Mountain National Park",
+  "state": "CO"
+}

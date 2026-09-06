@@ -1,0 +1,49 @@
+{
+  "built": "2026-09-06T06:47:39+00:00",
+  "git_commit": "fa38be70aabf9dbd62e6c617618c3e6dd606f7c5",
+  "files": {
+    "cells.geojson": {
+      "sha256": "3d776eb3d0258568ed54c5fddbed1a8f625f5ac1959932cde71cc3fa75ea2f02",
+      "bytes": 3647468
+    },
+    "species.json": {
+      "sha256": "6d5c27bf27b50964700f2bdc9ff8770e2ae274a8e14d8b5330cf2054475126d9",
+      "bytes": 145156
+    },
+    "sightings.parquet": {
+      "sha256": "296d5866029c00f5d5d281fde030db88171e78b533885d12e89af2924bfc848a",
+      "bytes": 2711521
+    },
+    "photos_species.json": {
+      "sha256": "ddc397258d91633fa8464a57342551ba07bf762b4385b368fa8129acfe8aaf29",
+      "bytes": 139371
+    },
+    "photos_cells.json": {
+      "sha256": "c4e66e4f55091e2ea7fa5a562a26a386ce336a7011f62f75896ffaff0999723f",
+      "bytes": 357229
+    },
+    "landmarks.json": {
+      "sha256": "173f2bd60b10d27fc133c00f2efedbd6ceed734db89371bc6d09986c71032087",
+      "bytes": 24855
+    },
+    "boundary.geojson": {
+      "sha256": "8148786ad86a3de1bc093459f066f6d4999e79b2f5bcbfad24ef9c4403be25b1",
+      "bytes": 31155
+    },
+    "roads.json": {
+      "sha256": "a618b059e737441623b1ea14476f37195c32a422f042fc043500d082fd4145ea",
+      "bytes": 1184406
+    },
+    "camera_pass.json": {
+      "sha256": "51766c3a111828a805f2f9355c053848b12ccbf4f0224d3a028fa7193e600079",
+      "bytes": 437
+    },
+    "amenities.json": {
+      "sha256": "27416c7dc0c2b16dae07e5c7bb0cad43166240dff6b42e8a808ea4dafeb93f5a",
+      "bytes": 136272
+    }
+  },
+  "park": "olympic",
+  "name": "Olympic National Park",
+  "state": "WA"
+}

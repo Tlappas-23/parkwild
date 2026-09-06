@@ -1,0 +1,49 @@
+{
+  "built": "2026-09-06T06:47:48+00:00",
+  "git_commit": "fa38be70aabf9dbd62e6c617618c3e6dd606f7c5",
+  "files": {
+    "cells.geojson": {
+      "sha256": "41734753200f4c153a9e0334d421e859662285c7faf3395a8cc42b8421e9415b",
+      "bytes": 587189
+    },
+    "species.json": {
+      "sha256": "945b24f6e1c81eeaf5f5e5f2351927ff7f4717d373bb39f52d4200bed327b545",
+      "bytes": 102335
+    },
+    "sightings.parquet": {
+      "sha256": "55340e1746b5a11e7ec202a616ca4cf95f8368ea4e7faac662ee33549f56fa63",
+      "bytes": 660278
+    },
+    "photos_species.json": {
+      "sha256": "d2ed9ab46349032017d9dbefc34bf572235dcd8b53f18360ab104b2f68be980d",
+      "bytes": 97392
+    },
+    "photos_cells.json": {
+      "sha256": "c07c25d9c388fb9de8f176c7fecc91ea0342e1f80093f1e70a103c381215429a",
+      "bytes": 218980
+    },
+    "landmarks.json": {
+      "sha256": "23d280bbfe9cea8644dbfc1a079c3dc6e68fbaaddedb435d481fe278612e4c18",
+      "bytes": 34893
+    },
+    "boundary.geojson": {
+      "sha256": "f2e0acd1cb50fe42d6a646dae1edc2dd6b5fd288c5ed70df381c82e0b2e3296f",
+      "bytes": 16601
+    },
+    "roads.json": {
+      "sha256": "5bbae5929f44bd97e0d498fae27b0ed3db7a3cc4f8ac61b750064464a66a2e49",
+      "bytes": 1704583
+    },
+    "camera_pass.json": {
+      "sha256": "fe18932c102fb195d6b997776bf5986fc052e06fdccf73a9a3bfd66dc1788b4e",
+      "bytes": 440
+    },
+    "amenities.json": {
+      "sha256": "1ba67728bd32f3a258028db5b4bdec2de7379f800f73bd1836ad1cdb85023cc3",
+      "bytes": 96709
+    }
+  },
+  "park": "shenandoah",
+  "name": "Shenandoah National Park",
+  "state": "VA"
+}
