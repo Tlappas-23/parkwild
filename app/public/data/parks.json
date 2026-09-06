@@ -1,9 +1,9 @@
 {
- "generated": "2026-09-06T20:33:26+00:00",
+ "generated": "2026-09-06T21:07:09+00:00",
  "attribution": "Park photographs: Wikimedia Commons, each under the licence printed on its card",
  "species_index": {
-  "sha256": "26387a7a35d612062a3c213abcac8e3cb2de6e9604dd7522c73566cb1c101b8b",
-  "bytes": 1112313
+  "sha256": "f3e930583c8cd671b93d07d9a3e32c4f98acacbb0cc5b8997b42b6ef6a6061fe",
+  "bytes": 1132312
  },
  "parks": [
   {
@@ -844,7 +844,7 @@
    "key": "mammoth_cave",
    "name": "Mammoth Cave National Park",
    "state": "KY",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -86.267,
     37.0974,
@@ -855,11 +855,11 @@
     -86.1454,
     37.1839
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 127,
+   "sightings": 1373,
+   "cells": 159,
+   "stops": 3,
+   "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Mammoth_Cave_Rotunda_%28USGS_Lwt02830%29.jpg/1280px-Mammoth_Cave_Rotunda_%28USGS_Lwt02830%29.jpg",
     "page": "https://commons.wikimedia.org/wiki/File:Mammoth_Cave_Rotunda_(USGS_Lwt02830).jpg",
@@ -873,7 +873,7 @@
    "key": "petrified_forest",
    "name": "Petrified Forest National Park",
    "state": "AZ",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -109.9687,
     34.7787,
@@ -884,11 +884,11 @@
     -109.7727,
     34.9746
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 217,
+   "sightings": 3953,
+   "cells": 658,
+   "stops": 8,
+   "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Jasper_Forest_at_Petrified_Forest_NP_in_AZ_12.jpg/1280px-Jasper_Forest_at_Petrified_Forest_NP_in_AZ_12.jpg",
     "page": "https://commons.wikimedia.org/wiki/File:Jasper_Forest_at_Petrified_Forest_NP_in_AZ_12.jpg",
@@ -902,7 +902,7 @@
    "key": "saguaro",
    "name": "Saguaro National Park",
    "state": "AZ",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -111.2438,
     32.104,
@@ -913,11 +913,11 @@
     -110.8712,
     32.228
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 342,
+   "sightings": 11772,
+   "cells": 1206,
+   "stops": 8,
+   "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Saguaro_Sunset.jpg/1280px-Saguaro_Sunset.jpg",
     "page": "https://commons.wikimedia.org/wiki/File:Saguaro_Sunset.jpg",
@@ -931,7 +931,7 @@
    "key": "great_sand_dunes",
    "name": "Great Sand Dunes National Park",
    "state": "CO",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -105.7282,
     37.6628,
@@ -942,9 +942,9 @@
     -105.5783,
     37.8095
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
+   "species": 107,
+   "sightings": 753,
+   "cells": 185,
    "stops": null,
    "tour_source": null,
    "hero": {
