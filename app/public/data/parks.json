@@ -1,8 +1,8 @@
 {
- "generated": "2026-09-06T18:23:46+00:00",
+ "generated": "2026-09-06T18:41:56+00:00",
  "attribution": "Park photographs: Wikimedia Commons, each under the licence printed on its card",
  "species_index": {
-  "sha256": "551ebd91dd38c6ab4476cc1f8f69b399ec8cbbed85710fa9973778307bfeadf4",
+  "sha256": "adb132ef46b06023dc6fd365bd7a856d1baa742948f6ad01484d9fedfc850677",
   "bytes": 726580
  },
  "parks": [
@@ -496,7 +496,7 @@
    "key": "joshua_tree",
    "name": "Joshua Tree National Park",
    "state": "CA",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -116.458,
     33.6702,
@@ -507,11 +507,11 @@
     -115.8601,
     33.8998
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 224,
+   "sightings": 18134,
+   "cells": 1954,
+   "stops": 8,
+   "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Joshua_Tree_-_Cyclops_%2B_Potato_Head_-_Sunrise.jpg/1280px-Joshua_Tree_-_Cyclops_%2B_Potato_Head_-_Sunrise.jpg",
     "page": "https://commons.wikimedia.org/wiki/File:Joshua_Tree_-_Cyclops_%2B_Potato_Head_-_Sunrise.jpg",
