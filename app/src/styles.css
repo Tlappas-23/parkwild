@@ -281,3 +281,15 @@ table.pass th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05
 .update-pill { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 50; background: var(--fg); color: var(--panel); padding: 8px 10px 8px 14px; border-radius: 999px; font-size: 13px; display: flex; gap: 10px; align-items: center; box-shadow: var(--shadow); }
 .update-pill .primary { background: var(--panel); color: var(--fg); border-color: var(--panel); }
 .home-search { max-width: 360px; margin-top: 12px; }
+
+
+/* legend: bottom-right above the zoom buttons on wide screens, so the left
+   panel can grow (planner open) without covering it */
+@media (min-width: 900px) {
+  .legend { left: auto; right: 14px; bottom: 132px; max-width: 320px; }
+}
+@media (max-width: 899px) {
+  .map-page.touring .legend { display: none; }
+}
+.tour-card .thumb { position: relative; display: block; }
+.near-tag { position: absolute; left: 4px; bottom: 4px; background: rgba(15,23,42,0.72); color: #fff; font-size: 9px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; padding: 2px 5px; border-radius: 999px; }

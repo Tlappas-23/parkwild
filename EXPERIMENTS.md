@@ -206,6 +206,11 @@ Format: date, what, number, kept?, why, where it lives.
 - **Kept:** the worker now skips waiting at install and claims open pages (`skipWaiting`, `clientsClaim`); the app reloads on the controller change when it happens within 30 s of opening, and otherwise shows a "newer version is ready" pill so a tour or a plan is never yanked away. Existing stale tabs pick this up on the next worker update check, which GitHub Pages' ten-minute cache bounds; closing every tab of the site once does it immediately.
 - **Number:** the owner's screenshot was build 4 of 8 that day.
 
+### E-035: pictures from there, a closer camera, and motion during the tour
+- **What:** the owner, on the corner card: the legend collided with the left panel once the planner opened; the tour's photographs should look like they were taken at the stop; the camera should be closer and the map should move while the tour runs.
+- **Kept:** the legend sits bottom-right above the zoom buttons on wide screens (hidden on phones while touring). Each species on a stop's card now shows a photograph taken inside the stop's 2.5 km radius when one exists, found through the cell strips (one photograph per species per cell) and the galleries' cell ids, tagged "near here"; otherwise the species' park-wide photograph, said so in the tooltip. Stops land at zoom 13.3 and 64° pitch (was 12.4 / 60°) and, once the flight ends, the camera turns 45° over the 14 s dwell; a drag, the next flight or leaving the tour stops the turn.
+- **Number:** on Yellowstone's eleven stops, 32 of the 33 species cards show a photograph taken within 2.5 km of the stop (Yellowstone Lake: 2 of 3). Not curated; the cell strips decide.
+
 ## Open questions with a planned experiment
 
 - **Q-1 SpeciesNet determinism.** Answered (E-013).

@@ -3,7 +3,7 @@ import maplibregl, { type GeoJSONSource, type LngLatBoundsLike, type Map as MLMa
 import "maplibre-gl/dist/maplibre-gl.css";
 import type { FeatureCollection } from "geojson";
 import { filteredFeatures, speciesMatches, useStore } from "../store";
-import { STOP_PITCH, STOP_ZOOM, stopBearing, tourStops } from "../tour";
+import { ORBIT_DEG, ORBIT_MS, STOP_PITCH, STOP_ZOOM, stopBearing, tourStops } from "../tour";
 import type { BoundaryFile, LandmarksFile, Ring } from "../types";
 import CellDetail from "./CellDetail";
 import PlanPanel from "./PlanPanel";
@@ -345,6 +345,14 @@ export default function MapPage() {
     const padding = side ? { top: 0, left: 0, right: (panel?.offsetWidth ?? 300) + 28, bottom: 0 } : { top: 0, left: 0, right: 0, bottom: (panel?.offsetHeight ?? 120) + 24 };
     map.flyTo({ center: [stop.lon, stop.lat], zoom: STOP_ZOOM, pitch: STOP_PITCH, bearing: stopBearing(stops, tour.stop),
                 duration: reducedMotion ? 0 : 3000, curve: 1.5, essential: true, padding });
+    // Then a slow part-turn around the stop while the narration runs. The next
+    // flight, a drag, or leaving the tour ends it.
+    if (!reducedMotion) {
+      map.once("moveend", () => {
+        const t = useStore.getState().tour;
+        if (t.active && t.stop === tour.stop) map.easeTo({ bearing: map.getBearing() + ORBIT_DEG, duration: ORBIT_MS, easing: (x) => x });
+      });
+    }
   }, [ready, tour.active, tour.stop, stops, reducedMotion]);
 
   const options = useMemo(() => {

@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { speciesPhotos } from "../photos";
 import PhotoCredit from "../PhotoCredit";
 import { useStore } from "../store";
-import { nearbySpecies, TOUR_DWELL_MS, TOUR_RADIUS_M, tourStops } from "../tour";
+import { nearbySpecies, photoNear, TOUR_DWELL_MS, TOUR_RADIUS_M, tourStops } from "../tour";
 
 // The tour bar: one stop at a time, what it is (Wikipedia, credited), and
 // which animals people have recorded within walking distance, with a
@@ -13,12 +12,15 @@ import { nearbySpecies, TOUR_DWELL_MS, TOUR_RADIUS_M, tourStops } from "../tour"
 // always see the map". It is now a slim bar with a "Details" toggle for the
 // full text and larger photographs.
 export default function Tour() {
-  const { tour, landmarks, cells, photosSpecies, tourGo, tourNext, tourPrev, tourPlay, endTour, selectSpecies, addSite } = useStore();
+  const { tour, landmarks, cells, photosSpecies, photosCells, ensureCellPhotos, tourGo, tourNext, tourPrev, tourPlay, endTour, selectSpecies, addSite } = useStore();
   const [expanded, setExpanded] = useState(false);
   const [minimised, setMinimised] = useState(false);   // a one-line strip: name and arrows, nothing else
   const stops = useMemo(() => tourStops(landmarks), [landmarks]);
   const stop = stops[tour.stop];
   const nearby = useMemo(() => (stop ? nearbySpecies(cells, stop.lon, stop.lat) : null), [cells, stop]);
+
+  // The cell strips hold the photographs taken near each stop; fetch them once.
+  useEffect(() => { if (tour.active) void ensureCellPhotos(); }, [tour.active, ensureCellPhotos]);
 
   // Autoplay: dwell, then move on; stops by itself at the last stop.
   useEffect(() => {
@@ -75,11 +77,16 @@ export default function Tour() {
         {nearby && nearby.list.length > 0 ? (
           <ul className="tour-species" aria-label={`Recorded within ${TOUR_RADIUS_M / 1000} km`}>
             {nearby.list.slice(0, expanded ? 6 : 3).map((n) => {   // one row unless Details is open
-              const photo = speciesPhotos(photosSpecies, n.species)[0];
+              const hit = photoNear(n.species, nearby.cellIds, photosCells, photosSpecies);
+              const photo = hit?.photo;
               return (
                 <li key={n.species}>
-                  <button className="tour-card" onClick={() => selectSpecies(n.species)} title={`${n.common ?? n.species}: ${n.count.toLocaleString()} sightings within ${TOUR_RADIUS_M / 1000} km`}>
-                    {photo ? <img src={photo.url("square")} alt={`${n.common ?? n.species} photographed by ${photo.observer}`} loading="lazy" /> : <span className="ph" aria-hidden="true" />}
+                  <button className="tour-card" onClick={() => selectSpecies(n.species)}
+                    title={`${n.common ?? n.species}: ${n.count.toLocaleString()} sightings within ${TOUR_RADIUS_M / 1000} km${hit ? (hit.near ? "; photographed near this stop" : "; photographed elsewhere in the park") : ""}`}>
+                    {photo ? <span className="thumb">
+                      <img src={photo.url("square")} alt={`${n.common ?? n.species} photographed by ${photo.observer}`} loading="lazy" />
+                      {hit?.near && <span className="near-tag">near here</span>}
+                    </span> : <span className="ph" aria-hidden="true" />}
                     <span className="tour-card-name">{n.common ?? n.species}</span>
                     <span className="tour-card-count">{n.count.toLocaleString()}</span>
                   </button>
