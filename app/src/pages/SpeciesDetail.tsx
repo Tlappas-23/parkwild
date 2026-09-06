@@ -4,15 +4,10 @@ import type { Species, SpeciesAcrossParks } from "../types";
 import { speciesPhotos } from "../photos";
 import PhotoCredit from "../PhotoCredit";
 import { useStore } from "../store";
+import { shortPark } from "../names";
 
 const Model3D = lazy(() => import("../Model3D"));
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-// "Yellowstone National Park" is the badge; in a row or a button the word
-// everyone uses is enough.
-export function shortPark(name: string): string {
-  return name.replace(/ National Park( and Preserve)?$/, "").replace(/ National Parks$/, "");
-}
 
 // Where people see this animal, park by park, from the cross-park index: the
 // count, the busiest cell, and a button that opens that park's map on it. The
@@ -137,8 +132,8 @@ function FullDetail({ species: s, entry, onBack, where }: { species: Species; en
             <div><strong>{s.first?.slice(0, 4)}–{s.last?.slice(0, 4)}</strong><span>years seen</span></div>
             <div><strong>{MONTHS[peak]}</strong><span>busiest month</span></div>
             <div>
-              <strong>{relPeak >= 0 ? `${MONTHS[relPeak]} ×${relMax.toFixed(1)}` : "—"}</strong>
-              <span title="This species' share of the month divided by everyone's share of it">seen more than usual</span>
+              <strong>{relPeak >= 0 ? `${MONTHS[relPeak]} ×${relMax.toFixed(1)}` : <span className="muted">too few</span>}</strong>
+              <span title="This species' share of the month divided by everyone's share of it">{relPeak >= 0 ? "seen more than usual" : "records to compare months"}</span>
             </div>
           </div>
           <div className="badges">

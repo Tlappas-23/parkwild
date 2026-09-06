@@ -51,7 +51,7 @@ app:
 
 ## copy the baked exports into the app's public data folder
 app-data:
-	mkdir -p app/public/data/$(PARK) && cp data/export/$(PARK)/*.{geojson,json,parquet} app/public/data/$(PARK)/
+	mkdir -p app/public/data/$(PARK) && cp data/export/$(PARK)/*.{geojson,json} app/public/data/$(PARK)/
 
 ## secret scan over everything git tracks (CI runs the same)
 secrets:

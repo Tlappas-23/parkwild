@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { speciesPhotos } from "../photos";
 import { speciesMatches, useStore } from "../store";
 import type { SpeciesAcrossParks } from "../types";
-import SpeciesDetail, { shortPark } from "./SpeciesDetail";
+import SpeciesDetail from "./SpeciesDetail";
+import { shortPark } from "../names";
 
 // The species page has two scopes. "In this park" is the photo grid the park's
 // own files feed. "All parks" searches every shipped park at once from the

@@ -407,6 +407,15 @@ branch or repository that CI writes and Pages serves alongside the app;
 manifest still baked into the app. **Recommendation: (b)**, before the tenth
 park. Until decided, parks are added a few at a time.
 
+**Resolved 2026-09-06 (E-051): (a), with the parquet taken out.** The app never
+read `sightings.parquet` and it was the largest file in every park folder
+(3.5 of Yellowstone's 9.2 MB); it stays in `data/export` for anyone who wants
+the table. Without it, 63 parks are about 120 MB in the repository and the
+Pages build, well inside the limits, and history grows only by what actually
+changes. Publishing goes through `scripts/publish_data.sh`, a data-only PR
+from a fresh worktree, so code and data never share a commit. (b) stays the
+next step if the repository passes about 500 MB.
+
 ### O-10: sharper aerial imagery from a source whose terms are not clean (raised 2026-09-05)
 
 USGS imagery ends at zoom 16, which blurs in the pitched close-ups the tour

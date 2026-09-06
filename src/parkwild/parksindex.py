@@ -156,7 +156,7 @@ def build_index(out_path: Path = INDEX_PATH, *, heroes: bool = True) -> dict:
     payload = {"generated": datetime.now(UTC).isoformat(timespec="seconds"),
                "attribution": "Park photographs: Wikimedia Commons, each under the licence printed on its card",
                # the cross-park species index is fetched on demand; its hash rides here, baked into the build
-               "species_index": species_index_stamp(),
+               "species_index": species_index_stamp(out_path.parent / "species_index.json"),
                "parks": parks}
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(json.dumps(payload, indent=1, ensure_ascii=False))

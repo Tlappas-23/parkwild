@@ -125,14 +125,17 @@ def cmd_roads(args):
 def cmd_index(args):
     """parks.json for the home page: every configured park, counts for the
     exported ones, a credited hero photograph (network: Wikipedia, Commons)."""
-    print(json.dumps(build_index(heroes=not args.no_heroes), indent=2))
+    kw = {"out_path": Path(args.out)} if args.out else {}
+    print(json.dumps(build_index(heroes=not args.no_heroes, **kw), indent=2))
 
 
 def cmd_species_index(args):
     """species_index.json: where each animal was seen, park by park, rolled up
     from the files the app ships (no network, no database). Run it after
     app-data and before `index`, which bakes its hash into parks.json."""
-    print(json.dumps(build_species_index(Path(args.data_dir) if args.data_dir else APP_DATA_DIR), indent=2))
+    data_dir = Path(args.data_dir) if args.data_dir else APP_DATA_DIR
+    out = Path(args.out) if args.out else data_dir / "species_index.json"
+    print(json.dumps(build_species_index(data_dir, out), indent=2))
 
 
 def cmd_amenities(args):
@@ -206,10 +209,12 @@ def build_parser():
 
     p = sub.add_parser("species-index", help="species_index.json: every species across the shipped parks, with busiest cells (no network, no database)")
     p.add_argument("--data-dir", default=None, help="park folders to roll up (default: app/public/data)")
+    p.add_argument("--out", default=None, help="where to write (default: <data-dir>/species_index.json)")
     p.set_defaults(func=cmd_species_index)
 
     p = sub.add_parser("index", help="app/public/data/parks.json: every park, counts, credited hero image (network, no database)")
     p.add_argument("--no-heroes", action="store_true")
+    p.add_argument("--out", default=None, help="where to write (default: app/public/data/parks.json); the species index hash is read beside it")
     p.set_defaults(func=cmd_index)
 
     p = sub.add_parser("all", help="ingest all sources, dedupe, export, summarise")

@@ -50,6 +50,7 @@ Per park: what the hexagons mean, what the map cannot tell you, sensitive specie
 
 ## For the owner
 
+- **Bring parks live unattended:** `nohup scripts/parks_batch.sh arches bryce_canyon ... > data/batch/batch.log 2>&1 &` runs sightings, export, landmarks, roads and things to do per park and opens a data PR after every six (`GROUP=` to change). `scripts/publish_data.sh "title" park ...` publishes exports on their own. Neither touches the working tree: the PR is built in a fresh worktree.
 - **Check the tour camera without eyes on it:** `node app/scripts/tour-probe.mjs "https://tlappas-23.github.io/parkwild/?park=zion" /tmp/probe 44 8` starts headless Chrome, runs the tour, presses Next at 8 s, and leaves camera samples and screenshots in the folder (E-048).
 
 - Add a park: a stanza in `config/parks.toml` (or copy from `config/parks.seed.toml`), then `make track-a PARK=key`, `track_a.py landmarks|roads|amenities --park key`, `make app-data PARK=key`, `track_a.py index`, ship.

@@ -157,7 +157,10 @@ input[type=range] { width: 100%; accent-color: var(--accent); }
   .hero, .two-col { grid-template-columns: 1fr; }
   .drawer { top: auto; left: 10px; right: 10px; bottom: 10px; width: auto; max-height: 62vh; }
   .controls { width: calc(100% - 28px); }
-  .topbar { padding: 8px 12px; } .brand .park { display: none; }
+  .topbar { padding: 8px 10px; gap: 8px; } .brand-row { min-width: 0; overflow: hidden; }
+  .park-link .park { white-space: nowrap; }
+  .park-link .park-full, .park-link .change { display: none; }
+  nav { flex-shrink: 0; } nav button { padding: 0 9px; font-size: var(--t-13); }
   .legend { display: none; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
@@ -490,3 +493,8 @@ nav button.active { background: var(--panel); color: var(--fg); box-shadow: var(
 .tour-progress { position: absolute; left: 0; right: 0; top: 0; height: 3px; pointer-events: none; }
 .tour-progress div { height: 100%; background: var(--accent); border-radius: 0 2px 2px 0; transition: width 260ms linear; }
 @media (prefers-reduced-motion: reduce) { .tour-progress div { transition: none; } }
+
+/* the phone's top bar: icon, short park name, and the whole navigation in one row */
+.park-link .park-short { display: none; }
+@media (max-width: 760px) { .park-link .park-short { display: inline; } }
+@media (max-width: 480px) { .brand > span { display: none; } .brand { gap: 0; padding: 4px 2px; } nav button { padding: 0 8px; } }

@@ -39,6 +39,8 @@ Track B never blocks the app: a park with no imagery pass simply has no amber ce
 | `track_a.py roads --park K` | Overpass | roads.json, manifest | yes | none |
 | `track_a.py amenities --park K` | Overpass, roads.json | amenities.json, manifest | yes | none |
 | `track_a.py species-index` | the shipped park folders | `app/public/data/species_index.json` | no | none |
+| `scripts/parks_batch.sh K1 K2 ...` | everything above per park, then `publish_data.sh` after every six | live parks, unattended; logs in `data/batch/` | yes | none |
+| `scripts/publish_data.sh "title" K1 ...` | `data/export/<park>` | a data-only PR from a fresh worktree: park folders, species index, park index; `sightings.parquet` is not shipped | no | none |
 | `track_a.py index` | parks.toml, seed, exports, Wikipedia, Commons, species_index.json | `app/public/data/parks.json` (carries the species index hash) | yes | none |
 | `phase0.py pull / download / detect --corridor C` | Mapillary, SpeciesNet | images, downloads, predictions | yes | write |
 | `phase0.py sample / report`, `species-sample / species-report` | predictions, review CSVs | review galleries, numbers | no | write |
