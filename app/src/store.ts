@@ -45,6 +45,8 @@ interface State {
   tourPrevBasemap: Basemap | null;   // what the visitor had before the tour switched to satellite
   tourDrive: { to: string; distanceM: number } | null;   // set while the camera is on the road between stops
   setTourDrive: (d: { to: string; distanceM: number } | null) => void;
+  driveMode: boolean;                  // drive the road between stops (default) or fly
+  setDriveMode: (on: boolean) => void;
   location: Location | null;         // the device's position, only ever asked for on a tap
   locationError: string | null;
   roads: RoadsFile | null;           // loaded on the first route request
@@ -135,6 +137,8 @@ export const useStore = create<State>((set, get) => ({
   tourPrevBasemap: null,
   tourDrive: null,
   setTourDrive: (tourDrive) => set({ tourDrive }),
+  driveMode: (() => { try { return localStorage.getItem("parkwild:drive") !== "off"; } catch { return true; } })(),
+  setDriveMode: (driveMode) => { set({ driveMode }); try { localStorage.setItem("parkwild:drive", driveMode ? "on" : "off"); } catch { /* ignore */ } },
   location: null,
   locationError: null,
   roads: null,

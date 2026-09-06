@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import maplibregl, { type GeoJSONSource, type LngLatBoundsLike, type Map as MLMap } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { ChevronLeft, Globe, Play, Route, SlidersHorizontal } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronUp, Globe, Play, RotateCcw, RotateCw, Route, SlidersHorizontal } from "lucide-react";
 import { PARKS_INDEX } from "../parksIndex";
 import { addParksLayers, liveBounds, setParksData } from "../parksOverlay";
 import type { FeatureCollection } from "geojson";
 import { filteredFeatures, speciesMatches, useStore } from "../store";
-import { bearingDeg, DRIVE_LOOKAHEAD_M, DRIVE_MAX_MS, DRIVE_MIN_MS, DRIVE_PITCH, DRIVE_SPEED_MS, DRIVE_ZOOM, ORBIT_DEG_PER_S, placeOf, placeOfLandmark, pointAt, resample, STOP_PITCH, STOP_ZOOM, stopBearing, thingsNear, tourStops, trailLines, type Place } from "../tour";
+import { DRIVE_LOOKAHEAD_M, DRIVE_MAX_MS, DRIVE_MIN_LEG_M, DRIVE_MIN_MS, DRIVE_PITCH, DRIVE_SPEED_MS, DRIVE_ZOOM, headingAt, ORBIT_DEG_PER_S, ORBIT_PAUSE_MS, placeOf, placeOfLandmark, pointAt, resample, STOP_PITCH, STOP_ZOOM, stopBearing, thingsNear, tourStops, trailLines, type Place } from "../tour";
 import { routerFor } from "../routing";
 import type { BoundaryFile, LandmarksFile, Ring } from "../types";
 import CellDetail from "./CellDetail";
@@ -85,6 +85,7 @@ export default function MapPage() {
   const wasTouring = useRef(false);
   const prevStop = useRef<number | null>(null);          // where the last flight ended, for the drive
   const driving = useRef(false);                          // the orbit yields while the camera is on the road
+  const userTouch = useRef(-1e9);        // when the visitor last moved the map themselves
   const fittedPark = useRef<string | null>(null);      // which park the view was last framed on
   const [ready, setReady] = useState(false);
   const [overview, setOverview] = useState(false);          // zoomed out to every park
@@ -92,7 +93,7 @@ export default function MapPage() {
   const {
     cells, species, boundary, landmarks, speciesFilter, yearRange, setSpeciesFilter, setYearRange, selectCell, selectedCell,
     reducedMotion, basemap, setBasemap, terrain3d, setTerrain3d, tour, startTour, tourGo, plan, location, openPlan, addSite, park, cameraPass,
-    amenities, tourTab, controlsOpen, setControlsOpen, selectedPlace, selectPlace, roads, showCameraPass, setPage,
+    amenities, tourTab, controlsOpen, setControlsOpen, selectedPlace, selectPlace, roads, showCameraPass, setPage, driveMode,
   } = useStore();
   // The amber swatch earns its place only where the camera pass found something.
   const hasModelCells = useMemo(() => (cells?.features ?? []).some((f) => f.properties.mp > 0), [cells]);
@@ -455,7 +456,7 @@ export default function MapPage() {
     const padding = side ? { top: 0, left: 0, right: (panel?.offsetWidth ?? 300) + 28, bottom: 0 } : { top: 0, left: 0, right: 0, bottom: (panel?.offsetHeight ?? 120) + 24 };
     const arrive = (bearing: number, ms: number) => map.flyTo({ center: [stop.lon, stop.lat], zoom: STOP_ZOOM, pitch: STOP_PITCH, bearing,
       duration: reducedMotion ? 0 : ms, curve: 1.4, essential: true, padding });
-    if (!from || reducedMotion) { arrive(stopBearing(stops, tour.stop), 3000); return; }
+    if (!from || reducedMotion || !driveMode) { arrive(stopBearing(stops, tour.stop), from ? 2400 : 3000); return; }
 
     let cancelled = false;
     let raf = 0;
@@ -472,25 +473,30 @@ export default function MapPage() {
       const coords = r.path(s, b.node);
       if (coords.length < 2) { arrive(stopBearing(stops, tour.stop), 2200); return; }
       const rs = resample(coords, 25);
+      if (rs.total < DRIVE_MIN_LEG_M) { arrive(stopBearing(stops, tour.stop), 2200); return; }
       const duration = Math.max(DRIVE_MIN_MS, Math.min(DRIVE_MAX_MS, (rs.total / DRIVE_SPEED_MS) * 1000));
       setDrive({ to: stop.name, distanceM: rs.total });
       driving.current = true;
       map.stop();
+      map.setPadding(padding);
       // Down onto the road first, then along it.
-      let heading = bearingDeg(rs.pts[0] as [number, number], pointAt(rs, Math.min(rs.total, DRIVE_LOOKAHEAD_M)));
-      await new Promise<void>((res) => { map.once("moveend", () => res()); map.flyTo({ center: rs.pts[0] as [number, number], zoom: DRIVE_ZOOM, pitch: DRIVE_PITCH, bearing: heading, duration: 1400, essential: true, padding }); });
+      let heading = headingAt(rs, 0, DRIVE_LOOKAHEAD_M);
+      await new Promise<void>((res) => { map.once("moveend", () => res()); map.flyTo({ center: rs.pts[0] as [number, number], zoom: DRIVE_ZOOM, pitch: DRIVE_PITCH, bearing: heading, duration: 1400, essential: true }); });
       if (cancelled) return;
       const t0 = performance.now();
+      let lastNow = t0;
       const frame = (now: number) => {
         if (cancelled) return;
         const t = Math.min(1, (now - t0) / duration);
         const e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;      // ease in, ease out
         const d = e * rs.total;
         const p = pointAt(rs, d);
-        const target = bearingDeg(p, pointAt(rs, Math.min(rs.total, d + DRIVE_LOOKAHEAD_M)));
+        const target = headingAt(rs, d, DRIVE_LOOKAHEAD_M);
         const diff = ((target - heading + 540) % 360) - 180;                 // turn the short way, smoothly
-        heading = heading + diff * 0.12;
-        map.jumpTo({ center: p, bearing: heading, pitch: DRIVE_PITCH, zoom: DRIVE_ZOOM, padding });
+        const k = Math.min(1, (now - lastNow) / 120);                         // frame-rate independent smoothing
+        lastNow = now;
+        heading = heading + diff * k;
+        map.jumpTo({ center: p, bearing: heading, pitch: DRIVE_PITCH, zoom: DRIVE_ZOOM });
         if (t < 1) { raf = requestAnimationFrame(frame); return; }
         driving.current = false;
         setDrive(null);
@@ -499,7 +505,11 @@ export default function MapPage() {
       raf = requestAnimationFrame(frame);
     })();
     return () => { cancelled = true; if (raf) cancelAnimationFrame(raf); driving.current = false; setDrive(null); };
-  }, [ready, tour.active, tour.stop, stops, reducedMotion]);
+  }, [ready, tour.active, tour.stop, stops, reducedMotion, driveMode]);
+
+  // Rotate and tilt from buttons, for everyone who never finds right-drag.
+  const turn = (deg: number) => { const m = mapRef.current; if (!m) return; userTouch.current = performance.now(); m.easeTo({ bearing: m.getBearing() + deg, duration: reducedMotion ? 0 : 500 }); };
+  const tilt = (deg: number) => { const m = mapRef.current; if (!m) return; userTouch.current = performance.now(); m.easeTo({ pitch: Math.max(0, Math.min(m.getMaxPitch(), m.getPitch() + deg)), duration: reducedMotion ? 0 : 400 }); };
 
   // The turn around the stop: a frame loop that nudges the bearing whenever
   // the map is not already moving, so it waits for the flight in, yields to
@@ -510,14 +520,24 @@ export default function MapPage() {
     if (!ready || !map || !tour.active || reducedMotion) return;
     let raf = 0;
     let last = performance.now();
+    // A drag, a wheel, a pinch or the rotate buttons all mean "my turn":
+    // the orbit waits ORBIT_PAUSE_MS after the last one. Without this it
+    // took the map back the moment a finger lifted, which read as "I can't
+    // spin the map".
+    const touched = () => { userTouch.current = performance.now(); };
+    map.on("dragstart", touched); map.on("rotatestart", touched); map.on("pitchstart", touched); map.on("wheel", touched); map.on("touchstart", touched);
     const tick = (now: number) => {
       const dt = Math.min(now - last, 100);
       last = now;
-      if (!driving.current && !map.isMoving()) map.setBearing(map.getBearing() + (ORBIT_DEG_PER_S * dt) / 1000);
+      const mine = now - userTouch.current > ORBIT_PAUSE_MS;
+      if (mine && !driving.current && !map.isMoving()) map.setBearing(map.getBearing() + (ORBIT_DEG_PER_S * dt) / 1000);
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
+    return () => {
+      cancelAnimationFrame(raf);
+      map.off("dragstart", touched); map.off("rotatestart", touched); map.off("pitchstart", touched); map.off("wheel", touched); map.off("touchstart", touched);
+    };
   }, [ready, tour.active, reducedMotion]);
 
   const options = useMemo(() => {
@@ -587,13 +607,20 @@ export default function MapPage() {
         {plan.open && <PlanPanel />}
       </div>
 
+      <div className="cam-ctrl" role="group" aria-label="Rotate and tilt">
+        <button className="icon-btn" onClick={() => turn(-45)} aria-label="Rotate left" title="Rotate left (or right-drag the map)"><RotateCcw className="ico" aria-hidden="true" /></button>
+        <button className="icon-btn" onClick={() => turn(45)} aria-label="Rotate right" title="Rotate right"><RotateCw className="ico" aria-hidden="true" /></button>
+        <button className="icon-btn" onClick={() => tilt(-15)} aria-label="Tilt down" title="Look from higher up"><ChevronUp className="ico" aria-hidden="true" /></button>
+        <button className="icon-btn" onClick={() => tilt(15)} aria-label="Tilt up" title="Look from lower down"><ChevronDown className="ico" aria-hidden="true" /></button>
+      </div>
+
       <div className="legend" aria-label="Legend">
         <span><i className="swatch human" /> people saw it</span>
         {hasModelCells && <span><i className="swatch model" /> roadside camera pass <button className="link small" onClick={showCameraPass}>what's that?</button></span>}
         <span><i className="dot stop" /> tour stop</span>
         <span><i className="dot" /> landmark</span>
         {cameraPass && cameraPass.corridors.length > 0 && <span><i className="swatch pass" /> camera pass area</span>}
-        <span className="muted">Cells ~170 m; larger for sensitive species. Empty means nobody looked. <button className="link small" onClick={() => setPage("about")}>About the data</button></span>
+        <span className="muted">Cells ~170 m; larger for sensitive species. Empty means nobody looked. Rotate with the arrows, a right-drag or two fingers. <button className="link small" onClick={() => setPage("about")}>About the data</button></span>
       </div>
 
       <CellDetail />
