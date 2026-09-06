@@ -1,8 +1,9 @@
 #!/bin/sh
 # The fortnightly refresh: for every live park, pull only the sightings that
 # changed since the last run (iNaturalist updated_since, GBIF lastInterpreted),
-# dedupe, re-export, rebuild the places, refresh the climate normals when they
-# are older than a season, then publish one data PR for all of them. Cron runs
+# dedupe, re-export (which picks the photographs again), rebuild the places,
+# refresh the landmarks and things to do once a month and the climate normals
+# once a season, then publish one data PR for all of them. Cron runs
 # it on the 1st and 15th at 03:00; it refuses to start while the park batch
 # holds the database, and never runs twice at once.
 #
@@ -29,6 +30,11 @@ for d in "$ROOT"/data/export/*/; do
   $PY "$ROOT/scripts/track_a.py" ingest --park "$p" --since "$SINCE" > "$STATE/refresh_$p.log" 2>&1 || { log "$p: ingest failed (see refresh_$p.log)"; continue; }
   $PY "$ROOT/scripts/track_a.py" dedupe --park "$p" >> "$STATE/refresh_$p.log" 2>&1 || log "$p: dedupe failed"
   $PY "$ROOT/scripts/track_a.py" export --park "$p" >> "$STATE/refresh_$p.log" 2>&1 || { log "$p: export failed"; continue; }
+  # Once a month: the landmarks (Wikipedia text, Commons photographs, street imagery) and the things to do.
+  if [ ! -f "$d/landmarks.json" ] || [ -n "$(find "$d/landmarks.json" -mtime +30 2>/dev/null)" ]; then
+    $PY "$ROOT/scripts/track_a.py" landmarks --park "$p" >> "$STATE/refresh_$p.log" 2>&1 || log "$p: landmarks failed"
+    $PY "$ROOT/scripts/track_a.py" amenities --park "$p" >> "$STATE/refresh_$p.log" 2>&1 || log "$p: amenities failed"
+  fi
   $PY "$ROOT/scripts/track_a.py" park-places --park "$p" >> "$STATE/refresh_$p.log" 2>&1 || log "$p: places failed"
   if [ ! -f "$d/climate.json" ] || [ -n "$(find "$d/climate.json" -mtime +90 2>/dev/null)" ]; then
     $PY "$ROOT/scripts/track_a.py" climate --park "$p" >> "$STATE/refresh_$p.log" 2>&1 || log "$p: climate failed"
