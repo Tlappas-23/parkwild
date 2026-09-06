@@ -24,8 +24,8 @@ interface State {
   boundary: BoundaryFile | null;
   cameraPass: CameraPassFile | null;   // Track B per corridor; null where it never ran
   amenities: AmenitiesFile | null;     // things to do around places; null until exported
-  tourTab: "wildlife" | "todo";
-  setTourTab: (t: "wildlife" | "todo") => void;
+  tourTab: "wildlife" | "todo" | "photos";
+  setTourTab: (t: "wildlife" | "todo" | "photos") => void;
   manifest: Manifest | null;
   error: string | null;
   speciesFilter: string | null;      // scientific name, or null for all
