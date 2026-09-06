@@ -20,13 +20,13 @@ You arrive on the whole park outline. Blue hexagons are places where people reco
 
 ## Tour
 
-"Take the tour" lands close over each stop in satellite 3D and turns slowly while you read; turn or tilt the map yourself and it waits ten seconds before taking over again. On Next the camera rises over the road and follows the shortest road path to the next stop, climbing higher the longer the leg so the ground passes at a readable pace, then settles close over the stop; the car/plane button on the card switches to a straight flight instead, and the choice is remembered. The card in the corner has three tabs:
+"Take the tour" lands close over each stop in satellite 3D and turns slowly while you read; drag, turn, tilt or zoom the map yourself and it waits five seconds before taking over again (a tap does not interrupt it). On Next the camera rises over the road and follows the shortest road path to the next stop, climbing higher the longer the leg so the ground passes at a readable pace, then settles close over the stop; the car/plane button on the card switches to a straight flight instead, and the choice is remembered. The card in the corner has three tabs:
 
 - **Wildlife**: the species recorded within 2.5 km, each with a photograph taken near that stop when one exists ("near here").
 - **Things to do**: key features, hikes with lengths, camping and lodging with the fees and reservation rules OpenStreetMap carries, and facilities; a plus on each adds it to a route; the same items appear on the map while the tab is open.
 - **Photos**: photographs of the place from Wikimedia Commons, and "Look around from here on Mapillary" where street imagery is within 300 m.
 
-Play advances every 14 seconds; the arrows step; the expand button shows more; the minus shrinks the card to a strip; Escape exits. Tapping the map never stops the motion.
+The tour plays by itself: each stop holds for about 14 seconds, the thin bar along the top of the card counts it down, then the camera moves on. Pause holds the stop; Play moves on within a second when the stop has already had its time. The arrows step; the expand button shows more; the minus shrinks the card to a strip; Escape exits. Tapping the map to open a cell never stops the tour.
 
 ## Places
 

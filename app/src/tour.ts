@@ -75,8 +75,12 @@ export function headingAt(rs: Resampled, d: number, lookM: number): number {
   if (ahead - d > 5) return bearingDeg(pointAt(rs, d), pointAt(rs, ahead));
   return bearingDeg(pointAt(rs, Math.max(0, d - lookM)), pointAt(rs, rs.total));
 }
-// ORBIT_PAUSE_MS — ARBITRARY (after the visitor turns the map, the tour keeps its hands off this long)
-export const ORBIT_PAUSE_MS = 10000;
+// ORBIT_PAUSE_MS — ARBITRARY (after the visitor drags, turns, tilts or zooms the map, the tour keeps
+// its hands off this long; ten seconds read as "it stopped" (E-050))
+export const ORBIT_PAUSE_MS = 5000;
+// PLAY_MIN_MS — ARBITRARY (Play pressed at a stop that has already had its time moves on after
+// this, not after another full dwell)
+export const PLAY_MIN_MS = 1200;
 // ORBIT_DEG_PER_S — ARBITRARY (a slow turn around the stop for as long as the
 // tour runs; about a quarter turn per dwell. The first version was one
 // 45° animation that any tap on the map cancelled for good, E-044)

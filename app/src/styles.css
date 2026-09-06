@@ -483,3 +483,10 @@ nav button.active { background: var(--panel); color: var(--fg); box-shadow: var(
   .where-row { grid-template-columns: 1fr auto; } .where-bar { grid-column: 1 / -1; } .where-num { text-align: left; }
   .page-tools { flex-wrap: wrap; }
 }
+
+
+/* the tour's dwell, counted along the top edge of the card while it plays */
+.tour { overflow: hidden; }
+.tour-progress { position: absolute; left: 0; right: 0; top: 0; height: 3px; pointer-events: none; }
+.tour-progress div { height: 100%; background: var(--accent); border-radius: 0 2px 2px 0; transition: width 260ms linear; }
+@media (prefers-reduced-motion: reduce) { .tour-progress div { transition: none; } }

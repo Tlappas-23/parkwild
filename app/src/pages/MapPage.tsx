@@ -567,15 +567,16 @@ export default function MapPage() {
     if (!ready || !map || !tour.active || reducedMotion) return;
     let raf = 0;
     let last = performance.now();
-    // A drag, a wheel, a pinch or the rotate buttons all mean "my turn":
-    // the orbit waits ORBIT_PAUSE_MS after the last one. Without this it
-    // took the map back the moment a finger lifted, which read as "I can't
-    // spin the map". MapLibre fires rotatestart and pitchstart for its own
-    // camera moves as well, so only events carrying a real input event count;
-    // the first version counted the orbit's own nudge and paused itself for
-    // good (E-048).
+    // A drag, a turn, a tilt, a pinch, a wheel or the rotate buttons all mean
+    // "my turn": the orbit waits ORBIT_PAUSE_MS after the last one. Without
+    // this it took the map back the moment a finger lifted, which read as "I
+    // can't spin the map". A tap is not a view change and does not count
+    // (E-050). MapLibre fires rotatestart and pitchstart for its own camera
+    // moves as well, so only events carrying a real input event count; the
+    // first version counted the orbit's own nudge and paused itself for good
+    // (E-048).
     const touched = (e: { originalEvent?: unknown }) => { if (e.originalEvent) userTouch.current = performance.now(); };
-    map.on("dragstart", touched); map.on("rotatestart", touched); map.on("pitchstart", touched); map.on("wheel", touched); map.on("touchstart", touched);
+    map.on("dragstart", touched); map.on("rotatestart", touched); map.on("pitchstart", touched); map.on("zoomstart", touched); map.on("wheel", touched);
     const tick = (now: number) => {
       const dt = Math.min(now - last, 100);
       last = now;
@@ -586,7 +587,7 @@ export default function MapPage() {
     raf = requestAnimationFrame(tick);
     return () => {
       cancelAnimationFrame(raf);
-      map.off("dragstart", touched); map.off("rotatestart", touched); map.off("pitchstart", touched); map.off("wheel", touched); map.off("touchstart", touched);
+      map.off("dragstart", touched); map.off("rotatestart", touched); map.off("pitchstart", touched); map.off("zoomstart", touched); map.off("wheel", touched);
     };
   }, [ready, tour.active, reducedMotion]);
 

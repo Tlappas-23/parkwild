@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Bed, Car, ChevronLeft, ChevronRight, Compass, Eye, Footprints, Info, Maximize2, Minimize2, Minus, Mountain, Pause, Play, Plane, Plus, RotateCcw, Sailboat, Signpost, Tent, UtensilsCrossed, X } from "lucide-react";
 import PhotoCredit from "../PhotoCredit";
 import { useStore } from "../store";
-import { nearbySpecies, photoNear, placeOf, thingsNear, TOUR_DWELL_MS, TOUR_RADIUS_M, tourStops, type NearItem } from "../tour";
+import { nearbySpecies, photoNear, placeOf, PLAY_MIN_MS, thingsNear, TOUR_DWELL_MS, TOUR_RADIUS_M, tourStops, type NearItem } from "../tour";
 
 // The tour bar: one stop at a time, what it is (Wikipedia, credited), and
 // which animals people have recorded within walking distance, with a
@@ -45,12 +45,24 @@ export default function Tour() {
   useEffect(() => { if (tour.active) void ensureCellPhotos(); }, [tour.active, ensureCellPhotos]);
 
   // Autoplay: once the camera has arrived, dwell, then move on; stops by
-  // itself at the last stop. The dwell does not count while on the road.
+  // itself at the last stop. The dwell counts from the arrival at a stop, not
+  // from the moment Play is pressed, so Play at a stop that has had its time
+  // moves on within a second; and the bar along the top of the card shows the
+  // count, so a still camera never reads as a dead one (E-050). The dwell does
+  // not count while on the road.
+  const arrivedAt = useRef(performance.now());
+  const [progress, setProgress] = useState(0);
+  useEffect(() => { arrivedAt.current = performance.now(); setProgress(0); }, [tour.active, tour.stop, tourDrive]);
   useEffect(() => {
     if (!tour.active || !tour.playing || tourDrive) return;
-    const t = setTimeout(() => { if (tour.stop < stops.length - 1) tourNext(); else tourPlay(false); }, TOUR_DWELL_MS);
-    return () => clearTimeout(t);
+    const remaining = Math.max(PLAY_MIN_MS, TOUR_DWELL_MS - (performance.now() - arrivedAt.current));
+    const t = setTimeout(() => { if (tour.stop < stops.length - 1) tourNext(); else tourPlay(false); }, remaining);
+    const iv = setInterval(() => setProgress(Math.min(1, (performance.now() - arrivedAt.current) / TOUR_DWELL_MS)), 250);
+    return () => { clearTimeout(t); clearInterval(iv); };
   }, [tour.active, tour.playing, tour.stop, stops.length, tourNext, tourPlay, tourDrive]);
+  const progressBar = tour.playing && !tourDrive
+    ? <div className="tour-progress" aria-hidden="true"><div style={{ width: `${Math.round(progress * 100)}%` }} /></div>
+    : null;
 
   // Arrow keys walk, Escape leaves.
   useEffect(() => {
@@ -69,6 +81,7 @@ export default function Tour() {
   if (minimised) {
     return (
       <section className="tour min" aria-label="Virtual tour" aria-live="polite">
+        {progressBar}
         <button className="icon-btn" onClick={tourPrev} disabled={tour.stop === 0} aria-label="Previous stop"><ChevronLeft className="ico" aria-hidden="true" /></button>
         <button className="tour-min-title" onClick={() => setMinimised(false)} title="Show the stop">
           <span className="eyebrow">{tour.stop + 1}/{stops.length}</span> {stop.name}
@@ -81,6 +94,7 @@ export default function Tour() {
 
   return (
     <section className={"tour" + (expanded ? " expanded" : "")} aria-label="Virtual tour" aria-live="polite">
+      {progressBar}
       <div className="tour-main">
         <div className="tour-title">
           <span className="eyebrow">{tourDrive ? `On the road · ${(tourDrive.distanceM / 1000).toFixed(1)} km to` : `${tour.stop + 1}/${stops.length} · ${stop.kind}${stop.ele_m ? ` · ${Math.round(stop.ele_m).toLocaleString()} m` : ""}`}</span>
