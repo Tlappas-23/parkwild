@@ -1,6 +1,6 @@
 {
-  "built": "2026-09-06T16:45:42+00:00",
-  "git_commit": "162490d39d3fe40f44c7a85ce0001b72be95a1b4",
+  "built": "2026-09-06T18:42:49+00:00",
+  "git_commit": "9516669c4c40d94d1d560de3846434254858c006",
   "files": {
     "cells.geojson": {
       "sha256": "6d047f910f231861a2b38b225689e237324973fe9d6703230619cc1d770a74cb",
@@ -21,6 +21,10 @@
     "photos_cells.json": {
       "sha256": "35a69e2fe0e0f6765a11fd80102aec5f074c7bca92f31e796481040640a98174",
       "bytes": 1251096
+    },
+    "places.json": {
+      "sha256": "6beecfb0420d3cdc02e26461b672453d20ce1e0d86a433b4af207f7136c8f714",
+      "bytes": 603391
     },
     "bias.json": {
       "sha256": "3f7f2a3130de777ee07cb73cd76840068c6c4c218b9e6b77447ce2a2de0f9fc4",
