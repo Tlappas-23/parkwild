@@ -1,0 +1,16 @@
+# Weekly dependency updates as pull requests, which the required checks then
+# test like any other change. Security updates arrive as soon as GitHub has
+# them. Free; no token in the repository.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /app
+    schedule: { interval: weekly }
+    groups:
+      dev-tools: { dependency-type: development }
+  - package-ecosystem: pip
+    directory: /
+    schedule: { interval: weekly }
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: weekly }
