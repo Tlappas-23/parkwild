@@ -1,0 +1,53 @@
+{
+  "built": "2026-09-06T18:56:03+00:00",
+  "git_commit": "dc7b1e0e1f3b519c4b16f22b52df0e8d3c8bfbf4",
+  "files": {
+    "cells.geojson": {
+      "sha256": "647eb123dfed27ed3c5562fd6de7806d1bc4e32a5ca361a9439d848e0eec5f5c",
+      "bytes": 340564
+    },
+    "species.json": {
+      "sha256": "bcdf3d55201d7e27202a69da6da188d7d49d42e6b1daaa84b1bd156404097ab9",
+      "bytes": 59849
+    },
+    "sightings.parquet": {
+      "sha256": "76b9f5cb2fdd78e9477d84362b5271f84d35ad55806cc94a87c1a44748a0e756",
+      "bytes": 230901
+    },
+    "photos_species.json": {
+      "sha256": "9864729bbeb22bc0a35ce4f1a8e86bf7da4d53aa7f9e6ba72c97d3d7d03560d2",
+      "bytes": 69382
+    },
+    "photos_cells.json": {
+      "sha256": "d3d0ba8b6d759b5fe80b2491a17ce0edb4789c799d90db99ff2a4bdf6211bee1",
+      "bytes": 118620
+    },
+    "places.json": {
+      "sha256": "a9866f2458492b08e89485126795cd9b240a042a19d49e402e4859e421df54a7",
+      "bytes": 109229
+    },
+    "landmarks.json": {
+      "sha256": "c0041d453c3a813487d1334c8fa23655eac79986e876c92da0e573522d9046ef",
+      "bytes": 29607
+    },
+    "boundary.geojson": {
+      "sha256": "f1bd35cd9a61b000b2575caca658798d15f18cb35daea1e7e641460360c9cc19",
+      "bytes": 8377
+    },
+    "roads.json": {
+      "sha256": "d3046b0185de44f6a0d638c0bcdf98d19f2376255ad90480a583a0247cc92c32",
+      "bytes": 572074
+    },
+    "camera_pass.json": {
+      "sha256": "809300946b7f92dbb72ff946cf263b14e7ced71f54882b51d35056c8f7c59af7",
+      "bytes": 442
+    },
+    "amenities.json": {
+      "sha256": "a5727f959a31dc5396bc38d856fe3eae203906a226290f8ff3fa8c033a7bf937",
+      "bytes": 61799
+    }
+  },
+  "park": "kings_canyon",
+  "name": "Kings Canyon National Park",
+  "state": "CA"
+}

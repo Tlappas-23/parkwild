@@ -1,0 +1,53 @@
+{
+  "built": "2026-09-06T19:09:50+00:00",
+  "git_commit": "dc7b1e0e1f3b519c4b16f22b52df0e8d3c8bfbf4",
+  "files": {
+    "cells.geojson": {
+      "sha256": "bc4b03de32bcb5e57f3385fc8f50155b39bc35836d1f2d97642c5cedcb6f12e5",
+      "bytes": 477125
+    },
+    "species.json": {
+      "sha256": "3f9c74546b02e5bd79633a56fb5082aacce1dd59f093415477be9443691e4e0c",
+      "bytes": 77245
+    },
+    "sightings.parquet": {
+      "sha256": "7d81df333dcb414e229876b349eb34387f49629b3b7a8a937b98c396ffaeabdd",
+      "bytes": 844637
+    },
+    "photos_species.json": {
+      "sha256": "216b901587b4c19630ba3c712ea1e026a6559cace7736cd0c68a7381509dab71",
+      "bytes": 98214
+    },
+    "photos_cells.json": {
+      "sha256": "3638e25568e819f3938a597f62bd5f7881ee20c65b2172b7a38da686f9c9424a",
+      "bytes": 261340
+    },
+    "places.json": {
+      "sha256": "7cc66194bf8a9b36ee722ebc75ca92646d87ce0f69325d182d69742a926cd788",
+      "bytes": 148485
+    },
+    "landmarks.json": {
+      "sha256": "c6ecca32a6b865d06ff67cf4a68db179cad95590ffc78531db70073f1acebdc7",
+      "bytes": 35707
+    },
+    "boundary.geojson": {
+      "sha256": "2039df0a04bd288232b6bfbce03d762d9de4a1db1e4162f5e663346898d688bf",
+      "bytes": 2469
+    },
+    "roads.json": {
+      "sha256": "672b32e665a0d924695010ce0aa39e7c92ceec1493f26b1d00bdcec4918aa493",
+      "bytes": 510106
+    },
+    "camera_pass.json": {
+      "sha256": "a823e6f0576c1a880dc25145f3472bf0b4a792aac04e44fca3ba50f1ab2e0115",
+      "bytes": 443
+    },
+    "amenities.json": {
+      "sha256": "b770eb2be334c01e750393576f0c9b0cd65fef4d0688e9401f1fc1e70afa9c4e",
+      "bytes": 83188
+    }
+  },
+  "park": "mount_rainier",
+  "name": "Mount Rainier National Park",
+  "state": "WA"
+}
