@@ -1,18 +1,18 @@
 {
-  "built": "2026-09-06T03:22:10+00:00",
-  "git_commit": "3af59e265eb1c870ed5000b30c898dfa706001f5",
+  "built": "2026-09-06T16:45:42+00:00",
+  "git_commit": "162490d39d3fe40f44c7a85ce0001b72be95a1b4",
   "files": {
     "cells.geojson": {
-      "sha256": "35880b68779e56a866233d8f7367bf7acb0cc2ee1738e9fa8ae50c148d74cd2e",
-      "bytes": 2738680
+      "sha256": "6d047f910f231861a2b38b225689e237324973fe9d6703230619cc1d770a74cb",
+      "bytes": 2738923
     },
     "species.json": {
-      "sha256": "5e653d26cedef1bbf62cecc8837c56413dce9b72a31b03ca937e1e0f1402c7f5",
-      "bytes": 133239
+      "sha256": "7f243f347a98b96a3e7fa5e5c75d6cb61e7407fa635cc7ed9e8f124e3ec8ffb0",
+      "bytes": 133240
     },
     "sightings.parquet": {
-      "sha256": "db0b5535341570b26cecc76fae45f83b805d2ea9da7a734e5c3dbc0fe9ba0135",
-      "bytes": 3501755
+      "sha256": "7bd9c10c29180204e47791f9694b7b007b5cc08c619042bc6c7c2a633307b370",
+      "bytes": 3497844
     },
     "photos_species.json": {
       "sha256": "7c30ffd9f2aca66af75e9580398f4497b1be43c841d2899ddb45b78d7918e7ff",
@@ -37,6 +37,10 @@
     "roads.json": {
       "sha256": "d8d686088f833ff2003518445d930592a780d50dfdd6b2494245b961177396f7",
       "bytes": 1480110
+    },
+    "camera_pass.json": {
+      "sha256": "7a9fc9844c9b2dabd78bd021987794fc752769c605597decf73756bbf7f4ea53",
+      "bytes": 1634
     },
     "amenities.json": {
       "sha256": "2da8139ba226fcd90e06bad297d937a538d5e954b45666b6c03a1f7ac803cf16",
