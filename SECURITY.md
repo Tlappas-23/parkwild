@@ -10,7 +10,7 @@ it; see the last section.
 
 | Asset | Threat | Control |
 |---|---|---|
-| Source code | someone else pushing, force-pushing, or deleting | private GitHub repo, single writer, 2FA, protected `main` |
+| Source code | someone else pushing, force-pushing, or deleting | public repository with one writer, 2FA, protected `main`, required checks |
 | Secrets (`MAPILLARY_TOKEN`) | committed by accident, leaked in CI logs | gitignored `.env`, pre-commit secret scan, CI secret scan, never echoed |
 | Raw model output | overwritten by a rerun or a "fix" | `predictions_raw` / `detections_raw` are append-only (`INSERT OR IGNORE`); corrections live in `manual_review` |
 | Published data files | tampered after build | `manifest.json` with SHA-256 per file and the git commit; the app checks hashes before using data |

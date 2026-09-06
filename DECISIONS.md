@@ -382,6 +382,31 @@ ceiling: a 1.5B model misreads facts sometimes; the facts stay on screen.
 
 ---
 
+## ADR-0022: No 3D animal models
+
+**Date:** 2026-09-06. **Status:** accepted.
+
+**Context.** BUILD_SPEC Phase 6 planned a stylised 3D model beside the
+photographs on some species pages. The viewer, the ingest script, the
+credit lines on the About page and a sourcing sheet were built; no file was
+ever downloaded, because each download was a browser action with the licence
+read from the page first, and it never happened. Zero species in zero parks
+had a model, and the About page said so.
+
+**Decision.** Remove the track: the viewer and its two dependencies (an
+875 KB chunk that never loaded), the `model` field in species.json, the
+ingest script, the models config and folder, the sourcing sheet, O-5.
+
+**Why.** The photographs are the stronger content; low-poly animals beside
+observer photographs read as a toy against the site's look. The spec's own
+rule already forbade the one striking use, an animal placed at a precise
+spot, because positions are approximate and sensitive species are coarse.
+Weight and maintenance for nothing.
+
+**Consequences.** Species pages are photographs, months, sources and the
+park-by-park section. Nothing visible changes. Shipped species.json files
+keep a `"model": null` key until their next export; the app ignores it.
+
 ## Open decisions (owner's call; recorded here so nothing is decided by drift)
 
 | # | Decision | Default until decided | Where |
@@ -390,7 +415,7 @@ ceiling: a 1.5B model misreads facts sometimes; the facts stay on screen.
 | O-2 | Create the private GitHub repo and push (`Tlappas-23`), then `make protect` | **decided: yes** (2026-09-05); pushed to github.com/Tlappas-23/parkwild; protect failed, see O-7 | SECURITY.md |
 | O-3 | Enable the Cloudflare Access read gate at launch | **decided: public** (2026-09-05), with the species suppression list (config/suppression.toml) | ADR-0008 |
 | O-4 | Ingest eBird (421,940 Yellowstone records) | **decided: skip** (2026-09-05); revisit only for checklists with GPS tracks | ADR-0011 |
-| O-5 | Quaternius pack license: CC0 (pack page) vs QAL v1.0 (site license page) | **decided: QAL, credit anyway** (2026-09-05); license archived + hashed | docs/3d-assets.md |
+| O-5 | Quaternius pack license: CC0 (pack page) vs QAL v1.0 (site license page) | closed 2026-09-06: the 3D track was removed before any file was downloaded (ADR-0022) | EXPERIMENTS.md E-052 |
 | O-6 | Start the app skeleton (React + Vite + MapLibre + R3F; `npm install` is several hundred MB) | **decided: yes** (2026-09-05) | BUILD_SPEC.md Phase 5 |
 | O-7 | Repo visibility: GitHub only protects `main` server-side on public or paid repos. Make it public (protection on, code visible, no secrets in it) or stay private with the local pre-push guard only | **decided: public** (2026-09-05); `main` protected server-side, local guard kept | SECURITY.md |
 

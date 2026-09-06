@@ -18,7 +18,6 @@ export default function AboutPage() {
     for (const f of cells?.features ?? []) { if (f.properties.y0) lo = Math.min(lo, f.properties.y0); if (f.properties.y1) hi = Math.max(hi, f.properties.y1); }
     return lo < hi ? `${lo} to ${hi}` : null;
   })();
-  const threeD = (species?.species ?? []).filter((x) => x.model);
   const short = parkName.replace(/ National Park.*$/, "");
 
   return (
@@ -60,7 +59,7 @@ export default function AboutPage() {
 
       <h2 id="camera-pass">Where a computer model is involved, and where it is not</h2>
       <p>
-        Three things on this site could involve a model. Here is the state of each for {short}.
+        Two things on this site can involve a model. Here is the state of each for {short}.
       </p>
       <h3>Roadside camera pass</h3>
       {passRan.length > 0 ? (
@@ -104,14 +103,6 @@ export default function AboutPage() {
         When enabled, the model may only write from numbered facts drawn from this data, must cite one for every sentence, and says "the data doesn't say" otherwise; the answer shows which facts it used and flags any number that is in none of them.
         "What did I see?" ranks a photograph against this park's species names with an image model, on your device, as a suggestion only. Nothing you type or photograph leaves your device.
         Models: Qwen2.5 1.5B Instruct (Apache-2.0) via WebLLM, CLIP ViT-B/32 (MIT) via Transformers.js. The question set and its measured results are in the repository (docs/ai-eval.md).
-      </p>
-      <h3>3D animals</h3>
-      <p>
-        {threeD.length === 0 ? "No 3D animal models are used in this park. Species pages show photographs." : (
-          <>Species pages for {threeD.map((x) => x.common_name ?? x.scientific_name).join(", ")} show a 3D model beside the photographs:{" "}
-            {threeD.map((x) => <span key={x.scientific_name}><a href={x.model!.source} target="_blank" rel="noreferrer">{x.model!.credit}</a>. </span>)}
-            A model is never placed at a coordinate; it is an illustration, not a sighting.</>
-        )}
       </p>
 
       <h2>Road bias and seasonal bias</h2>

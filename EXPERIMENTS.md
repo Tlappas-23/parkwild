@@ -297,6 +297,11 @@ Format: date, what, number, kept?, why, where it lives.
 - **Clean-up shipped with it:** a shared HTML escaper for the two MapLibre popups built from data; a stray 524-byte parquet committed at the repository root removed; the phone top bar rebuilt (short park name, whole navigation on one row); no dash placeholders in the species stats; the README rewritten for what the project is now.
 - **Open:** how the automatic tours look in parks with few wikidata-tagged features, and Overpass behaviour on the Alaska bounding boxes, both to be read from the batch logs as they arrive.
 
+### E-052: the 3D track removed; the app gets its own tests; ready to share
+- **What:** the owner asked why there were no 3D animals, agreed to remove the track, and asked for a pass over whether the project is good to share.
+- **Kept:** ADR-0022 (no 3D models): viewer, two dependencies, ingest script, config, sourcing sheet and the `model` field gone; the About page now describes two places a model can be involved, not three. The app had no unit tests of its own (the Python side has 86); `npm test` now bundles `src/*.test.ts` with esbuild and runs them under Node's test runner, no new dependency, and CI runs typecheck, tests and build for the app on every pull request (before this, a TypeScript error surfaced only at deploy). Link previews: generic description and Open Graph tags. RESULTS.md carries the three unreviewed corridors from the overnight chain. SECURITY.md no longer calls the repository private.
+- **Left for the owner (only they can):** a LICENSE file for the code; the repository description, topics and homepage on GitHub; the species review CSV; running the Ask page's measurement on the live site.
+
 ## Open questions with a planned experiment
 
 - **Q-1 SpeciesNet determinism.** Answered (E-013).

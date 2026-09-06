@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { ArrowLeft, MapPin } from "lucide-react";
 import type { Species, SpeciesAcrossParks } from "../types";
 import { speciesPhotos } from "../photos";
@@ -6,7 +6,6 @@ import PhotoCredit from "../PhotoCredit";
 import { useStore } from "../store";
 import { shortPark } from "../names";
 
-const Model3D = lazy(() => import("../Model3D"));
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 // Where people see this animal, park by park, from the cross-park index: the
@@ -84,7 +83,7 @@ function LightDetail({ entry, onBack, parkName, where }: { entry: SpeciesAcrossP
 }
 
 function FullDetail({ species: s, entry, onBack, where }: { species: Species; entry: SpeciesAcrossParks | null; onBack: () => void; where: React.ReactNode }) {
-  const { reducedMotion, setSpeciesFilter, setPage, photosSpecies, species: all, parkName, showCameraPass, park, showSpeciesInPark } = useStore();
+  const { setSpeciesFilter, setPage, photosSpecies, species: all, parkName, showCameraPass, park, showSpeciesInPark } = useStore();
   const photos = useMemo(() => speciesPhotos(photosSpecies, s.scientific_name), [photosSpecies, s.scientific_name]);
   const hero = photos[0];
   const max = Math.max(1, ...s.months);
@@ -155,15 +154,6 @@ function FullDetail({ species: s, entry, onBack, where }: { species: Species; en
       </div>
 
       {where}
-
-      {s.model && (
-        <section className="panel3d" aria-label="3D model">
-          {!reducedMotion ? (
-            <Suspense fallback={<div className="placeholder">loading model…</div>}><Model3D url={`${import.meta.env.BASE_URL}${s.model.url}`} /></Suspense>
-          ) : <div className="placeholder">3D view paused (reduced motion)</div>}
-          <p className="muted small">3D: <a href={s.model.source} target="_blank" rel="noreferrer">{s.model.title}</a> by {s.model.author}, {s.model.license}</p>
-        </section>
-      )}
 
       <section className="two-col">
         <div>

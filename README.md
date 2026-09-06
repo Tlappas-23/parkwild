@@ -71,7 +71,7 @@ touched. `docs/ARCHITECTURE.md` has the full map, file by file.
 ```
 app/                     the site (Vite, React, MapLibre); app/scripts has the build helpers and the headless tour probe
 config/                  parks.toml (all 63 parks), corridors.toml, suppression.toml, taxonomy.toml
-docs/                    ARCHITECTURE.md, USER-GUIDE.md, data cards, the AI evaluation, 3D asset sourcing
+docs/                    ARCHITECTURE.md, USER-GUIDE.md, data cards, the AI evaluation
 scripts/                 track_a.py, track_b.py, phase0.py, parks_batch.sh, publish_data.sh, ship.sh, check_secrets.py
 src/parkwild/            the Python library: pure batch code, no agents, one DuckDB writer
 tests/                   offline tests with fixtures; CI runs them on every push
