@@ -1,4 +1,5 @@
 import { lazy, Suspense, useMemo } from "react";
+import { ArrowLeft, MapPin } from "lucide-react";
 import type { Species } from "../types";
 import { speciesPhotos } from "../photos";
 import PhotoCredit from "../PhotoCredit";
@@ -36,7 +37,7 @@ export default function SpeciesDetail({ species: s, onBack }: { species: Species
   const parkHasModel = (all?.species ?? []).some((x) => x.confidence_basis.model_predicted > 0);
   return (
     <article className="page detail">
-      <button className="link back" onClick={onBack}>← All species</button>
+      <button className="link back" onClick={onBack}><ArrowLeft className="ico" aria-hidden="true" /> All species</button>
 
       <div className="hero">
         {hero ? (
@@ -69,7 +70,7 @@ export default function SpeciesDetail({ species: s, onBack }: { species: Species
             )}
           </div>
           {s.suppression?.action !== "exclude" && (
-            <button className="primary" onClick={() => { setSpeciesFilter(s.scientific_name); setPage("map"); }}>Show on the map</button>
+            <button className="primary" onClick={() => { setSpeciesFilter(s.scientific_name); setPage("map"); }}><MapPin className="ico" aria-hidden="true" /> Show on the map</button>
           )}
         </div>
       </div>

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import maplibregl, { type GeoJSONSource, type LngLatBoundsLike, type Map as MLMap } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
+import { ChevronLeft, Play, Route, SlidersHorizontal } from "lucide-react";
 import type { FeatureCollection } from "geojson";
 import { filteredFeatures, speciesMatches, useStore } from "../store";
 import { ORBIT_DEG, ORBIT_MS, placeOf, placeOfLandmark, STOP_PITCH, STOP_ZOOM, stopBearing, thingsNear, tourStops, trailLines, type Place } from "../tour";
@@ -168,7 +169,7 @@ export default function MapPage() {
       map.addLayer({ id: "route-casing", type: "line", source: "route", layout: { "line-join": "round", "line-cap": "round" },
         paint: { "line-color": "#ffffff", "line-width": 8, "line-opacity": 0.9 } }, firstSymbol);
       map.addLayer({ id: "route-line", type: "line", source: "route", layout: { "line-join": "round", "line-cap": "round" },
-        paint: { "line-color": "#c2410c", "line-width": 4 } }, firstSymbol);
+        paint: { "line-color": "#1d4ed8", "line-width": 4 } }, firstSymbol);
 
       // Landmarks: tour stops are numbered and always labelled; the rest are
       // small dots that get a name once you are close enough for it to fit.
@@ -191,18 +192,18 @@ export default function MapPage() {
       map.addLayer({ id: "focus-casing", type: "line", source: "focus", filter: ["==", ["geometry-type"], "LineString"], layout: { "line-join": "round", "line-cap": "round" },
         paint: { "line-color": "#ffffff", "line-width": 7, "line-opacity": 0.9 } });
       map.addLayer({ id: "focus-line", type: "line", source: "focus", filter: ["==", ["geometry-type"], "LineString"], layout: { "line-join": "round", "line-cap": "round" },
-        paint: { "line-color": "#7c2d12", "line-width": 3.5 } });
+        paint: { "line-color": "#101010", "line-width": 3.5 } });
       map.addLayer({ id: "focus-point", type: "circle", source: "focus", filter: ["==", ["geometry-type"], "Point"],
-        paint: { "circle-radius": 13, "circle-color": "rgba(124,45,18,0.15)", "circle-stroke-color": "#7c2d12", "circle-stroke-width": 2.5 } });
+        paint: { "circle-radius": 13, "circle-color": "rgba(16,16,16,0.12)", "circle-stroke-color": "#101010", "circle-stroke-width": 2.5 } });
       // Things to do around the current stop, coloured by kind, while that tab is open.
       map.addLayer({ id: "things-dot", type: "circle", source: "things",
         paint: { "circle-radius": 5.5, "circle-stroke-color": "#ffffff", "circle-stroke-width": 1.5,
-                 "circle-color": ["match", ["get", "kind"], "camp", "#15803d", "stay", "#0f766e", "trail", "#7c2d12", "trailhead", "#9a3412", "feature", "#6d28d9", "#0369a1"] } });
+                 "circle-color": "#475569" } });
       map.addLayer({ id: "things-label", type: "symbol", source: "things", minzoom: 11,
         layout: { "text-field": ["get", "label"], "text-font": ["Noto Sans Regular"], "text-size": 10.5, "text-offset": [0, 0.8], "text-anchor": "top", "text-optional": true, "text-max-width": 10 },
         paint: { "text-color": "#1f2937", "text-halo-color": "rgba(255,255,255,0.92)", "text-halo-width": 1.2 } });
       map.addLayer({ id: "route-stop-dot", type: "circle", source: "route-stops",
-        paint: { "circle-radius": 11, "circle-color": "#c2410c", "circle-stroke-color": "#ffffff", "circle-stroke-width": 2 } });
+        paint: { "circle-radius": 11, "circle-color": "#1d4ed8", "circle-stroke-color": "#ffffff", "circle-stroke-width": 2 } });
       map.addLayer({ id: "route-stop-n", type: "symbol", source: "route-stops",
         layout: { "text-field": ["get", "n"], "text-font": ["Noto Sans Bold"], "text-size": 12, "text-allow-overlap": true },
         paint: { "text-color": "#ffffff" } });
@@ -431,19 +432,19 @@ export default function MapPage() {
 
       {!controlsOpen && (
         <button className="controls-pill" onClick={() => setControlsOpen(true)} aria-label="Show filters and tools">
-          <span aria-hidden="true">☰</span> Filters{current ? <span className="pill-chip">{current.common_name ?? current.scientific_name}</span> : null}{plan.open ? <span className="pill-chip">route</span> : null}
+          <SlidersHorizontal className="ico" aria-hidden="true" /> Filters{current ? <span className="pill-chip">{current.common_name ?? current.scientific_name}</span> : null}{plan.open ? <span className="pill-chip">route</span> : null}
         </button>
       )}
       <div className="controls" role="group" aria-label="Filters" hidden={!controlsOpen}>
-        <button className="icon-btn controls-hide" onClick={() => setControlsOpen(false)} aria-label="Hide filters and tools" title="Hide panel">‹</button>
+        <button className="icon-btn controls-hide" onClick={() => setControlsOpen(false)} aria-label="Hide filters and tools" title="Hide panel"><ChevronLeft className="ico" aria-hidden="true" /></button>
         <div className="control view-row">
-          {stops.length > 0 && !tour.active && <button className="primary" onClick={startTour}>▶ Take the tour</button>}
+          {stops.length > 0 && !tour.active && <button className="primary" onClick={startTour}><Play className="ico" aria-hidden="true" /> Take the tour</button>}
           <div className="seg" role="group" aria-label="Basemap">
             <button className={basemap === "terrain" ? "on" : ""} aria-pressed={basemap === "terrain"} onClick={() => setBasemap("terrain")}>Terrain</button>
             <button className={basemap === "satellite" ? "on" : ""} aria-pressed={basemap === "satellite"} onClick={() => setBasemap("satellite")}>Satellite</button>
           </div>
           <button className={"toggle" + (terrain3d ? " on" : "")} aria-pressed={terrain3d} onClick={() => setTerrain3d(!terrain3d)}>3D</button>
-          {!plan.open && <button className="toggle" onClick={openPlan}>◎ Plan a visit</button>}
+          {!plan.open && <button className="toggle" onClick={openPlan}><Route className="ico" aria-hidden="true" /> Plan a visit</button>}
         </div>
         <div className="control">
           <label htmlFor="species-search">Species</label>

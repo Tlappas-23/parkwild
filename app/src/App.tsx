@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useState } from "react";
+import { RefreshCw } from "lucide-react";
 import { hardReload, stripFreshParam } from "./data";
 import { useStore } from "./store";
 import SpeciesPage from "./pages/SpeciesPage";
@@ -7,6 +8,8 @@ import HomePage from "./pages/HomePage";
 
 // The map page pulls in maplibre-gl (its own chunk); it is loaded only when shown.
 const MapPage = lazy(() => import("./pages/MapPage"));
+// The Ask page pulls in the on-device model runtimes only when the visitor enables them.
+const AskPage = lazy(() => import("./pages/AskPage"));
 
 // After a deploy the new service worker installs but waits while any tab
 // still runs the old one (E-027). Telling it to skip waiting means the next
@@ -55,16 +58,16 @@ export default function App() {
           )}
         </div>
         <nav aria-label="Pages">
-          {(["home", "map", "species", "about"] as const).map((p) => (
+          {(["home", "map", "species", "ask", "about"] as const).map((p) => (
             <button key={p} className={page === p ? "active" : ""} aria-current={page === p ? "page" : undefined} onClick={() => setPage(p)}>
-              {p === "home" ? "Parks" : p === "map" ? "Map" : p === "species" ? "Species" : "About"}
+              {p === "home" ? "Parks" : p === "map" ? "Map" : p === "species" ? "Species" : p === "ask" ? "Ask" : "About"}
             </button>
           ))}
         </nav>
       </header>
       {updateReady && (
         <div className="update-pill" role="status">
-          A newer version is ready. <button className="primary small-btn" onClick={() => window.location.reload()}>Reload</button>
+          A newer version is ready. <button className="primary small-btn" onClick={() => window.location.reload()}><RefreshCw className="ico" aria-hidden="true" /> Reload</button>
         </div>
       )}
       <main className={page === "map" ? "main-map" : ""}>
@@ -82,6 +85,11 @@ export default function App() {
           </Suspense>
         )}
         {species && page === "species" && <SpeciesPage />}
+        {species && page === "ask" && (
+          <Suspense fallback={<div className="loading"><div className="spinner" aria-hidden="true" /><p className="muted">Loading…</p></div>}>
+            <AskPage />
+          </Suspense>
+        )}
         {species && page === "about" && <AboutPage />}
       </main>
     </div>

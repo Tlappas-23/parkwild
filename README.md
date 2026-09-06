@@ -194,7 +194,9 @@ same box on iNaturalist; species grid and detail
 with month histogram and a lazy 3D viewer; About with methods, limitations,
 suppression and licensing; a home page with a card per park (counts, a
 credited Commons photograph, ADR-0019) that opens each park's map with an
-animated arrival on the whole outline (ADR-0017). Deploy target is
+animated arrival on the whole outline (ADR-0017); and an Ask page where a
+language model and an image model run on the visitor's device, opt-in, and
+may only write from the site's own facts (ADR-0021, docs/ai-eval.md). Deploy target is
 Cloudflare Pages with `app/public/_headers` for CSP.
 
 Rough cost on this machine: steps 1 to 3 are a few minutes of API calls and

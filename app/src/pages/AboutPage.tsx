@@ -38,6 +38,15 @@ export default function AboutPage() {
         Where a source already obscures a location, that record is counted but never mapped, and its photographs never appear in a cell.
       </p>
 
+      <h2>Ask, on your device</h2>
+      <p>
+        The Ask page runs a small language model in your browser after you choose to download it (about 1 GB, once). It may only write from
+        numbered facts drawn from this site's data, must cite a fact for every sentence, and says "the data doesn't say" when the facts do not cover a
+        question; the answer shows which facts it used and flags any number that is in none of them. "What did I see?" ranks a photograph against
+        this park's species names with an image model, on your device, as a suggestion only. Nothing you type or photograph leaves your device.
+        Models: Qwen2.5 1.5B Instruct (Apache-2.0) via WebLLM, CLIP ViT-B/32 (MIT) via Transformers.js. The question set and its measured results are in the repository (docs/ai-eval.md).
+      </p>
+
       <h2 id="camera-pass">Roadside camera pass</h2>
       <p>
         Besides what people reported, a computer-vision model looked for animals in street-level photographs taken from park roads

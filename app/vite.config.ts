@@ -27,6 +27,8 @@ export default defineConfig({
         // exactly the files it was built with, and a visitor's first load does
         // not pull every park's data in the background (E-027).
         globPatterns: ["**/*.{js,css,html,svg,webmanifest}"],
+        // The AI runtimes and the onnx wasm are fetched on demand, never precached.
+        globIgnores: ["**/ort/**", "**/assets/webllm-*.js", "**/assets/transformers-*.js"],
         maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
         // Data URLs carry ?v=<manifest hash>. Ignoring that parameter when
         // matching the precache means a cached app shell is always served its
@@ -71,6 +73,9 @@ export default defineConfig({
         manualChunks: {
           maplibre: ["maplibre-gl"],
           three: ["three", "@react-three/fiber"],
+          // On-device AI: loaded only from the Ask page, after the visitor opts in.
+          webllm: ["@mlc-ai/web-llm"],
+          transformers: ["@huggingface/transformers"],
         },
       },
     },
