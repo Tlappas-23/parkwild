@@ -3,6 +3,7 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
+license = { text = "MIT" }
 name = "parkwild"
 version = "0.0.1"
 description = "Wildlife detection from crowdsourced street-level imagery in US national parks"

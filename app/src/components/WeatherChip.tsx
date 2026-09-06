@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { Cloud, CloudDrizzle, CloudFog, CloudLightning, CloudRain, CloudSnow, Sun } from "lucide-react";
 import type { ClimateFile } from "../data/types";
-import { fetchWeather, toF, weatherIcon, weatherLabel, type Weather } from "../lib/weather";
+import { fetchWeather, toF, weatherLabel, type Weather } from "../lib/weather";
+import WeatherGlyph from "./WeatherGlyph";
 
 // Now, the next three days, and what this month is usually like at a spot.
 // Fahrenheit first because the parks are American, Celsius in the title.
@@ -20,19 +20,9 @@ const MONTHS = [
   "December",
 ];
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-const ICONS = {
-  sun: Sun,
-  cloud: Cloud,
-  fog: CloudFog,
-  drizzle: CloudDrizzle,
-  rain: CloudRain,
-  snow: CloudSnow,
-  storm: CloudLightning,
-};
 
-function Icon({ code }: { code: number }) {
-  const I = ICONS[weatherIcon(code)];
-  return <I className="ico" aria-hidden="true" />;
+function Icon({ code, size = 22 }: { code: number; size?: number }) {
+  return <WeatherGlyph code={code} size={size} />;
 }
 
 export default function WeatherChip({
@@ -41,12 +31,14 @@ export default function WeatherChip({
   climate,
   at,
   compact,
+  badge,
 }: {
   lat: number;
   lon: number;
   climate?: ClimateFile | null;
   at?: string;
   compact?: boolean;
+  badge?: boolean; // the tour card: a bigger picture beside the stop's name, one line of typical weather under it
 }) {
   const [w, setW] = useState<Weather | null | undefined>(undefined);
   useEffect(() => {
@@ -66,6 +58,31 @@ export default function WeatherChip({
   const month = new Date().getMonth();
   const typical = climate?.months[month];
   if (w === null && !typical) return null;
+  if (badge) {
+    return (
+      <div className="weather as-badge" aria-live="polite">
+        {w ? (
+          <div
+            className="weather-badge"
+            title={`${Math.round(w.temp)} °C, ${weatherLabel(w.code)}, wind ${Math.round(w.wind)} km/h`}
+          >
+            <Icon code={w.code} size={40} />
+            <div className="weather-badge-text">
+              <strong>{toF(w.temp)}°F</strong>
+              <span className="muted small">{weatherLabel(w.code)}</span>
+            </div>
+          </div>
+        ) : w === undefined ? (
+          <span className="muted small">Weather…</span>
+        ) : null}
+        {typical && typical.tmax != null && typical.tmin != null && (
+          <div className="weather-typical muted small">
+            Usually {toF(typical.tmax)}° / {toF(typical.tmin)}° in {MONTHS[month]}
+          </div>
+        )}
+      </div>
+    );
+  }
   return (
     <div className={"weather" + (compact ? " compact" : "")} aria-live="polite">
       {w === undefined ? (
