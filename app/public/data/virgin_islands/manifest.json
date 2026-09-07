@@ -1,0 +1,53 @@
+{
+  "built": "2026-09-07T00:07:56+00:00",
+  "git_commit": "e6ce3024dc1d328e1ca135d942a6f4df7b6baa9c",
+  "files": {
+    "cells.geojson": {
+      "sha256": "eb10fdc4940d91b7569341ae345ce92b4b996414bad9b6759ab817fda0fa674a",
+      "bytes": 192500
+    },
+    "species.json": {
+      "sha256": "b0aebc20253fab666190d422eb11956ce24473a6c767a9c97ce583338dc0724a",
+      "bytes": 39424
+    },
+    "sightings.parquet": {
+      "sha256": "96834e7507279481171d889ec28c1cd6b856b2be57c3ced2c9faf497fc4427cc",
+      "bytes": 140350
+    },
+    "photos_species.json": {
+      "sha256": "aa26f810ba76b7649d1d6924ca21b18cb650652cafd858186d112b25651d30a3",
+      "bytes": 47010
+    },
+    "photos_cells.json": {
+      "sha256": "4d4b7f1c3b00d9b2d8db03dd68db3896ed3c474d5e87844937ea41f33798ce10",
+      "bytes": 57538
+    },
+    "places.json": {
+      "sha256": "df5d5d478d80ce70e3c428d7e86e587a7bf88ab917c76ea473ccb650a19218cf",
+      "bytes": 25696
+    },
+    "landmarks.json": {
+      "sha256": "f303573d80ea1f7576683121a04fc7b0ec477058c625df2db049621f707832f3",
+      "bytes": 17339
+    },
+    "boundary.geojson": {
+      "sha256": "9a24c9e506c9d8ed4dd4647d2256ecdb40adc3bbd449734a02ec95fde920b32e",
+      "bytes": 4951
+    },
+    "roads.json": {
+      "sha256": "c15a065e99aab7f1eca74ead73bb80e94f07664dce6f7fa10ff2b19eb35283d7",
+      "bytes": 124015
+    },
+    "camera_pass.json": {
+      "sha256": "69929562dc22e0ee261cb767d528adbb96dfafa7a568d8b3f754f1044a4eef92",
+      "bytes": 444
+    },
+    "amenities.json": {
+      "sha256": "f5717c4924e17523427bc3ceb00d880ad106ab66429f2dd697d8f49a2abbd201",
+      "bytes": 10405
+    }
+  },
+  "park": "virgin_islands",
+  "name": "Virgin Islands National Park",
+  "state": "VI"
+}

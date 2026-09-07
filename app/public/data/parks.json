@@ -1,9 +1,9 @@
 {
- "generated": "2026-09-06T23:41:14+00:00",
+ "generated": "2026-09-07T00:12:03+00:00",
  "attribution": "Park photographs: Wikimedia Commons, each under the licence printed on its card",
  "species_index": {
-  "sha256": "1132f9fe76c6523b53f3f1bd27aa55cc7a8168f8157402d95221857cc319bd02",
-  "bytes": 1679728
+  "sha256": "549ba749570ba710180c9925ead642104e739c45e967e43d9830b69c2722ac2c",
+  "bytes": 1809350
  },
  "parks": [
   {
@@ -1366,7 +1366,7 @@
    "key": "isle_royale",
    "name": "Isle Royale National Park",
    "state": "MI",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -89.4143,
     47.7586,
@@ -1377,11 +1377,11 @@
     -88.7945,
     48.0303
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 136,
+   "sightings": 3452,
+   "cells": 506,
+   "stops": 8,
+   "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Edisen_Fishery_at_IRNP.jpg/1280px-Edisen_Fishery_at_IRNP.jpg",
     "page": "https://commons.wikimedia.org/wiki/File:Edisen_Fishery_at_IRNP.jpg",
@@ -1395,7 +1395,7 @@
    "key": "congaree",
    "name": "Congaree National Park",
    "state": "SC",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -80.8684,
     33.7433,
@@ -1406,18 +1406,18 @@
     -80.7348,
     33.7939
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 148,
+   "sightings": 3886,
+   "cells": 528,
+   "stops": 1,
+   "tour_source": "auto",
    "hero": null
   },
   {
    "key": "biscayne",
    "name": "Biscayne National Park",
    "state": "FL",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -80.3472,
     25.2914,
@@ -1428,11 +1428,11 @@
     -80.2183,
     25.4813
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 163,
+   "sightings": 4086,
+   "cells": 591,
+   "stops": 6,
+   "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Biscayne.JPG/1280px-Biscayne.JPG",
     "page": "https://commons.wikimedia.org/wiki/File:Biscayne.JPG",
@@ -1446,7 +1446,7 @@
    "key": "dry_tortugas",
    "name": "Dry Tortugas National Park",
    "state": "FL",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -82.9679,
     24.5653,
@@ -1457,11 +1457,11 @@
     -82.3617,
     24.6457
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 186,
+   "sightings": 4201,
+   "cells": 183,
+   "stops": 1,
+   "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Fort-Jefferson_Dry-Tortugas.jpg/1280px-Fort-Jefferson_Dry-Tortugas.jpg",
     "page": "https://commons.wikimedia.org/wiki/File:Fort-Jefferson_Dry-Tortugas.jpg",
@@ -1475,7 +1475,7 @@
    "key": "virgin_islands",
    "name": "Virgin Islands National Park",
    "state": "VI",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -64.8024,
     18.2966,
@@ -1486,11 +1486,11 @@
     -64.7399,
     18.3369
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 94,
+   "sightings": 2032,
+   "cells": 490,
+   "stops": 8,
+   "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/St_John_Trunk_Bay_3.jpg/1280px-St_John_Trunk_Bay_3.jpg",
     "page": "https://commons.wikimedia.org/wiki/File:St_John_Trunk_Bay_3.jpg",
@@ -1504,7 +1504,7 @@
    "key": "haleakala",
    "name": "Haleakala National Park",
    "state": "HI",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -156.2567,
     20.6264,
@@ -1515,11 +1515,11 @@
     -156.1486,
     20.6994
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 45,
+   "sightings": 1959,
+   "cells": 186,
+   "stops": 8,
+   "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Haleakala_National_Park_02.jpg/1280px-Haleakala_National_Park_02.jpg",
     "page": "https://commons.wikimedia.org/wiki/File:Haleakala_National_Park_02.jpg",

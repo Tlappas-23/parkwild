@@ -1,0 +1,53 @@
+{
+  "built": "2026-09-06T23:47:17+00:00",
+  "git_commit": "e6ce3024dc1d328e1ca135d942a6f4df7b6baa9c",
+  "files": {
+    "cells.geojson": {
+      "sha256": "5e9b91725961150710dcacdcec381616ce954b9c7d733c6f149e28f966398f8f",
+      "bytes": 207762
+    },
+    "species.json": {
+      "sha256": "bef5910e65ab5e70ef518c85498ba2ae9d5949adeb9524012245dd8c4c3388d9",
+      "bytes": 56965
+    },
+    "sightings.parquet": {
+      "sha256": "27cbe77384ced5eb99fc1fe00e54659553fcf881116ad038d4223ea67c291ebc",
+      "bytes": 196256
+    },
+    "photos_species.json": {
+      "sha256": "ff2fa460ec322e3e77b8ab0814a3e2fa2075999ba032d8024e263dbdf7523176",
+      "bytes": 77427
+    },
+    "photos_cells.json": {
+      "sha256": "3b20cf0ccd65353cc7492225fd40e1679465a4d14511c4f2d16842459fab01d8",
+      "bytes": 109427
+    },
+    "places.json": {
+      "sha256": "1780dd7528d9d112fe02fd726bec8b3f2330a2ad3815e96b032aa17f36f8d4fd",
+      "bytes": 41658
+    },
+    "landmarks.json": {
+      "sha256": "6ea4555641c3981e9f5853e821d1ac046a7d714694a46a9c850f5da73d4feae2",
+      "bytes": 16756
+    },
+    "boundary.geojson": {
+      "sha256": "3d3de6eec8a94500e77b3e71ac9f90660cc34db764ffe82102d5e572367bf0ef",
+      "bytes": 2325
+    },
+    "roads.json": {
+      "sha256": "8620616bf3d57bb4234e5d6bbf998274a04f527017738cdf27c962345e870433",
+      "bytes": 163431
+    },
+    "camera_pass.json": {
+      "sha256": "bc32c55d51dfe945b9ca6a9499e20b988eac25ca3a23cdb6f566b23b8cff6524",
+      "bytes": 441
+    },
+    "amenities.json": {
+      "sha256": "7522f51f715492c43001555a4be2e47e3c21a3d68d9923385bad8d34c05cc531",
+      "bytes": 14727
+    }
+  },
+  "park": "isle_royale",
+  "name": "Isle Royale National Park",
+  "state": "MI"
+}
