@@ -1,0 +1,53 @@
+{
+  "built": "2026-09-07T01:10:16+00:00",
+  "git_commit": "e6ce3024dc1d328e1ca135d942a6f4df7b6baa9c",
+  "files": {
+    "cells.geojson": {
+      "sha256": "bb8f7f1a2dff8be489468636d454adc4800eb328107854570f949eb20bb28dd0",
+      "bytes": 691814
+    },
+    "species.json": {
+      "sha256": "dada4829e32d2c7b9c64a6253d60aeb1b867b7d5a9c45ec68e58b3558439fcf0",
+      "bytes": 85447
+    },
+    "sightings.parquet": {
+      "sha256": "bdeb894c02455b7c228bcb202a0215d7ebd0db6943b0f74e649f7e147e257fdb",
+      "bytes": 555124
+    },
+    "photos_species.json": {
+      "sha256": "dc2741e6ebec6b0a7233e78a57698dcce195feb371facae24b9e655e959c8e45",
+      "bytes": 40091
+    },
+    "photos_cells.json": {
+      "sha256": "3b30f0298c56724dd347014ea754976e95cd2f9e1ff5bf143f988ef0df515845",
+      "bytes": 32106
+    },
+    "places.json": {
+      "sha256": "bd4902f8e908900dae1940f294956926a3e1e4a58a70ca3e618538b8d6d9d5c1",
+      "bytes": 6218
+    },
+    "landmarks.json": {
+      "sha256": "55ca90bf7cba0359debe85874df20f830ae2f5d679f0f38fec04531f4412070b",
+      "bytes": 267
+    },
+    "boundary.geojson": {
+      "sha256": "aba15f911726309ae4298227e9565850f26c3cc2e15b4a54587203db9583039d",
+      "bytes": 5099
+    },
+    "roads.json": {
+      "sha256": "eae0e790d9d73f9e35c264c376a40311068298fa5d7b2d93903363ccee681614",
+      "bytes": 13635
+    },
+    "camera_pass.json": {
+      "sha256": "2fa23a8440757519eb13dba7bb272f367b7ec570a2828d0c0f9436dd948a4fdf",
+      "bytes": 442
+    },
+    "amenities.json": {
+      "sha256": "dde5952aff5d46abb5b5352476c604906368b459274d22c3e186769f392c3d63",
+      "bytes": 3897
+    }
+  },
+  "park": "kenai_fjords",
+  "name": "Kenai Fjords National Park",
+  "state": "AK"
+}

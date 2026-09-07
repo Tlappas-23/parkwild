@@ -1,9 +1,9 @@
 {
- "generated": "2026-09-07T00:12:03+00:00",
+ "generated": "2026-09-07T01:24:12+00:00",
  "attribution": "Park photographs: Wikimedia Commons, each under the licence printed on its card",
  "species_index": {
-  "sha256": "549ba749570ba710180c9925ead642104e739c45e967e43d9830b69c2722ac2c",
-  "bytes": 1809350
+  "sha256": "234d27dd7bb84f67ae005d4dc1de912cd3fefff11bc24444ad802ec62c1e821a",
+  "bytes": 1979021
  },
  "parks": [
   {
@@ -1533,7 +1533,7 @@
    "key": "hawaii_volcanoes",
    "name": "Hawaii Volcanoes National Park",
    "state": "HI",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -155.8007,
     19.0583,
@@ -1544,11 +1544,11 @@
     -155.4083,
     19.3029
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 57,
+   "sightings": 3724,
+   "cells": 478,
+   "stops": 8,
+   "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/P%C4%81hoehoe_and_Aa_flows_at_Hawaii.jpg/1280px-P%C4%81hoehoe_and_Aa_flows_at_Hawaii.jpg",
     "page": "https://commons.wikimedia.org/wiki/File:P%C4%81hoehoe_and_Aa_flows_at_Hawaii.jpg",
@@ -1562,7 +1562,7 @@
    "key": "american_samoa",
    "name": "National Park of American Samoa",
    "state": "AS",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -170.7279,
     -14.2837,
@@ -1573,11 +1573,11 @@
     -170.0727,
     -14.2258
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 36,
+   "sightings": 155,
+   "cells": 68,
+   "stops": 7,
+   "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Pola_Islands_Tutuila_NPS.jpg/1280px-Pola_Islands_Tutuila_NPS.jpg",
     "page": "https://commons.wikimedia.org/wiki/File:Pola_Islands_Tutuila_NPS.jpg",
@@ -1591,7 +1591,7 @@
    "key": "denali",
    "name": "Denali National Park",
    "state": "AK",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -152.8846,
     62.2927,
@@ -1602,11 +1602,11 @@
     -150.8312,
     63.1829
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 189,
+   "sightings": 30641,
+   "cells": 2266,
+   "stops": 8,
+   "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Every_Road-_Denali_%287945497984%29.jpg/1280px-Every_Road-_Denali_%287945497984%29.jpg",
     "page": "https://commons.wikimedia.org/wiki/File:Every_Road-_Denali_(7945497984).jpg",
@@ -1620,7 +1620,7 @@
    "key": "glacier_bay",
    "name": "Glacier Bay National Park",
    "state": "AK",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -138.5882,
     58.1592,
@@ -1631,18 +1631,18 @@
     -136.9525,
     58.8211
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 233,
+   "sightings": 14801,
+   "cells": 3478,
+   "stops": 8,
+   "tour_source": "auto",
    "hero": null
   },
   {
    "key": "kenai_fjords",
    "name": "Kenai Fjords National Park",
    "state": "AK",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -150.9767,
     59.2889,
@@ -1653,11 +1653,11 @@
     -150.2466,
     59.7966
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 206,
+   "sightings": 14201,
+   "cells": 1671,
+   "stops": 0,
+   "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Kenai_Fjords_coast.jpg/1280px-Kenai_Fjords_coast.jpg",
     "page": "https://commons.wikimedia.org/wiki/File:Kenai_Fjords_coast.jpg",
@@ -1671,7 +1671,7 @@
    "key": "katmai",
    "name": "Katmai National Park",
    "state": "AK",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -156.5285,
     57.8733,
@@ -1682,11 +1682,11 @@
     -154.8894,
     58.5736
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 214,
+   "sightings": 16431,
+   "cells": 2011,
+   "stops": 8,
+   "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Katmai_Crater_1980.jpg/1280px-Katmai_Crater_1980.jpg",
     "page": "https://commons.wikimedia.org/wiki/File:Katmai_Crater_1980.jpg",

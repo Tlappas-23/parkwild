@@ -1,0 +1,53 @@
+{
+  "built": "2026-09-07T00:19:39+00:00",
+  "git_commit": "e6ce3024dc1d328e1ca135d942a6f4df7b6baa9c",
+  "files": {
+    "cells.geojson": {
+      "sha256": "818fae822ffe3b42e8a711e071366b6d3db1e79a6452bc60363389ff4589b33b",
+      "bytes": 188625
+    },
+    "species.json": {
+      "sha256": "454331537f41fdbd69bec89f0397041193fd7df71dce4e049a08fec916a8acd1",
+      "bytes": 24009
+    },
+    "sightings.parquet": {
+      "sha256": "632de3169678bb9b268b2d3b9125870987cff40d6db37fe373fc17deee369efe",
+      "bytes": 274387
+    },
+    "photos_species.json": {
+      "sha256": "de5804e5cc2646391f970f5dd2a47558240a03e401597cbbc0dcfa26d0423fed",
+      "bytes": 29050
+    },
+    "photos_cells.json": {
+      "sha256": "48d2260351cfd92ef93e618ffd2a4db491e2f0c1cde0bd2edb87c69f12dc222d",
+      "bytes": 69795
+    },
+    "places.json": {
+      "sha256": "e967b54da33c269a42382deb5ade3a224b6fb90898287311586bfaeabd7d453e",
+      "bytes": 41152
+    },
+    "landmarks.json": {
+      "sha256": "6c0cbd25f5edf22fbbf71a9577251b2403553d5cf62a05bbff172036dde2b1ed",
+      "bytes": 10551
+    },
+    "boundary.geojson": {
+      "sha256": "d22d96c0a789d123ea3aece29d39aa19997998247d1d4f18f8a7e12696e6b702",
+      "bytes": 3010
+    },
+    "roads.json": {
+      "sha256": "46362cde2b8147c67ba18949682d5bc67d27f87256760daf349c0f7df72f25bb",
+      "bytes": 205970
+    },
+    "camera_pass.json": {
+      "sha256": "7cc11a8505f74ac3513bd7da5a9a5877a4126f98414b7498dfaf357f3f4bf37d",
+      "bytes": 446
+    },
+    "amenities.json": {
+      "sha256": "22274b12395fb31b53cfe2903b4bffa1eb244899670335862245c9f68a179bd4",
+      "bytes": 26400
+    }
+  },
+  "park": "hawaii_volcanoes",
+  "name": "Hawaii Volcanoes National Park",
+  "state": "HI"
+}

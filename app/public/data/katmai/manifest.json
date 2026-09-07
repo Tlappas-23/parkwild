@@ -1,0 +1,53 @@
+{
+  "built": "2026-09-07T01:24:08+00:00",
+  "git_commit": "e6ce3024dc1d328e1ca135d942a6f4df7b6baa9c",
+  "files": {
+    "cells.geojson": {
+      "sha256": "a1f79abb713e48977f065a448cd154a6b47fd457b601753048cb37fd67872054",
+      "bytes": 827124
+    },
+    "species.json": {
+      "sha256": "3cf01c60527c02d2204c595afea2cf552bc5265cb678feaba9630f0b078c8702",
+      "bytes": 89205
+    },
+    "sightings.parquet": {
+      "sha256": "4db65295698a6deab0c3bd44129c79fe45eeae83f2db6fdaf88e4fa00c0efcfb",
+      "bytes": 599222
+    },
+    "photos_species.json": {
+      "sha256": "c805c8f6162066849bc23b852e340b6b0c9d9c90e9b96af6d3d9aeba56b31978",
+      "bytes": 55175
+    },
+    "photos_cells.json": {
+      "sha256": "f70616730d12d86a44174932800c860895ef7d09d442880be22a60f4f2e091c7",
+      "bytes": 42494
+    },
+    "places.json": {
+      "sha256": "b1eb95c20859bbd0b216f1dd62abf114395e17ea5929498fa706ec10aad0b8e2",
+      "bytes": 20182
+    },
+    "landmarks.json": {
+      "sha256": "69ffb3b9f44b9daa575d8980adfe61a2da10ec553de2acfe1feb01c473cc2dd7",
+      "bytes": 13600
+    },
+    "boundary.geojson": {
+      "sha256": "3a4a6f78d89a262ff1df46c1c41fee919a85d434dd611f5efe077ead6bdf2da7",
+      "bytes": 13597
+    },
+    "roads.json": {
+      "sha256": "365f0eb7f43736e8e878137803b83a3f7b990197a39af96ae0b20f457b6520e1",
+      "bytes": 43671
+    },
+    "camera_pass.json": {
+      "sha256": "d655d93d3d13bf9488aaf3b7e46ec7ad971930f98e4bf01811f4f976798b3242",
+      "bytes": 436
+    },
+    "amenities.json": {
+      "sha256": "b47552c1c36a08c92bf1398c02379d5d8bfe325019c28caef5dadefec7b1da39",
+      "bytes": 10930
+    }
+  },
+  "park": "katmai",
+  "name": "Katmai National Park",
+  "state": "AK"
+}

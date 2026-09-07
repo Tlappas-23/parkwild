@@ -1,0 +1,53 @@
+{
+  "built": "2026-09-07T00:21:08+00:00",
+  "git_commit": "e6ce3024dc1d328e1ca135d942a6f4df7b6baa9c",
+  "files": {
+    "cells.geojson": {
+      "sha256": "c437ae1453e57e0d580dedd8bededa97424a9b67533f184ecbcd0b47c7b93ffa",
+      "bytes": 28614
+    },
+    "species.json": {
+      "sha256": "77a8c6b5963dd849197595dd39768c83ef75ed0b4541f8ed55f73312888da1dc",
+      "bytes": 15427
+    },
+    "sightings.parquet": {
+      "sha256": "a930db87c4f9023ba8380f4714e5c263b9cadeb36f431105699326916558caa9",
+      "bytes": 17182
+    },
+    "photos_species.json": {
+      "sha256": "77e521c1ecb5ef7065411d1719a0ff8b2779e0fd6cf5ef07ffea3088e0c38180",
+      "bytes": 9219
+    },
+    "photos_cells.json": {
+      "sha256": "0448eedf2925e0136846dd32d0dbba7b54db6ce1d196251f4d548012d909439d",
+      "bytes": 5960
+    },
+    "places.json": {
+      "sha256": "e1fcc812229bf1076e0b7e78682fca5eb4bb96cb684c87bcdf672443b0b8aebb",
+      "bytes": 4855
+    },
+    "landmarks.json": {
+      "sha256": "519f7bf7421b3798c44dedc03247a941135c35acbd4dfdd465b08d9150f656f4",
+      "bytes": 3339
+    },
+    "boundary.geojson": {
+      "sha256": "139065027df908f0d8eda5ea9b0cf7a1045ee0ef0efd006742e1a5e684df9de9",
+      "bytes": 2258
+    },
+    "roads.json": {
+      "sha256": "6fc9b09d5362bcdefdbc3076b1146e8b7134822925b208a5a5ad77641dfe1de5",
+      "bytes": 50613
+    },
+    "camera_pass.json": {
+      "sha256": "35a7e1ac0c81d61ec4bd1631728834c5f18b13bb29b2f718602722ca62d57706",
+      "bytes": 444
+    },
+    "amenities.json": {
+      "sha256": "8478b0ea523f50ec113c0711fd065dbb2ddce3fea18de34699d8da387d5610c0",
+      "bytes": 2825
+    }
+  },
+  "park": "american_samoa",
+  "name": "National Park of American Samoa",
+  "state": "AS"
+}
