@@ -103,6 +103,8 @@ make test lint                # offline; no token, no model
 cd app && npm ci && npm run dev
 ```
 
+To change the code rather than run it, [CONTRIBUTING.md](CONTRIBUTING.md) has the checks and the ship flow.
+
 Bringing a park live, end to end (network, no token):
 
 ```bash
