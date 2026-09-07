@@ -1,0 +1,53 @@
+{
+  "built": "2026-09-07T00:56:01+00:00",
+  "git_commit": "e6ce3024dc1d328e1ca135d942a6f4df7b6baa9c",
+  "files": {
+    "cells.geojson": {
+      "sha256": "b21f4a1e4f53490b9f75862b3f2cfc6b25b6a2edc239b664b1ad69c7a6b4f1f8",
+      "bytes": 914337
+    },
+    "species.json": {
+      "sha256": "f66da641801426dc587b9acaac9731ad2f697ece2612a2b7c1bc9cd320a8a18f",
+      "bytes": 81066
+    },
+    "sightings.parquet": {
+      "sha256": "22056140b11bd77911168b09bf8cd706af9182958c2edce491f22b13377337a8",
+      "bytes": 1198547
+    },
+    "photos_species.json": {
+      "sha256": "92c383e5bf8efe7e79b265714f46f32090a0bd0c4a6250b004c92588ee05966c",
+      "bytes": 84878
+    },
+    "photos_cells.json": {
+      "sha256": "736b440c0938f4796e1dca6c1b198c827458ea8735abcd4226c1630a2c820b6f",
+      "bytes": 264208
+    },
+    "places.json": {
+      "sha256": "73bbe5abf59ac8cbd51ab28daaddadb882ccf5a48a57d1268428684e0917b5eb",
+      "bytes": 64439
+    },
+    "landmarks.json": {
+      "sha256": "7863f064d42d81d2e6d63b30601388d67ffdc3d489a811e26e5390734bd307bb",
+      "bytes": 10405
+    },
+    "boundary.geojson": {
+      "sha256": "edf5eb03e60ebcf5ad5ec8bf3e4c7079e2e6f9934c9a551a5ec243674b43d64a",
+      "bytes": 2199
+    },
+    "roads.json": {
+      "sha256": "6b6a2a466edfce05f15c2d87794c168d70e62042866b0f9616ba5c756e70b321",
+      "bytes": 258474
+    },
+    "camera_pass.json": {
+      "sha256": "992f46c3ffef1841b8a17b7ded3fbb85752de9dba806c37780ae5f669396ed32",
+      "bytes": 436
+    },
+    "amenities.json": {
+      "sha256": "2f65006d71d3ff7a42dd40de62e1cee6ac6bd0520d13e95016d28131b996645c",
+      "bytes": 40364
+    }
+  },
+  "park": "denali",
+  "name": "Denali National Park",
+  "state": "AK"
+}
