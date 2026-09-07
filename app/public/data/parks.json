@@ -1,9 +1,9 @@
 {
- "generated": "2026-09-07T04:02:50+00:00",
+ "generated": "2026-09-07T14:05:26+00:00",
  "attribution": "Park photographs: Wikimedia Commons, each under the licence printed on its card",
  "species_index": {
-  "sha256": "a18480130e13227cbf65cf665bbacadb6dfa3f5c5742ba626bc999d0ad4f869d",
-  "bytes": 2071546
+  "sha256": "1f43ade480fa68f3e222b8be98ce9de577ab2b9e0844a734b627113c652325cc",
+  "bytes": 2100331
  },
  "parks": [
   {
@@ -1758,7 +1758,7 @@
    "key": "gates_of_the_arctic",
    "name": "Gates of the Arctic National Park",
    "state": "AK",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -156.9994,
     66.6496,
@@ -1769,11 +1769,11 @@
     -153.2641,
     67.6525
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 156,
+   "sightings": 19772,
+   "cells": 1267,
+   "stops": 8,
+   "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Remote_river_in_Gates_of_the_Arctic_%2816524035298%29.jpg/1280px-Remote_river_in_Gates_of_the_Arctic_%2816524035298%29.jpg",
     "page": "https://commons.wikimedia.org/wiki/File:Remote_river_in_Gates_of_the_Arctic_(16524035298).jpg",
