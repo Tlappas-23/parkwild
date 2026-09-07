@@ -1,0 +1,57 @@
+{
+  "built": "2026-09-07T14:05:21+00:00",
+  "git_commit": "5220781957c1ef99daa9f05f4959195d38ea3579",
+  "files": {
+    "cells.geojson": {
+      "sha256": "e8e621bcfa9b4df156eeb1a51ea803c9b0bf84da70b34d4bae39c6304ad0a815",
+      "bytes": 587957
+    },
+    "species.json": {
+      "sha256": "d1ddf645a2c9cf72027ca11e39acc7c188c9d295c3de3d559352e66dad2766bc",
+      "bytes": 64384
+    },
+    "sightings.parquet": {
+      "sha256": "da313215cd2fcbd07a3723ee7fce5f2b6bd154c45a5af549c7490a996d202bbc",
+      "bytes": 573894
+    },
+    "photos_species.json": {
+      "sha256": "dc65aae6af957d5666e63282155d089800532ea440e2931c44ff9e000d12cf25",
+      "bytes": 11564
+    },
+    "photos_cells.json": {
+      "sha256": "8f68ff637664e2d2215f023116faf48e511c903bb3a187cecb7031004508cab8",
+      "bytes": 7479
+    },
+    "places.json": {
+      "sha256": "815fbef2639c4764abfb370105fa4df3714c194d53ff3213e1ee30cb813502d3",
+      "bytes": 27569
+    },
+    "climate.json": {
+      "sha256": "439da1f8f2dfdc91161fa47679f424ae04d5a0f7c5e996c549408f3354bfecaa",
+      "bytes": 1071
+    },
+    "landmarks.json": {
+      "sha256": "dd5d3f775421012d38e7b5489eff92f11c7708ceb109f987a0071778c2b00d88",
+      "bytes": 4932
+    },
+    "boundary.geojson": {
+      "sha256": "9ef83b7a8cf85dac0716eddef31211e21c843aca1a3338ffbe2fedaa040eda7f",
+      "bytes": 3270
+    },
+    "roads.json": {
+      "sha256": "be3a872daf328ca48a70956da8915baa6075bc2e1c2282a10950ce50c960f67a",
+      "bytes": 120107
+    },
+    "camera_pass.json": {
+      "sha256": "bd2b611993cdf9ae3ba701376e3ffcc14d98e27c65c314332d0d6434778f06a6",
+      "bytes": 449
+    },
+    "amenities.json": {
+      "sha256": "9cabb249f29e3e38e661fdbb893d1d55b87b7ceb6103174cb977c05ee9c4d80b",
+      "bytes": 15322
+    }
+  },
+  "park": "gates_of_the_arctic",
+  "name": "Gates of the Arctic National Park",
+  "state": "AK"
+}
