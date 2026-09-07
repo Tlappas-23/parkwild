@@ -24,7 +24,7 @@ import { MAX_SITES, planRoute, routerFor, type Mode, type PlanResult, type Site 
 import type { Place } from "../lib/tour";
 
 export type Page = "home" | "map" | "places" | "species" | "ask" | "about";
-export type Basemap = "terrain" | "satellite";
+export type Basemap = "terrain" | "satellite" | "topo";
 export interface TourState {
   active: boolean;
   stop: number;

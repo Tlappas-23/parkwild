@@ -211,6 +211,11 @@ export default function AboutPage() {
           Images themselves are not redistributed; "look around" links open Mapillary.
         </li>
         <li>
+          USGS: the Topo and Satellite basemaps and the relief (The National Map, 3DEP), the month's earthquakes inside
+          the park (Earthquake Hazards Program) and the stream gauges' flow and water temperature (National Water
+          Information System), all public domain and fetched live.
+        </li>
+        <li>
           Weather: live conditions and the next days from
           <a href="https://open-meteo.com" target="_blank" rel="noreferrer">
             Open-Meteo
