@@ -1,0 +1,53 @@
+{
+  "built": "2026-09-07T00:11:59+00:00",
+  "git_commit": "e6ce3024dc1d328e1ca135d942a6f4df7b6baa9c",
+  "files": {
+    "cells.geojson": {
+      "sha256": "db8411e30f0c1fbde0e2c88597baf7f95294c75d58e2af19c97d18e85fe7e7d3",
+      "bytes": 75390
+    },
+    "species.json": {
+      "sha256": "9906def49b978d356ea0e070fad9ebcea243aea5b9bbaf9f86e79a3896b07f20",
+      "bytes": 18981
+    },
+    "sightings.parquet": {
+      "sha256": "1291a7479a0537083e45823f2717dffc693a125adee090dd26dbaf1cb9e8afbb",
+      "bytes": 152833
+    },
+    "photos_species.json": {
+      "sha256": "5de8f0a69bb29fd91504c96dad567a994e0259dceeca5e4bad16c724d9474457",
+      "bytes": 23761
+    },
+    "photos_cells.json": {
+      "sha256": "4a14ab2aafa23979f1fe224e3dad992fb99b7a8bf57119d371ca9398a8564355",
+      "bytes": 27468
+    },
+    "places.json": {
+      "sha256": "f2e6c0d0aa22ac47495ab4f1d74326222915a0c91af85af1e843b12eadb8f32e",
+      "bytes": 18582
+    },
+    "landmarks.json": {
+      "sha256": "45b586cbd0dade815605b4ff58a009a3702bf12dade5f56fc8b3dc081b1b1b66",
+      "bytes": 14084
+    },
+    "boundary.geojson": {
+      "sha256": "81f7fbc6cc3f339c9d82d66e956b996f41aa079b3bd78998f65bb314c352da08",
+      "bytes": 6263
+    },
+    "roads.json": {
+      "sha256": "9f16cacf5f26f2f8d84014ba02f57f3e6bccd552dba3611a0c1d4d0ff1929a2a",
+      "bytes": 67969
+    },
+    "camera_pass.json": {
+      "sha256": "d5aa1578d5ff01ae4dc6cf5631a35f0ad8298298e8b030ba465559af028c3175",
+      "bytes": 439
+    },
+    "amenities.json": {
+      "sha256": "bcadb9aacce4ab8b049c6b9eba2a8c57ca85fc1432eccf92f7568c63b4902cc2",
+      "bytes": 10879
+    }
+  },
+  "park": "haleakala",
+  "name": "Haleakala National Park",
+  "state": "HI"
+}

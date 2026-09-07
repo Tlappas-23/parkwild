@@ -1,0 +1,53 @@
+{
+  "built": "2026-09-06T23:58:28+00:00",
+  "git_commit": "e6ce3024dc1d328e1ca135d942a6f4df7b6baa9c",
+  "files": {
+    "cells.geojson": {
+      "sha256": "0fbe7ee39f5e525d59d3c231193781962becbbacc740526f9993f2dde2a8a3b4",
+      "bytes": 235457
+    },
+    "species.json": {
+      "sha256": "6f000132ac6a29319e51532da6113c18d67d54b8da00bfc02933139e2a92e2f6",
+      "bytes": 67725
+    },
+    "sightings.parquet": {
+      "sha256": "d7b2c7c25f10034f1558508ad1790a31fe36825d95aa8702410adb699754047d",
+      "bytes": 228062
+    },
+    "photos_species.json": {
+      "sha256": "cf977a8cc9a997e627aa579ce6a95b0994adf998df0ebeea58ae05986f95a712",
+      "bytes": 61679
+    },
+    "photos_cells.json": {
+      "sha256": "0c70996e442ff41ee624347ec877f067743ee627a4a9a6949b69821c95bc9d99",
+      "bytes": 54608
+    },
+    "places.json": {
+      "sha256": "c82c0e1c3f4f0372d3f9914427c573bc36c009820264c7f755f354719a07ea2b",
+      "bytes": 5614
+    },
+    "landmarks.json": {
+      "sha256": "7e4ab5bf0918cd7066db6b02d89c4518cf06fb5b3b867c4488ba442ce62f50fa",
+      "bytes": 2980
+    },
+    "boundary.geojson": {
+      "sha256": "2696b4720d6bdf5b9104f24aba39305e136b820a8957fbe92711392ecc6ac6c7",
+      "bytes": 5053
+    },
+    "roads.json": {
+      "sha256": "2622c5bbe2e6e74d194b8a2ab249784417d39a8069b33096df7c1e4d77ca5c7e",
+      "bytes": 126752
+    },
+    "camera_pass.json": {
+      "sha256": "15b8fe3af29ef56fb8d9c191f916a7df94fe425ffcdf2cd39b7080418fee6ad5",
+      "bytes": 438
+    },
+    "amenities.json": {
+      "sha256": "3fe747abf3eba01d7eac698ed813973a4538cf889ad6318b82f6ac011802424c",
+      "bytes": 2114
+    }
+  },
+  "park": "biscayne",
+  "name": "Biscayne National Park",
+  "state": "FL"
+}

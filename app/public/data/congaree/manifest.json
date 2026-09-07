@@ -1,0 +1,53 @@
+{
+  "built": "2026-09-06T23:53:56+00:00",
+  "git_commit": "e6ce3024dc1d328e1ca135d942a6f4df7b6baa9c",
+  "files": {
+    "cells.geojson": {
+      "sha256": "194095e1431cd5517a50030c9c2923265d3d14e8fe5e315cdfbe4ea5bd14af14",
+      "bytes": 227814
+    },
+    "species.json": {
+      "sha256": "7116eaa6f1ac2db6ace95304b745fa2b98a50c275a37357c451a0da820b34758",
+      "bytes": 61540
+    },
+    "sightings.parquet": {
+      "sha256": "f150f8ecf7d4854d4249e863a889d9866757b930bed64537d85cd8e580cef66e",
+      "bytes": 242665
+    },
+    "photos_species.json": {
+      "sha256": "26d2ceffdbd9359587a95aff45e50fb0a1216a153cecb87ad089ba7a847f3867",
+      "bytes": 99180
+    },
+    "photos_cells.json": {
+      "sha256": "0ea2cc75683dbfb68e27df0d9152e973b7ddec0a6e46a927dba678d7f0f4bf6a",
+      "bytes": 144307
+    },
+    "places.json": {
+      "sha256": "fcd0769cc3a326b28e6c7ad4d70e419ef4900c79cc25b8be886edfbec33ee92b",
+      "bytes": 7456
+    },
+    "landmarks.json": {
+      "sha256": "32c199d197d55f0258614a16c243e02eea4382f46921fa6c660638a0f34bd763",
+      "bytes": 3018
+    },
+    "boundary.geojson": {
+      "sha256": "c545e44b411aef5a5c5c48e6b8fad0c41586c22d257dde2905b43c30c7dbd4a9",
+      "bytes": 10026
+    },
+    "roads.json": {
+      "sha256": "3bf2637aa201d3edcdc1aa1617cd8c800345798f9039776d9abe683aaef13200",
+      "bytes": 56839
+    },
+    "camera_pass.json": {
+      "sha256": "a27d2b1a994ab3c7aded1ec80e7434954dd2fd0400a31b1a9ddf9c04a556f475",
+      "bytes": 438
+    },
+    "amenities.json": {
+      "sha256": "4b5756b1986bd8820e07aac960f90e94de7efa5aeb6ce9c2fc2739564a8caf68",
+      "bytes": 3233
+    }
+  },
+  "park": "congaree",
+  "name": "Congaree National Park",
+  "state": "SC"
+}

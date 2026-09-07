@@ -1,0 +1,53 @@
+{
+  "built": "2026-09-07T00:04:43+00:00",
+  "git_commit": "e6ce3024dc1d328e1ca135d942a6f4df7b6baa9c",
+  "files": {
+    "cells.geojson": {
+      "sha256": "36e7e835c899df88dd73bd25eed9752a42d071e55161d7be47a6de4cf175fe12",
+      "bytes": 91693
+    },
+    "species.json": {
+      "sha256": "60afc0f882c694036adcd7f1e979ee255619d5a8ac98b8c934688881c1ecf3db",
+      "bytes": 77733
+    },
+    "sightings.parquet": {
+      "sha256": "9613a0ccc3e0845a499cf3b1de2eab285afcb4d42453a134a903989f232beaa0",
+      "bytes": 234572
+    },
+    "photos_species.json": {
+      "sha256": "0f2ced51be40f06b3d1fbb940002ed0d06986370d1eccab5a21d9df628bcc310",
+      "bytes": 101194
+    },
+    "photos_cells.json": {
+      "sha256": "3fc0cfcf121e38247fd8e2b0177447eaf9a2e3ff1734381244410e99e11c387d",
+      "bytes": 47582
+    },
+    "places.json": {
+      "sha256": "824bef06bc4e8d5a1b589451da16bf7ada9765511455bdf2698076307df3f709",
+      "bytes": 7049
+    },
+    "landmarks.json": {
+      "sha256": "f098b91cdb59ff21ba33de198fb1494dd18141ab3bb846846942281d3c7a6cda",
+      "bytes": 4392
+    },
+    "boundary.geojson": {
+      "sha256": "607ea88a7b8a30b3c143d10df80a59df15c258ae3d725e1eccbbfa3f07673a20",
+      "bytes": 554
+    },
+    "roads.json": {
+      "sha256": "f7ad6daeb6d565d0c194d743ff4fab6925575a8e9023e070b3f2ab8e59f9e6f7",
+      "bytes": 10019
+    },
+    "camera_pass.json": {
+      "sha256": "23a50162a11b74c3a8590dbdfe30d1fc20d0823b7e246636114bc4b10ec7dbc1",
+      "bytes": 442
+    },
+    "amenities.json": {
+      "sha256": "6fc0423cc04311c17767efe17d478de46f975a325e3feea1e8d169559b171294",
+      "bytes": 3130
+    }
+  },
+  "park": "dry_tortugas",
+  "name": "Dry Tortugas National Park",
+  "state": "FL"
+}
