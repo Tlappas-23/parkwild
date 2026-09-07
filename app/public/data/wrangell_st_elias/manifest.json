@@ -1,0 +1,53 @@
+{
+  "built": "2026-09-07T03:23:21+00:00",
+  "git_commit": "e6ce3024dc1d328e1ca135d942a6f4df7b6baa9c",
+  "files": {
+    "cells.geojson": {
+      "sha256": "a023dd79e13adcd99d18ca3ce4c09c65199286ed60e3ce6f74fbc513548592ff",
+      "bytes": 1830367
+    },
+    "species.json": {
+      "sha256": "85d0a5916e955e9c37132ca19266d0f68e0348d3a7658703bfec803e039bc6f7",
+      "bytes": 100682
+    },
+    "sightings.parquet": {
+      "sha256": "7ae9a7cbe90a6baa81eee3af35406017ba2f628c3b03ecae33da4e944014e447",
+      "bytes": 1940764
+    },
+    "photos_species.json": {
+      "sha256": "16cc27d278e43cda71f304e75ed765bef8342a05705af0dc6feeadfedf9cf012",
+      "bytes": 30418
+    },
+    "photos_cells.json": {
+      "sha256": "78595752785779edd7be112d6a06a052f1367c9788e608a8148581731042d814",
+      "bytes": 22703
+    },
+    "places.json": {
+      "sha256": "7cde7ca46e9e114de6385477203865c44d475bd6cafe36fb800ae529ea90c503",
+      "bytes": 59727
+    },
+    "landmarks.json": {
+      "sha256": "5d17de6bfe875c09e35400b2ddfd419edc4130c1a8331afcfcd5f80c2822fd8a",
+      "bytes": 12418
+    },
+    "boundary.geojson": {
+      "sha256": "1d2a6fa11bf6ecb72d8329fc716b27d3c0b22d392dde6d6a9339df8544667b3e",
+      "bytes": 3182
+    },
+    "roads.json": {
+      "sha256": "6cb5bacf20ee1fc3f5304a6a1462c136915160a1427d853949884a52a1ab42b4",
+      "bytes": 404792
+    },
+    "camera_pass.json": {
+      "sha256": "f973f99146dd3f19d5abb1b4dce5e138eb5a2b05845f7c8a031b0b30e6004f71",
+      "bytes": 447
+    },
+    "amenities.json": {
+      "sha256": "4e91643f92123ba5def8fe16bf457df40f1b8c4bba203b100f3496281c5b0d9c",
+      "bytes": 37747
+    }
+  },
+  "park": "wrangell_st_elias",
+  "name": "Wrangell-St. Elias National Park",
+  "state": "AK"
+}
