@@ -1,0 +1,53 @@
+{
+  "built": "2026-09-07T04:02:44+00:00",
+  "git_commit": "e6ce3024dc1d328e1ca135d942a6f4df7b6baa9c",
+  "files": {
+    "cells.geojson": {
+      "sha256": "a8764d59b29a16755fa574462a36ea588ac2e00685c669d4de92a2a28f971106",
+      "bytes": 134364
+    },
+    "species.json": {
+      "sha256": "dfa6486ccfc62010f494e6b9b728cb04df64f84cdfe6d4d90b18c8ac5a46eb7d",
+      "bytes": 39266
+    },
+    "sightings.parquet": {
+      "sha256": "11170912cce8aa88d53b90011a64d93e8e8318762675cba05dbae215e7772b1f",
+      "bytes": 51890
+    },
+    "photos_species.json": {
+      "sha256": "ed08b087065130f7b443a9868590766d8c6230434acef041189c37aa04f646da",
+      "bytes": 9305
+    },
+    "photos_cells.json": {
+      "sha256": "52d71c52c74bcfe6d8eaff1e20711b59a7006ff6b6c2dbd79550bf0fc5e68887",
+      "bytes": 6111
+    },
+    "places.json": {
+      "sha256": "80679ba2087003b5f9db261c94a1449e5135ac61af2aeb9224cd8addde3d5b37",
+      "bytes": 1440
+    },
+    "landmarks.json": {
+      "sha256": "253588d97e31a7f2d011cc2b4c19c31aa53d08dd2a65977f05e02b6e6cae8454",
+      "bytes": 267
+    },
+    "boundary.geojson": {
+      "sha256": "1f254b09451dc7debce40030b5115b86200e13b7f1409581991b0dbbba7ff0f4",
+      "bytes": 2615
+    },
+    "roads.json": {
+      "sha256": "7f86e8263692d3ec6931a6bd20ecd79a9656e9f0f660117f6aca6cdbf0a9fb50",
+      "bytes": 533
+    },
+    "camera_pass.json": {
+      "sha256": "00262ea6a85ff7dbc53adf38ae766028631dc0c7646b1bcbb87a19d6a55e2c22",
+      "bytes": 442
+    },
+    "amenities.json": {
+      "sha256": "e660ae31d0cd2c8274b817353bd0bd920e905e0c1f44c20c16bf6e469752014c",
+      "bytes": 772
+    }
+  },
+  "park": "kobuk_valley",
+  "name": "Kobuk Valley National Park",
+  "state": "AK"
+}

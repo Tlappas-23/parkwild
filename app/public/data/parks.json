@@ -1,9 +1,9 @@
 {
- "generated": "2026-09-07T01:24:12+00:00",
+ "generated": "2026-09-07T04:02:50+00:00",
  "attribution": "Park photographs: Wikimedia Commons, each under the licence printed on its card",
  "species_index": {
-  "sha256": "234d27dd7bb84f67ae005d4dc1de912cd3fefff11bc24444ad802ec62c1e821a",
-  "bytes": 1979021
+  "sha256": "a18480130e13227cbf65cf665bbacadb6dfa3f5c5742ba626bc999d0ad4f869d",
+  "bytes": 2071546
  },
  "parks": [
   {
@@ -1700,7 +1700,7 @@
    "key": "wrangell_st_elias",
    "name": "Wrangell-St. Elias National Park",
    "state": "AK",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -145.435,
     59.6926,
@@ -1711,11 +1711,11 @@
     -142.2481,
     61.2053
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 243,
+   "sightings": 62655,
+   "cells": 4817,
+   "stops": 8,
+   "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Mt_Saint_Elias%2C_South_Central_Alaska.jpg/1280px-Mt_Saint_Elias%2C_South_Central_Alaska.jpg",
     "page": "https://commons.wikimedia.org/wiki/File:Mt_Saint_Elias,_South_Central_Alaska.jpg",
@@ -1729,7 +1729,7 @@
    "key": "lake_clark",
    "name": "Lake Clark National Park",
    "state": "AK",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -155.005,
     59.8513,
@@ -1740,11 +1740,11 @@
     -153.6018,
     60.6821
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 179,
+   "sightings": 9085,
+   "cells": 688,
+   "stops": 8,
+   "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/Lake_Clark_National_Park.jpg/1280px-Lake_Clark_National_Park.jpg",
     "page": "https://commons.wikimedia.org/wiki/File:Lake_Clark_National_Park.jpg",
@@ -1787,7 +1787,7 @@
    "key": "kobuk_valley",
    "name": "Kobuk Valley National Park",
    "state": "AK",
-   "status": "planned",
+   "status": "live",
    "bbox": [
     -160.2964,
     66.9118,
@@ -1798,11 +1798,11 @@
     -159.0631,
     67.3914
    ],
-   "species": null,
-   "sightings": null,
-   "cells": null,
-   "stops": null,
-   "tour_source": null,
+   "species": 98,
+   "sightings": 1273,
+   "cells": 326,
+   "stops": 0,
+   "tour_source": "auto",
    "hero": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Kobuk_Bendlova_235.jpg/1280px-Kobuk_Bendlova_235.jpg",
     "page": "https://commons.wikimedia.org/wiki/File:Kobuk_Bendlova_235.jpg",
