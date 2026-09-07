@@ -66,8 +66,13 @@ export default function HomePage() {
 
   return (
     <div className="page home">
-      <div className="home-hero" style={heroPark?.hero ? { backgroundImage: `url(${heroPark.hero.url})` } : undefined}>
-        <h1>Where the animals are.</h1>
+      <div className="home-hero">
+        {heroPark?.hero && (
+          <div className="home-hero-bg" style={{ backgroundImage: `url(${heroPark.hero.url})` }} aria-hidden="true" />
+        )}
+        <h1>
+          Where the <em>animals</em> are.
+        </h1>
         <p className="lede">
           Every recorded sighting in America's national parks, from people who were there, on a 3D map you can tour,
           filter by species, and plan a route through. Pick a park.

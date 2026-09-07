@@ -1,23 +1,42 @@
 /* Design system (E-040). One accent, one warning colour (the model), neutrals
    for everything else; a type scale, an 8-pt spacing scale, three radii, one
    shadow, one easing. Components below use only these tokens. */
+@font-face {
+  font-family: "Instrument Serif";
+  src: url("/fonts/instrument-serif-normal.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Instrument Serif";
+  src: url("/fonts/instrument-serif-italic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+/* Design system v2 (E-057): a dark field-guide look by default, deep
+   green-charcoal surfaces with warm ivory type and one blue accent, so the
+   photographs and the map carry the colour. The light set answers
+   data-theme="light" on the root. Same scales as v1. */
 :root {
-  --bg: #f6f6f3;
-  --fg: #101010;
-  --muted: #62625d;
-  --line: #e4e3de;
-  --panel: #ffffff;
-  --panel-2: #efeeea;
-  --panel-3: #e6e5e0;
-  --accent: #2563eb;
-  --accent-ink: #1d4ed8;
-  --accent-soft: color-mix(in oklab, var(--accent) 12%, var(--panel));
-  --model: #b45309;
-  --model-soft: color-mix(in oklab, var(--model) 10%, var(--panel));
-  --slate: #475569;
-  --danger: #dc2626;
-  --shadow: 0 1px 2px rgba(16, 16, 16, 0.06), 0 10px 30px rgba(16, 16, 16, 0.1);
-  --shadow-sm: 0 1px 2px rgba(16, 16, 16, 0.08);
+  --bg: #0f1412;
+  --bg-2: #141a17;
+  --fg: #ede9df;
+  --muted: #a4a297;
+  --line: #262d29;
+  --panel: #171d1a;
+  --panel-2: #1e2521;
+  --panel-3: #262e29;
+  --accent: #7aa2ff;
+  --accent-ink: #a5c0ff;
+  --accent-soft: color-mix(in oklab, var(--accent) 16%, var(--panel));
+  --model: #e0a24a;
+  --model-soft: color-mix(in oklab, var(--model) 14%, var(--panel));
+  --slate: #97a3ae;
+  --danger: #f27171;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 18px 50px rgba(0, 0, 0, 0.45);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.45);
   --r-sm: 8px;
   --r: 12px;
   --r-lg: 18px;
@@ -38,24 +57,28 @@
   --s-6: 32px;
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
   --dur: 220ms;
-  --glass: color-mix(in oklab, var(--panel) 86%, transparent);
+  --glass: color-mix(in oklab, var(--panel) 80%, transparent);
+  --display: "Instrument Serif", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  color-scheme: dark;
 }
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #131313;
-    --fg: #f2f1ed;
-    --muted: #a9a8a1;
-    --line: #2a2a28;
-    --panel: #1c1c1b;
-    --panel-2: #242422;
-    --panel-3: #2c2c2a;
-    --accent: #5b8def;
-    --accent-ink: #8fb4f5;
-    --model: #d9982e;
-    --slate: #9aa4b2;
-    --shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 10px 30px rgba(0, 0, 0, 0.5);
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
-  }
+:root[data-theme="light"] {
+  --bg: #f6f6f3;
+  --bg-2: #f0efeb;
+  --fg: #101010;
+  --muted: #62625d;
+  --line: #e4e3de;
+  --panel: #ffffff;
+  --panel-2: #efeeea;
+  --panel-3: #e6e5e0;
+  --accent: #2563eb;
+  --accent-ink: #1d4ed8;
+  --model: #b45309;
+  --slate: #475569;
+  --danger: #dc2626;
+  --shadow: 0 1px 2px rgba(16, 16, 16, 0.06), 0 10px 30px rgba(16, 16, 16, 0.1);
+  --shadow-sm: 0 1px 2px rgba(16, 16, 16, 0.08);
+  --glass: color-mix(in oklab, var(--panel) 86%, transparent);
+  color-scheme: light;
 }
 * {
   box-sizing: border-box;
@@ -67,7 +90,11 @@ body,
   margin: 0;
 }
 body {
-  background: var(--bg);
+  background:
+    radial-gradient(1100px 620px at 12% -8%, color-mix(in oklab, var(--accent) 14%, transparent), transparent 60%),
+    radial-gradient(900px 560px at 100% 100%, color-mix(in oklab, var(--model) 10%, transparent), transparent 60%),
+    linear-gradient(180deg, var(--bg-2), var(--bg) 40%);
+  background-attachment: fixed;
   color: var(--fg);
   font:
     var(--t-15)/1.5 -apple-system,
@@ -2775,4 +2802,234 @@ nav button.active {
   font-size: var(--t-17);
   letter-spacing: -0.01em;
   font-variant-numeric: tabular-nums;
+}
+
+/* the field-guide look: a faint grain over the ground, serif display type, and pictures that breathe */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.045;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='160' height='160' filter='url(%23n)' opacity='0.9'/></svg>");
+  background-size: 160px 160px;
+}
+#root {
+  position: relative;
+  z-index: 1;
+}
+h1,
+.hero-text h1,
+.home-hero h1,
+.tour-title h2,
+.card-title,
+.drawer h2,
+.page h1 {
+  font-family: var(--display);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+h1,
+.page h1 {
+  font-size: clamp(34px, 4.2vw, 46px);
+  line-height: 1.05;
+}
+.card-title {
+  font-size: var(--t-17);
+}
+.tour-title h2 {
+  font-size: var(--t-24);
+}
+.home-hero h1 {
+  font-size: clamp(40px, 6vw, 72px);
+  line-height: 1;
+}
+.home-hero h1 em,
+.page h1 em {
+  font-style: italic;
+  color: var(--accent-ink);
+}
+/* pictures that move: a slow drift on every thumbnail and hero, staggered by --kb, off under reduced motion */
+.card-media {
+  overflow: hidden;
+}
+.card-media img,
+.hero-photo img,
+.place-thumb img,
+.park-media img {
+  will-change: transform;
+  animation: kenburns 28s ease-in-out infinite alternate;
+  animation-delay: var(--kb, 0s);
+  transform-origin: 50% 50%;
+}
+.card:hover .card-media img,
+.park-card:hover img {
+  animation-play-state: paused;
+  transform: scale(1.06);
+  transition: transform 900ms var(--ease);
+}
+@keyframes kenburns {
+  0% {
+    transform: scale(1) translate(0, 0);
+  }
+  50% {
+    transform: scale(1.08) translate(-1.5%, 1%);
+  }
+  100% {
+    transform: scale(1.12) translate(1.5%, -1.5%);
+  }
+}
+.card {
+  transition:
+    transform var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease),
+    border-color var(--dur) var(--ease);
+  border-color: var(--line);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow);
+  border-color: color-mix(in oklab, var(--accent) 35%, var(--line));
+}
+.controls,
+.drawer,
+.tour,
+.legend,
+.cam-ctrl,
+.weather-pill {
+  box-shadow:
+    var(--shadow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  border: 1px solid color-mix(in oklab, var(--line) 70%, transparent);
+}
+/* the home hero: the park photograph drifts behind the words */
+.home-hero {
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--bg-2);
+}
+.home-hero-bg {
+  position: absolute;
+  inset: -6%;
+  background: center / cover no-repeat;
+  animation: hero-drift 48s ease-in-out infinite alternate;
+  z-index: -1;
+  filter: saturate(1.05);
+}
+.home-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(90deg, rgba(8, 12, 10, 0.78) 0%, rgba(8, 12, 10, 0.45) 55%, rgba(8, 12, 10, 0.2) 100%),
+    linear-gradient(0deg, rgba(8, 12, 10, 0.75), transparent 45%);
+}
+@keyframes hero-drift {
+  0% {
+    transform: scale(1) translate(0, 0);
+  }
+  100% {
+    transform: scale(1.1) translate(-2%, 1.5%);
+  }
+}
+/* live readings from USGS in the map panel */
+.live {
+  display: grid;
+  gap: 6px;
+  margin: 4px 0 12px;
+  padding: 10px 12px;
+  border-radius: var(--r);
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+}
+.live-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.live-row > .ico {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--accent-ink);
+}
+.live-list {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+.live-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  color: inherit;
+  text-decoration: none;
+  font-size: var(--t-13);
+  min-width: 0;
+}
+.live-item:hover .live-name {
+  text-decoration: underline;
+}
+.live-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.live-val {
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+.live-credit {
+  margin-left: 24px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .card-media img,
+  .hero-photo img,
+  .place-thumb img,
+  .park-media img,
+  .home-hero-bg {
+    animation: none !important;
+  }
+}
+
+/* stagger the drift so a grid never moves in lockstep: delays by position, no script needed */
+.grid > :nth-child(6n + 1) img,
+.park-grid > :nth-child(6n + 1) img {
+  --kb: 0s;
+}
+.grid > :nth-child(6n + 2) img,
+.park-grid > :nth-child(6n + 2) img {
+  --kb: -5s;
+}
+.grid > :nth-child(6n + 3) img,
+.park-grid > :nth-child(6n + 3) img {
+  --kb: -11s;
+}
+.grid > :nth-child(6n + 4) img,
+.park-grid > :nth-child(6n + 4) img {
+  --kb: -17s;
+}
+.grid > :nth-child(6n + 5) img,
+.park-grid > :nth-child(6n + 5) img {
+  --kb: -23s;
+}
+.grid > :nth-child(6n + 6) img,
+.park-grid > :nth-child(6n + 6) img {
+  --kb: -8s;
+}
+
+/* the hero runs edge to edge; only its words stay at reading width */
+.home-hero {
+  max-width: none;
+}
+.home-hero > :not(.home-hero-bg) {
+  max-width: 720px;
+}
+.home-hero > .home-hero-bg {
+  max-width: none;
+  margin: 0;
+  z-index: -1;
 }

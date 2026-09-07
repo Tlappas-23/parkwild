@@ -42,6 +42,7 @@ import {
 import { routerFor } from "../lib/routing";
 import { esc } from "../lib/html";
 import WeatherChip from "../components/WeatherChip";
+import ParkLive from "../components/ParkLive";
 import type { BoundaryFile, LandmarksFile, Ring } from "../data/types";
 import CellDetail from "../components/CellDetail";
 import PlaceDetail from "../components/PlaceDetail";
@@ -58,6 +59,8 @@ import Tour from "../components/Tour";
 // this look like a map of Yellowstone rather than a diagram over it.
 const STYLE = "https://tiles.openfreemap.org/styles/liberty";
 const USGS_IMAGERY = "https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}";
+// USGS_TOPO — BORROWED (The National Map's topographic basemap, public domain: the look of a paper park map)
+const USGS_TOPO = "https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}";
 const TERRAIN_TILES = "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png";
 // TERRAIN_EXAGGERATION — ARBITRARY (1 is true relief; on the paper-style map a
 // little more reads better at a 60° pitch, on imagery it starts to look wrong)
@@ -278,6 +281,13 @@ export default function MapPage() {
         maxzoom: 16,
         attribution: "Imagery: USGS The National Map",
       });
+      map.addSource("usgs-topo", {
+        type: "raster",
+        tiles: [USGS_TOPO],
+        tileSize: 256,
+        maxzoom: 16,
+        attribution: "USGS The National Map",
+      });
       map.addSource("dem", {
         type: "raster-dem",
         tiles: [TERRAIN_TILES],
@@ -301,6 +311,10 @@ export default function MapPage() {
       // and label stays on top of it; the hillshade goes under the lines.
       map.addLayer(
         { id: "usgs-imagery", type: "raster", source: "usgs", layout: { visibility: "none" } },
+        layers[1]?.id,
+      );
+      map.addLayer(
+        { id: "usgs-topo", type: "raster", source: "usgs-topo", layout: { visibility: "none" } },
         layers[1]?.id,
       );
       map.addLayer(
@@ -839,10 +853,12 @@ export default function MapPage() {
     const map = mapRef.current;
     if (!ready || !map) return;
     const sat = basemap === "satellite" && !overview;
+    const topo = basemap === "topo" && !overview;
     map.setLayoutProperty("usgs-imagery", "visibility", sat ? "visible" : "none");
-    map.setLayoutProperty("hillshade", "visibility", sat ? "none" : "visible");
+    map.setLayoutProperty("usgs-topo", "visibility", topo ? "visible" : "none");
+    map.setLayoutProperty("hillshade", "visibility", sat || topo ? "none" : "visible");
     for (const id of fillIds.current)
-      if (map.getLayer(id)) map.setLayoutProperty(id, "visibility", sat ? "none" : "visible");
+      if (map.getLayer(id)) map.setLayoutProperty(id, "visibility", sat || topo ? "none" : "visible");
     map.setPaintProperty("mask", "fill-color", sat ? "#0a1016" : "#f4f3ee");
     map.setPaintProperty("mask", "fill-opacity", sat ? 0.55 : 0.7);
   }, [ready, basemap, overview]);
@@ -1224,6 +1240,13 @@ export default function MapPage() {
             >
               Satellite
             </button>
+            <button
+              className={basemap === "topo" ? "on" : ""}
+              aria-pressed={basemap === "topo"}
+              onClick={() => setBasemap("topo")}
+            >
+              Topo
+            </button>
           </div>
           <button
             className={"toggle" + (terrain3d ? " on" : "")}
@@ -1247,6 +1270,7 @@ export default function MapPage() {
         </div>
         <div className="control">
           {weatherAt && <WeatherChip lat={weatherAt.lat} lon={weatherAt.lon} climate={climate} at={weatherAt.at} />}
+          {parkCard?.bbox && <ParkLive bbox={parkCard.bbox} parkName={parkCard.name} />}
           <label htmlFor="species-search">Species</label>
           {current ? (
             <div className="chip-row">

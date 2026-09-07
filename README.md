@@ -30,6 +30,9 @@ Live site: https://tlappas-23.github.io/parkwild/
 - **Weather.** Conditions now and the next three days at the park and at
   each place, from Open-Meteo in your browser, and what each month is
   usually like there from ten years of its archive.
+- **Live from USGS.** The nearest stream gauges' flow and water temperature
+  and the month's earthquakes inside the park, plus the USGS Topo and
+  Satellite basemaps and the 3D relief.
 - **Species.** Search one park or all parks at once. Every species page shows
   where people see the animal, park by park, with a button that opens that
   park's map on the animal's busiest cell.
@@ -125,7 +128,9 @@ on CPU. The runbook is in `docs/USER-GUIDE.md` under "Maintaining the site".
 | OpenStreetMap via Overpass | park boundaries, landmarks, roads, trails, amenities | ODbL |
 | Wikipedia and Wikimedia Commons | landmark summaries and photographs | CC BY-SA and the licence printed on each photograph; only reusable licences pass |
 | Mapillary | street-level imagery for the detection track | CC BY-SA 4.0; image id, contributor and licence stored with every row |
-| OpenFreeMap, USGS The National Map, AWS Terrain Tiles | base map, imagery, relief | open; attributed on the map |
+| OpenFreeMap, USGS The National Map, AWS Terrain Tiles | base map, imagery, topographic map, relief | open; attributed on the map |
+| USGS Earthquake Hazards Program, USGS National Water Information System | earthquakes and stream gauges, live | public domain |
+| Open-Meteo | weather now and ten-year climate normals | CC BY 4.0 |
 | SpeciesNet, MegaDetector, Qwen2.5 via WebLLM, CLIP via Transformers.js | detection, classification, the assistant, the photo helper | Apache 2.0 and MIT; models run locally |
 
 Google Maps and Street View are not used anywhere, by design.

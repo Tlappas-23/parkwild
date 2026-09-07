@@ -10,7 +10,8 @@ Cards for every open park with a photograph, species and sighting counts, and th
 
 You arrive on the whole park outline. Blue hexagons are places where people recorded animals; deeper blue means more sightings. Amber appears only where the roadside camera pass added a sighting of its own (Yellowstone).
 
-- **Terrain / Satellite / 3D** at the top of the left panel. Satellite drapes USGS imagery over the relief.
+- **Terrain / Satellite / Topo / 3D** at the top of the left panel. Satellite drapes USGS imagery over the relief; Topo is the USGS topographic map, the look of a paper park map.
+- **Live from USGS**, under the weather: the nearest stream gauges with their flow and water temperature right now, and the month's earthquakes inside the park (largest first). Both link to the USGS page for the reading.
 - **Species** search: type "elk", "bison", a scientific name or an old name; the map keeps only cells with that species and the counts switch to that species.
 - **Years** two sliders bound the span.
 - **Tap a hexagon** for its drawer: sightings and years, the photographs taken in that cell (credited), and a link that opens the same box on iNaturalist so you can check it yourself. With a species filter on, the drawer leads with that species and folds the rest away. "Add this spot to a route" sends it to the planner.
