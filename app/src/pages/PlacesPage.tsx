@@ -241,12 +241,14 @@ function PlacePage({ place: p, onBack }: { place: PlaceRec; onBack: () => void }
   useEffect(() => {
     let live = true;
     setEle(null);
-    if (!p.ele_m)
+    if (p.ele_m == null)
       fetchElevation(p.lon, p.lat)
         .then((v) => {
           if (live) setEle(v);
         })
-        .catch(() => {});
+        .catch(() => {
+          /* no elevation is fine; the eyebrow simply stays short */
+        });
     return () => {
       live = false;
     };

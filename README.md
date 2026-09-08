@@ -33,8 +33,9 @@ Live site: https://tlappas-23.github.io/parkwild/
   each place, from Open-Meteo in your browser, and what each month is
   usually like there from ten years of its archive.
 - **Live from USGS.** The nearest stream gauges' flow and water temperature
-  and the month's earthquakes inside the park, plus the USGS Topo and
-  Satellite basemaps and the 3D relief.
+  and the month's earthquakes inside the park, an elevation for any place
+  OpenStreetMap left without one, plus the USGS Topo and Satellite basemaps
+  and the 3D relief.
 - **Species.** Search one park or all parks at once. Every species page shows
   where people see the animal, park by park, with a button that opens that
   park's map on the animal's busiest cell.

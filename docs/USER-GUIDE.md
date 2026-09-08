@@ -41,7 +41,7 @@ Choose a start (your location, asked once and never stored, or any landmark), Dr
 
 ## Places
 
-Every named trail, site, viewpoint, campground and facility in the park, ordered by how many sightings people recorded within reach of it (500 m of a point, 300 m of a trail). That is where observers went, the only free measure of where visitors go; it is not a visitor count. Filter by kind, search, or sort by longest trail, by Wikipedia readers a month (landmarks with an article), or A to Z. Each row shows a twelve-month sparkline and its busiest months. Open a place for its photograph and Wikipedia summary, the weather there now and this month's typical weather, the month-by-month chart, the animals people recorded there with a photograph each, and buttons to show it on the map or add it to a route. The file loads when you first open the page.
+Every named trail, site, viewpoint, campground and facility in the park, ordered by how many sightings people recorded within reach of it (500 m of a point, 300 m of a trail). That is where observers went, the only free measure of where visitors go; it is not a visitor count. Filter by kind, search, or sort by longest trail, by Wikipedia readers a month (landmarks with an article), or A to Z. Each row shows a twelve-month sparkline and its busiest months. Open a place for its photograph and Wikipedia summary, its elevation (from USGS when OpenStreetMap has none), the weather there now and this month's typical weather, the month-by-month chart, the animals people recorded there with a photograph each, and buttons to show it on the map or add it to a route. The file loads when you first open the page.
 
 ## Species
 
