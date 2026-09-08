@@ -1,0 +1,253 @@
+/* Map page: full-bleed map with floating controls and a drawer */
+.map-page {
+  position: relative;
+  flex: 1;
+  min-height: calc(100vh - 57px);
+}
+.map,
+.map.maplibregl-map {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.controls {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  width: min(340px, calc(100% - 28px));
+  background: var(--panel);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow);
+  padding: 14px 16px 10px;
+  z-index: 5;
+}
+.control {
+  margin-bottom: 12px;
+}
+.control label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.search {
+  position: relative;
+}
+.suggest {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 6px);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  list-style: none;
+  margin: 0;
+  padding: 6px;
+  max-height: 320px;
+  overflow: auto;
+  z-index: 6;
+}
+.suggest button {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  background: none;
+  border: 0;
+  padding: 8px 10px;
+  border-radius: 8px;
+  text-align: left;
+}
+.suggest button:hover,
+.suggest button:focus-visible {
+  background: var(--panel-2);
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: color-mix(in oklab, var(--accent) 12%, var(--panel));
+  color: var(--accent-ink);
+  border-radius: 999px;
+  padding: 6px 8px 6px 12px;
+  font-weight: 600;
+}
+.chip-x {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-size: 16px;
+  line-height: 1;
+  padding: 0 4px;
+}
+.range-pair {
+  display: grid;
+  gap: 6px;
+}
+input[type="range"] {
+  width: 100%;
+  accent-color: var(--accent);
+}
+.stat {
+  margin: 4px 0 0;
+}
+.legend {
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  align-items: center;
+  background: color-mix(in oklab, var(--panel) 88%, transparent);
+  backdrop-filter: blur(8px);
+  border-radius: 12px;
+  padding: 8px 12px;
+  font-size: 12px;
+  max-width: min(520px, calc(100% - 28px));
+}
+.swatch {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  vertical-align: -2px;
+  margin-right: 6px;
+  opacity: 0.6;
+}
+.swatch.human {
+  background: var(--accent);
+}
+.swatch.model {
+  background: var(--model);
+}
+.maplibregl-ctrl-attrib {
+  font-size: 11px;
+}
+
+.drawer {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  bottom: 14px;
+  width: min(400px, calc(100% - 28px));
+  background: var(--panel);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow);
+  z-index: 6;
+  overflow: auto;
+}
+.drawer-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 18px 18px 12px;
+}
+.drawer-head h2 {
+  margin: 2px 0 2px;
+  font-size: 22px;
+}
+.icon-btn {
+  border: 0;
+  background: var(--panel-2);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 18px;
+  line-height: 1;
+}
+.strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 0 18px 8px;
+}
+.strip figure {
+  margin: 0;
+}
+.strip img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 10px;
+  background: var(--panel-2);
+  display: block;
+}
+.strip figcaption {
+  font-size: 11px;
+  line-height: 1.35;
+  margin-top: 4px;
+  color: var(--muted);
+}
+.strip figcaption strong {
+  color: var(--fg);
+  font-weight: 600;
+}
+.rows {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0 10px 12px;
+}
+.row-btn {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2px 10px;
+  align-items: center;
+  text-align: left;
+  background: none;
+  border: 0;
+  border-top: 1px solid var(--line);
+  padding: 10px 8px;
+  border-radius: 8px;
+}
+.row-btn:hover {
+  background: var(--panel-2);
+}
+.row-name {
+  font-weight: 600;
+}
+.row-meta {
+  color: var(--muted);
+  font-size: 13px;
+  grid-column: 1;
+}
+.row-badges {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  display: flex;
+  gap: 4px;
+}
+.badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid;
+  white-space: nowrap;
+}
+.badge.human {
+  color: var(--accent-ink);
+  border-color: color-mix(in oklab, var(--accent) 45%, transparent);
+  background: color-mix(in oklab, var(--accent) 10%, transparent);
+}
+.badge.model {
+  color: var(--model);
+  border-color: color-mix(in oklab, var(--model) 55%, transparent);
+  border-style: dashed;
+  background: color-mix(in oklab, var(--model) 8%, transparent);
+}
+.credit {
+  font-size: 12px;
+  color: var(--muted);
+}
+.credit.compact {
+  font-size: 11px;
+}

@@ -1,0 +1,477 @@
+/* tour: a small translucent card top-right on wide screens, the bar on phones */
+@media (min-width: 900px) {
+  .tour {
+    top: 14px;
+    right: 14px;
+    bottom: auto;
+    left: auto;
+    transform: none;
+    width: 300px;
+    max-height: calc(100% - 28px);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 14px;
+    overflow: auto;
+    scrollbar-width: thin;
+    background: color-mix(in oklab, var(--panel) 86%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  .tour-title h2 {
+    font-size: 18px;
+  }
+  .tour-text {
+    -webkit-line-clamp: 3;
+    font-size: 12.5px;
+  }
+  .tour.expanded .tour-text {
+    -webkit-line-clamp: 40;
+    font-size: 13px;
+  }
+  .tour-species {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px 6px;
+    overflow: visible;
+  }
+  .tour-species li {
+    width: auto;
+  }
+  .tour-card {
+    grid-template-columns: 1fr;
+  }
+  .tour-card img,
+  .tour-card .ph {
+    width: 100%;
+  }
+  .tour-card-name {
+    font-size: 11px;
+    white-space: normal;
+    line-height: 1.15;
+  }
+  .tour-species .credit.compact {
+    display: block;
+    font-size: 9px;
+    line-height: 1.2;
+  }
+  .tour.expanded .tour-species {
+    grid-template-columns: 1fr;
+  }
+  .tour.expanded .tour-card {
+    grid-template-columns: 54px 1fr;
+    grid-template-areas: "img name" "img count";
+    column-gap: 10px;
+    align-items: center;
+  }
+  .tour.expanded .tour-card img,
+  .tour.expanded .tour-card .ph {
+    grid-area: img;
+    width: 54px;
+  }
+  .tour.expanded .tour-card-name {
+    grid-area: name;
+    font-size: 13px;
+  }
+  .tour.expanded .tour-card-count {
+    grid-area: count;
+  }
+  .tour.expanded .tour-species .credit.compact {
+    margin-left: 64px;
+    font-size: 10px;
+  }
+  .tour-nav {
+    grid-template-columns: repeat(4, auto);
+    justify-content: start;
+    gap: 5px;
+  }
+  .tour-nav .dots {
+    justify-content: flex-start;
+    margin-top: 0;
+  }
+  .tour-foot {
+    display: none;
+  }
+  .tour.expanded .tour-foot {
+    display: block;
+  }
+  .tour-foot {
+    margin: 0;
+    font-size: 11px;
+  }
+  .tour.min {
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    width: auto;
+    max-width: 360px;
+    padding: 6px 8px;
+  }
+  .tour.min button {
+    padding: 5px 9px;
+    font-size: 12.5px;
+  }
+  .tour-min-title {
+    background: none;
+    border: 0;
+    font: inherit;
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--fg);
+    cursor: pointer;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .tour-min-title .eyebrow {
+    margin-right: 4px;
+  }
+  .map-page.touring .drawer {
+    right: 328px;
+  }
+}
+@media (max-width: 899px) {
+  .tour:not(.expanded) .tour-species .credit,
+  .tour:not(.expanded) .tour-foot {
+    display: none;
+  }
+}
+
+/* roadside camera pass */
+.table-wrap {
+  overflow-x: auto;
+  margin: 8px 0 12px;
+}
+table.pass {
+  border-collapse: collapse;
+  font-size: 13px;
+  min-width: 640px;
+}
+table.pass th,
+table.pass td {
+  text-align: left;
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+table.pass th {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  font-weight: 600;
+}
+.badge.as-link {
+  cursor: pointer;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+}
+.link.small.muted {
+  font-size: 12px;
+}
+.legend .swatch.pass {
+  background: transparent;
+  border: 1.5px dashed #b86e00;
+}
+
+/* update pill and home search */
+.update-pill {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  z-index: 50;
+  background: var(--fg);
+  color: var(--panel);
+  padding: 8px 10px 8px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  box-shadow: var(--shadow);
+}
+.update-pill .primary {
+  background: var(--panel);
+  color: var(--fg);
+  border-color: var(--panel);
+}
+.home-search {
+  max-width: 360px;
+  margin-top: 12px;
+}
+
+/* legend: bottom-right above the zoom buttons on wide screens, so the left
+   panel can grow (planner open) without covering it */
+@media (min-width: 900px) {
+  .legend {
+    left: auto;
+    right: 14px;
+    bottom: 132px;
+    max-width: 320px;
+  }
+}
+/* the legend explains the cells; during a tour the card is the guide */
+.map-page.touring .legend {
+  display: none;
+}
+.tour-card .thumb {
+  position: relative;
+  display: block;
+}
+.near-tag {
+  position: absolute;
+  left: 4px;
+  bottom: 4px;
+  background: rgba(15, 23, 42, 0.72);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 2px 5px;
+  border-radius: 999px;
+}
+
+/* things to do */
+.tour-tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--line);
+}
+.tour-tabs button {
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  background: none;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  padding: 4px 8px 6px;
+  color: var(--muted);
+  cursor: pointer;
+}
+.tour-tabs button.on {
+  color: var(--fg);
+  border-bottom-color: var(--fg);
+}
+.tour-todo {
+  display: grid;
+  gap: 8px;
+  max-height: 38vh;
+  overflow: auto;
+  scrollbar-width: thin;
+  padding-right: 2px;
+}
+.todo-group .eyebrow {
+  margin-bottom: 3px;
+}
+.todo-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+}
+.todo-list li {
+  display: grid;
+  grid-template-columns: 10px 1fr auto;
+  gap: 8px;
+  align-items: center;
+  font-size: 12.5px;
+  line-height: 1.25;
+}
+.todo-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #0369a1;
+  border: 1.5px solid #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12);
+}
+.todo-dot.camp {
+  background: #15803d;
+}
+.todo-dot.stay {
+  background: #0f766e;
+}
+.todo-dot.trail {
+  background: #7c2d12;
+}
+.todo-dot.trailhead {
+  background: #9a3412;
+}
+.todo-dot.feature {
+  background: #6d28d9;
+}
+.chip-x.add {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  width: 22px;
+  height: 22px;
+  font-size: 14px;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+}
+
+/* stop photographs */
+.tour-photos {
+  display: grid;
+  gap: 8px;
+  max-height: 42vh;
+  overflow: auto;
+  scrollbar-width: thin;
+}
+.street-link {
+  display: grid;
+  gap: 2px;
+  text-decoration: none;
+  color: var(--fg);
+  background: var(--panel-2);
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.street-link:hover {
+  background: color-mix(in oklab, var(--accent) 12%, var(--panel-2));
+}
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+.photo-grid figure {
+  margin: 0;
+}
+.photo-grid img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 8px;
+  background: var(--panel-2);
+  display: block;
+}
+.photo-grid .credit.compact {
+  font-size: 9.5px;
+  line-height: 1.2;
+  margin-top: 3px;
+}
+
+/* the left panel folds away */
+.controls {
+  position: relative;
+}
+.controls-hide {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 26px;
+  height: 26px;
+  font-size: 16px;
+  line-height: 1;
+}
+.controls .view-row {
+  padding-right: 28px;
+}
+.controls-pill {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--fg);
+  background: color-mix(in oklab, var(--panel) 88%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 8px 12px;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+}
+.controls-pill .pill-chip {
+  background: color-mix(in oklab, var(--accent) 14%, var(--panel));
+  color: var(--accent-ink);
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 12px;
+}
+
+/* place drawer */
+.drawer.place {
+  z-index: 8;
+}
+.place-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0 18px 12px;
+}
+.as-btn {
+  text-decoration: none;
+  display: inline-block;
+}
+.place-sec {
+  padding: 10px 18px 6px;
+  border-top: 1px solid var(--line);
+}
+.place-sec .eyebrow {
+  margin-bottom: 6px;
+}
+.place-text {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+.animal-grid {
+  list-style: none;
+  margin: 0 0 6px;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px 6px;
+}
+.animal-grid .tour-card {
+  display: grid;
+  gap: 2px;
+}
+.animal-grid .tour-card img,
+.animal-grid .tour-card .ph {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 8px;
+  background: var(--panel-2);
+  display: block;
+}
+.animal-grid .tour-card-name {
+  font-size: 11px;
+  white-space: normal;
+  line-height: 1.15;
+}
+.animal-grid .credit.compact {
+  font-size: 9px;
+  line-height: 1.2;
+}
+.todo-body.as-link {
+  background: none;
+  border: 0;
+  padding: 0;
+  text-align: left;
+  font: inherit;
+  color: var(--fg);
+  cursor: pointer;
+}
+.todo-body.as-link:hover strong {
+  text-decoration: underline;
+}
+.place .photo-grid {
+  grid-template-columns: repeat(3, 1fr);
+}

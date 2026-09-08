@@ -77,7 +77,7 @@ All files live in `app/public/data/<park>/` and are listed, with a SHA-256, in t
 
 ## The app
 
-`app/src` is React 19 + Vite 7 + MapLibre GL 5 + Zustand, with lazy chunks for the map and the two on-device models. Source layout: `src/app` (shell), `src/pages`, `src/components`, `src/lib` (pure logic, unit-tested), `src/data` (loaders, types), `src/store`, `src/styles`; `npm run lint` (ESLint) and `npm run format:check` (Prettier) gate every pull request.
+`app/src` is React 19 + Vite 7 + MapLibre GL 5 + Zustand, with lazy chunks for the map and the two on-device models. Source layout: `src/app` (shell), `src/pages` (one file per page; the map page keeps the map and its effects, and hands its panel and chrome to `components/MapControls` and `components/MapChrome`), `src/components`, `src/lib` (pure logic, unit-tested; `mapStyle.ts` is the map's palette in one place), `src/data` (loaders, types), `src/store`, `src/styles` (one file per subject, imported in cascade order from `app.css`); `npm run lint` (ESLint) and `npm run format:check` (Prettier) gate every pull request.
 
 | Module | Role |
 |---|---|

@@ -1,0 +1,148 @@
+/* ---- design system: panels, motion, sizes (supersedes older rules above) ---- */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.controls,
+.drawer,
+.tour,
+.controls-pill,
+.suggest,
+.legend,
+.update-pill {
+  animation: rise var(--dur) var(--ease);
+}
+.tour-wild,
+.tour-todo,
+.tour-photos,
+.legs,
+.place-sec {
+  animation: fade var(--dur) var(--ease);
+}
+.controls {
+  padding: var(--s-4);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow);
+}
+.control {
+  margin-bottom: var(--s-3);
+}
+.control:last-of-type {
+  margin-bottom: 0;
+}
+.control label {
+  font-size: var(--t-12);
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.drawer {
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow);
+}
+.drawer-head {
+  padding: var(--s-4) var(--s-4) var(--s-3);
+}
+.drawer-head h2 {
+  font-size: var(--t-20);
+  margin: 2px 0;
+}
+.tour {
+  border-radius: var(--r-lg);
+}
+.tour-title h2 {
+  font-size: var(--t-17);
+}
+.tour-tabs button {
+  font-size: var(--t-12);
+  padding: 4px 8px 7px;
+}
+.badge {
+  font-size: var(--t-11);
+}
+.credit,
+.credit.compact,
+.strip figcaption,
+.photo-grid .credit.compact,
+.tour-species .credit.compact,
+.animal-grid .credit.compact,
+.park-body .credit.compact {
+  font-size: var(--t-11);
+  line-height: 1.3;
+}
+.tour-card-name,
+.animal-grid .tour-card-name {
+  font-size: var(--t-12);
+}
+.tour-card-count {
+  font-size: var(--t-11);
+}
+.legend {
+  font-size: var(--t-12);
+  border-radius: var(--r);
+  background: var(--glass);
+}
+.chip {
+  font-size: var(--t-13);
+}
+nav {
+  padding: 3px;
+}
+nav button {
+  min-height: 32px;
+  padding: 0 14px;
+  background: transparent;
+  color: var(--muted);
+}
+nav button.active {
+  background: var(--panel);
+  color: var(--fg);
+  box-shadow: var(--shadow-sm);
+}
+.topbar {
+  padding: 10px 20px;
+}
+.brand {
+  font-size: var(--t-17);
+}
+.park-link .park {
+  font-size: var(--t-14);
+}
+
+/* one colour for places on the map and in lists; the icon says what kind */
+.todo-dot,
+.todo-dot.camp,
+.todo-dot.stay,
+.todo-dot.trail,
+.todo-dot.trailhead,
+.todo-dot.feature {
+  background: var(--slate);
+}
+.todo-list li {
+  grid-template-columns: 18px 1fr auto;
+}
+.todo-ico {
+  width: 16px;
+  height: 16px;
+  color: var(--slate);
+}
+.leg-n {
+  background: var(--accent);
+}
+.near-tag {
+  font-size: 9.5px;
+}

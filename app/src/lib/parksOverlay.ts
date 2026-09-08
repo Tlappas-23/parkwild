@@ -2,6 +2,7 @@
 // park's map. Live parks are the accent, configured-but-pending parks are
 // hollow, seeded parks are faint dots; the label carries the state.
 import type { FeatureCollection } from "geojson";
+import { ACCENT, INK, INK_HALO, MAP_GROUND, PLACE } from "./mapStyle";
 import type { GeoJSONSource, Map as MLMap } from "maplibre-gl";
 import type { ParkCard } from "../data/types";
 
@@ -58,8 +59,8 @@ export function addParksLayers(map: MLMap, beforeId?: string): void {
       source: "parks",
       paint: {
         "circle-radius": ["case", ["get", "live"], 8, ["==", ["get", "status"], "planned"], 6, 4],
-        "circle-color": ["case", ["get", "live"], "#2563eb", "#ffffff"],
-        "circle-stroke-color": ["case", ["get", "live"], "#ffffff", "#475569"],
+        "circle-color": ["case", ["get", "live"], ACCENT, PLACE],
+        "circle-stroke-color": ["case", ["get", "live"], MAP_GROUND, MAP_GROUND],
         "circle-stroke-width": ["case", ["get", "live"], 2, 1.5],
         "circle-opacity": ["case", ["==", ["get", "status"], "seed"], 0.55, 1],
       },
@@ -81,8 +82,8 @@ export function addParksLayers(map: MLMap, beforeId?: string): void {
         "text-max-width": 8,
       },
       paint: {
-        "text-color": ["case", ["get", "live"], "#12324a", "#4b5563"],
-        "text-halo-color": "rgba(255,255,255,0.92)",
+        "text-color": ["case", ["get", "live"], INK, PLACE],
+        "text-halo-color": INK_HALO,
         "text-halo-width": 1.3,
         "text-opacity": ["case", ["==", ["get", "status"], "seed"], 0.8, 1],
       },

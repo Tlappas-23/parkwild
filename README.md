@@ -1,5 +1,7 @@
 # parkwild
 
+[![ci](https://github.com/Tlappas-23/parkwild/actions/workflows/ci.yml/badge.svg)](https://github.com/Tlappas-23/parkwild/actions/workflows/ci.yml) [![pages](https://github.com/Tlappas-23/parkwild/actions/workflows/pages.yml/badge.svg)](https://tlappas-23.github.io/parkwild/) [![licence: MIT](https://img.shields.io/badge/licence-MIT-2563eb.svg)](LICENSE)
+
 A free map of where people have seen wild animals in America's national parks.
 
 Every research-grade observation on iNaturalist and every GBIF record with
@@ -74,6 +76,62 @@ swapped on the server is refused. A cross-park species index and the park
 index sit beside the folders. Publishing is a data-only pull request that a
 script opens from a fresh git worktree, so the working tree is never
 touched. `docs/ARCHITECTURE.md` has the full map, file by file.
+
+## How it is pulled and automated
+
+```mermaid
+flowchart LR
+  subgraph sources [Free sources]
+    inat[iNaturalist research grade]
+    gbif[GBIF datasets]
+    osm[OpenStreetMap via Overpass]
+    wiki[Wikipedia and Commons]
+    meteo[Open-Meteo archive]
+    mapil[Mapillary imagery]
+  end
+  subgraph pipeline [Pipeline on one machine, DuckDB, one writer]
+    ingest[ingest and dedupe] --> export[export: cells, species, photos]
+    landmarks[landmarks, roads, things to do] --> places[places with seasons]
+    export --> places
+    climate[climate normals]
+    detect[MegaDetector and SpeciesNet on corridors] --> review[human review, precision with CI]
+  end
+  subgraph publish [Publish, no working tree touched]
+    worktree[fresh git worktree] --> pr[data pull request] --> ci[CI: lint, tests, build] --> pages[GitHub Pages]
+  end
+  subgraph browser [In the visitor's browser, live]
+    weather[Open-Meteo now and 3 days]
+    usgs[USGS quakes and stream gauges]
+    ask[WebLLM assistant, opt-in]
+  end
+  inat --> ingest
+  gbif --> ingest
+  osm --> landmarks
+  wiki --> landmarks
+  meteo --> climate
+  mapil --> detect
+  places --> worktree
+  climate --> worktree
+  review --> worktree
+  pages --> weather
+  pages --> usgs
+  pages --> ask
+```
+
+| Job | Trigger | What it does |
+|---|---|---|
+| `scripts/parks_batch.sh` | by hand, once per new set of parks | ingest, export, landmarks, roads, things to do, places, climate; a data PR every six parks; safe to restart |
+| `scripts/refresh.sh` | cron, 1st and 15th, 03:00 | only the sightings that changed, re-export, places, landmarks monthly, climate seasonally, one data PR |
+| `scripts/publish_data.sh` | called by both | copies exports into a fresh worktree, rebuilds the species and park indexes there, opens the PR with auto-merge |
+| `.github/workflows/ci.yml` | every push and pull request | Python lint, provenance check, tests, smoke; app lint, format, typecheck, tests, build; CodeQL; secret scan |
+| `.github/workflows/pages.yml` | every merge to `main` | builds the app with the performance budget enforced and deploys it |
+| Dependabot | weekly | dependency pull requests, merged when CI is green |
+| `.claude/workflows/propose-review-ship.js` | by hand, one sentence of intent | propose, review, implement, verify, ship, with every step graded |
+
+Every data file the site reads carries a SHA-256 in a manifest compiled into
+the app, so a file swapped on the server is refused; the browser fetches
+weather, USGS readings and the optional models itself, keyless, and stores
+nothing.
 
 ## Repository layout
 

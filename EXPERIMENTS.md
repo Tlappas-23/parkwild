@@ -332,6 +332,14 @@ Format: date, what, number, kept?, why, where it lives.
 - **USGS:** a Topo basemap (The National Map's topographic tiles, the look of a paper park map) beside Terrain and Satellite; and a live block on the map panel from two keyless USGS services: the month's earthquakes inside the park's box (M1.5 and up, largest named) and the nearest stream gauges with flow and water temperature. Zion shows the Virgin River's forks at 39 to 82 cfs and 64 to 69 °F and no earthquakes; Yellowstone shows its swarm. Public domain, credited on About, ten-minute cache, nothing stored.
 - **Checked:** every page screenshotted headless at 1280 and 390 px. The hero photograph first sat in a 720 px column because an old child rule gave every hero child that width; one rule frees the picture.
 
+### E-058: one surface: the dark map, a panel in three parts, and the structure behind it
+- **What:** clean up the maps and the structure to the standard a hiring review would hold it to, and show how everything is pulled and automated.
+- **Map:** OpenFreeMap's dark style with its background set to the site's own ground, so the page and the map are one surface. Every overlay re-inked from one module (`lib/mapStyle.ts`): the park boundary in light green on a ground-coloured casing, cells blue, tour stops in the accent, other places slate, things-to-do labels warm, light text with a dark halo; hillshade tuned for a dark ground; the wash outside the park dark in every basemap. The home map uses the same style and inks. Satellite and Topo sit inside the dark wash.
+- **Panel:** the left panel reads top to bottom: Take the tour; View (Terrain, Satellite, Topo, 3D; Plan a visit, All parks); Now, at the park's busiest place (weather, USGS rivers and earthquakes), which folds; Filter (species, years, the count). It lives in `components/MapControls.tsx` with the folded pills; the rotate and tilt buttons and the legend in `components/MapChrome.tsx`. The map page keeps the map and its camera effects and lost 220 lines.
+- **Stylesheet:** one 3,000-line file became twelve files by subject, imported in cascade order from `app.css`, so nothing moved in the cascade and each subject has a home. The built CSS is the same size.
+- **Pulled and automated:** the README opens with CI, Pages and licence badges and carries a flow diagram from the free sources through the pipeline, the worktree publish, CI and Pages, to what the browser fetches live, with a table of every job and its trigger. `make refresh`, `make batch`, `make publish` and `make probe` name the jobs.
+- **Checked:** every page screenshotted headless at 1280 and 390 px; lint, format, typecheck, tests, build and the performance budget pass.
+
 ## Open questions with a planned experiment
 
 - **Q-1 SpeciesNet determinism.** Answered (E-013).

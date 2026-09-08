@@ -1,0 +1,174 @@
+/* Design system (E-040). One accent, one warning colour (the model), neutrals
+   for everything else; a type scale, an 8-pt spacing scale, three radii, one
+   shadow, one easing. Components below use only these tokens. */
+@font-face {
+  font-family: "Instrument Serif";
+  src: url("/fonts/instrument-serif-normal.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Instrument Serif";
+  src: url("/fonts/instrument-serif-italic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+/* Design system v2 (E-057): a dark field-guide look by default, deep
+   green-charcoal surfaces with warm ivory type and one blue accent, so the
+   photographs and the map carry the colour. The light set answers
+   data-theme="light" on the root. Same scales as v1. */
+:root {
+  --bg: #0f1412;
+  --bg-2: #141a17;
+  --fg: #ede9df;
+  --muted: #a4a297;
+  --line: #262d29;
+  --panel: #171d1a;
+  --panel-2: #1e2521;
+  --panel-3: #262e29;
+  --accent: #7aa2ff;
+  --accent-ink: #a5c0ff;
+  --accent-soft: color-mix(in oklab, var(--accent) 16%, var(--panel));
+  --model: #e0a24a;
+  --model-soft: color-mix(in oklab, var(--model) 14%, var(--panel));
+  --slate: #97a3ae;
+  --danger: #f27171;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 18px 50px rgba(0, 0, 0, 0.45);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.45);
+  --r-sm: 8px;
+  --r: 12px;
+  --r-lg: 18px;
+  --t-11: 11px;
+  --t-12: 12px;
+  --t-13: 13px;
+  --t-14: 14px;
+  --t-15: 15px;
+  --t-17: 17px;
+  --t-20: 20px;
+  --t-24: 24px;
+  --t-32: 32px;
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --dur: 220ms;
+  --glass: color-mix(in oklab, var(--panel) 80%, transparent);
+  --display: "Instrument Serif", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  color-scheme: dark;
+}
+:root[data-theme="light"] {
+  --bg: #f6f6f3;
+  --bg-2: #f0efeb;
+  --fg: #101010;
+  --muted: #62625d;
+  --line: #e4e3de;
+  --panel: #ffffff;
+  --panel-2: #efeeea;
+  --panel-3: #e6e5e0;
+  --accent: #2563eb;
+  --accent-ink: #1d4ed8;
+  --model: #b45309;
+  --slate: #475569;
+  --danger: #dc2626;
+  --shadow: 0 1px 2px rgba(16, 16, 16, 0.06), 0 10px 30px rgba(16, 16, 16, 0.1);
+  --shadow-sm: 0 1px 2px rgba(16, 16, 16, 0.08);
+  --glass: color-mix(in oklab, var(--panel) 86%, transparent);
+  color-scheme: light;
+}
+* {
+  box-sizing: border-box;
+}
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+body {
+  background:
+    radial-gradient(1100px 620px at 12% -8%, color-mix(in oklab, var(--accent) 14%, transparent), transparent 60%),
+    radial-gradient(900px 560px at 100% 100%, color-mix(in oklab, var(--model) 10%, transparent), transparent 60%),
+    linear-gradient(180deg, var(--bg-2), var(--bg) 40%);
+  background-attachment: fixed;
+  color: var(--fg);
+  font:
+    var(--t-15)/1.5 -apple-system,
+    BlinkMacSystemFont,
+    "SF Pro Text",
+    "Segoe UI",
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+h1 {
+  font-size: var(--t-32);
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  margin: 0 0 var(--s-2);
+  font-weight: 700;
+}
+h2 {
+  font-size: var(--t-20);
+  letter-spacing: -0.015em;
+  margin: var(--s-6) 0 var(--s-3);
+  font-weight: 650;
+}
+a {
+  color: var(--accent-ink);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+input[type="search"],
+input[type="text"],
+select {
+  font: inherit;
+  color: var(--fg);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  padding: 8px 12px;
+  width: 100%;
+  min-height: 36px;
+}
+input[type="search"]:focus {
+  border-color: var(--accent);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+.muted {
+  color: var(--muted);
+}
+.small {
+  font-size: var(--t-13);
+}
+.pad {
+  padding: var(--s-3) var(--s-4);
+}
+.eyebrow {
+  font-size: var(--t-11);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 650;
+}
