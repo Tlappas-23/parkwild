@@ -17,6 +17,7 @@ import type { LandmarkPhoto, PlaceRec } from "../data/types";
 import { commonsNear, wikiFind, wikiSummary, type CommonsPhoto, type Summary } from "../lib/wiki";
 import { shortPark } from "../lib/names";
 import WeatherChip from "../components/WeatherChip";
+import { fetchElevation } from "../lib/usgs";
 
 // Every named trail, site, campground and facility in the park, sorted by how
 // many sightings people recorded within reach of it (the free proxy for
@@ -234,6 +235,22 @@ function PlacePage({ place: p, onBack }: { place: PlaceRec; onBack: () => void }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [p.id]);
+  // A place without an elevation tag in OpenStreetMap asks USGS for one at
+  // view time (E-059); a tagged value is never replaced.
+  const [ele, setEle] = useState<number | null>(null);
+  useEffect(() => {
+    let live = true;
+    setEle(null);
+    if (!p.ele_m)
+      fetchElevation(p.lon, p.lat)
+        .then((v) => {
+          if (live) setEle(v);
+        })
+        .catch(() => {});
+    return () => {
+      live = false;
+    };
+  }, [p.ele_m, p.lon, p.lat]);
   const hero = photos?.[0] ?? null;
   const b = busiest(p.near.months);
   const max = Math.max(1, ...p.near.months);
@@ -280,7 +297,11 @@ function PlacePage({ place: p, onBack }: { place: PlaceRec; onBack: () => void }
         <div className="hero-text">
           <div className="eyebrow">
             {kindLabel(p)}
-            {p.ele_m ? ` · ${Math.round(p.ele_m).toLocaleString()} m` : ""}
+            {p.ele_m
+              ? ` · ${Math.round(p.ele_m).toLocaleString()} m`
+              : ele != null
+                ? ` · ${Math.round(ele).toLocaleString()} m (USGS)`
+                : ""}
             {p.length_m ? ` · ${(p.length_m / 1000).toFixed(1)} km` : ""}
           </div>
           <h1>{p.name}</h1>
@@ -448,6 +469,7 @@ function PlacePage({ place: p, onBack }: { place: PlaceRec; onBack: () => void }
       <p className="muted small">
         Place: OpenStreetMap contributors, ODbL. Readers: Wikimedia pageviews. Photographs: Wikimedia Commons, each
         under the licence shown. Park: {shortPark(parkName)}.
+        {!p.ele_m && ele != null ? " Elevation: USGS 3DEP, public domain." : ""}
       </p>
     </article>
   );

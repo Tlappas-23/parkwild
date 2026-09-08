@@ -340,6 +340,11 @@ Format: date, what, number, kept?, why, where it lives.
 - **Pulled and automated:** the README opens with CI, Pages and licence badges and carries a flow diagram from the free sources through the pipeline, the worktree publish, CI and Pages, to what the browser fetches live, with a table of every job and its trigger. `make refresh`, `make batch`, `make publish` and `make probe` name the jobs.
 - **Checked:** every page screenshotted headless at 1280 and 390 px; lint, format, typecheck, tests, build and the performance budget pass.
 
+### E-059: an elevation for every place page
+- **What:** most places carry no `ele` tag in OpenStreetMap, so a place page's eyebrow usually says only what kind of place it is. The USGS Elevation Point Query Service reads the 3DEP model at a point, keyless and with CORS open, so the browser can ask at view time the way it asks Open-Meteo for the weather (E-055).
+- **Kept:** `fetchElevation` in `lib/usgs.ts` beside the quakes and the gauges, on the same ten-minute cache; `parseElevation` is pure and tested. The page asks only when `ele_m` is missing and shows the answer as "1,474 m (USGS)" with a credit in the footer; a tagged elevation is never replaced, and the list stays as it is, since 150 rows would be 150 requests. The service answers HTTP 200 with the text "Call failed." for a point off its raster and a sentinel of -1,000,000 for no data, so the body is read as text and anything that is not a finite number above -500 m counts as no elevation, in which case the page says nothing. One host added to connect-src in both CSP copies; no dependency. Old Faithful's coordinate reads 2,248 m from the service; Wikipedia gives 2,240 m for the geyser.
+- **Unresolved:** a trail is read at its one representative point, so a 10 km trail shows a single number. Parks off the raster (American Samoa, the sea edges of the Virgin Islands) are unchecked and would simply show no elevation. The place drawer and the tour card still show only tagged values, and nothing marks a tagged value against a USGS reading beyond the "(USGS)" in the eyebrow.
+
 ## Open questions with a planned experiment
 
 - **Q-1 SpeciesNet determinism.** Answered (E-013).

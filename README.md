@@ -187,7 +187,7 @@ on CPU. The runbook is in `docs/USER-GUIDE.md` under "Maintaining the site".
 | Wikipedia and Wikimedia Commons | landmark summaries and photographs | CC BY-SA and the licence printed on each photograph; only reusable licences pass |
 | Mapillary | street-level imagery for the detection track | CC BY-SA 4.0; image id, contributor and licence stored with every row |
 | OpenFreeMap, USGS The National Map, AWS Terrain Tiles | base map, imagery, topographic map, relief | open; attributed on the map |
-| USGS Earthquake Hazards Program, USGS National Water Information System | earthquakes and stream gauges, live | public domain |
+| USGS Earthquake Hazards Program, USGS National Water Information System, USGS Elevation Point Query Service | earthquakes and stream gauges, live, and the elevation of places OpenStreetMap does not carry | public domain |
 | Open-Meteo | weather now and ten-year climate normals | CC BY 4.0 |
 | SpeciesNet, MegaDetector, Qwen2.5 via WebLLM, CLIP via Transformers.js | detection, classification, the assistant, the photo helper | Apache 2.0 and MIT; models run locally |
 
