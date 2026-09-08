@@ -30,13 +30,13 @@ const QUAKE_URL = "https://earthquake.usgs.gov/fdsnws/event/1/query";
 const WATER_URL = "https://waterservices.usgs.gov/nwis/iv/";
 // ELEVATION_URL — BORROWED (USGS Elevation Point Query Service, a point read of the 3DEP elevation model)
 const ELEVATION_URL = "https://epqs.nationalmap.gov/v1/json";
-// ELEVATION_FLOOR_M — BORROWED (EPQS marks no data with -1,000,000; the lowest ground in any park is Badwater at -86 m)
+// ELEVATION_FLOOR_M — ASSUMED (a floor between EPQS's no-data value of -1,000,000 and the lowest ground in any park, Badwater at -86 m)
 export const ELEVATION_FLOOR_M = -500;
 // QUAKE_DAYS — ARBITRARY (a month is long enough to say "active" or "quiet" about a park)
 export const QUAKE_DAYS = 30;
 // QUAKE_MIN_MAG — BORROWED (below about 1.5 the catalogue is incomplete outside dense networks)
 export const QUAKE_MIN_MAG = 1.5;
-// CACHE_MS — ARBITRARY (both feeds update on the order of minutes; ten is plenty for a visit)
+// CACHE_MS — ARBITRARY (the feeds update on the order of minutes and an elevation never changes; ten is plenty for a visit)
 const CACHE_MS = 10 * 60 * 1000;
 const cache = new Map<string, { at: number; v: unknown }>();
 
