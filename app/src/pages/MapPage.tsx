@@ -1,21 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import maplibregl, { type GeoJSONSource, type LngLatBoundsLike, type Map as MLMap } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import {
-  ChevronDown,
-  ChevronLeft,
-  ChevronUp,
-  Globe,
-  Play,
-  RotateCcw,
-  RotateCw,
-  Route,
-  SlidersHorizontal,
-} from "lucide-react";
+import {} from "lucide-react";
 import { PARKS_INDEX } from "../data/parksIndex";
 import { addParksLayers, liveBounds, setParksData } from "../lib/parksOverlay";
 import type { FeatureCollection } from "geojson";
-import { filteredFeatures, speciesMatches, useStore } from "../store/index";
+import { filteredFeatures, useStore } from "../store/index";
 import {
   cruisePitch,
   cruiseZoom,
@@ -41,12 +31,25 @@ import {
 } from "../lib/tour";
 import { routerFor } from "../lib/routing";
 import { esc } from "../lib/html";
-import WeatherChip from "../components/WeatherChip";
-import ParkLive from "../components/ParkLive";
+import {
+  ACCENT,
+  ACCENT_DEEP,
+  CORRIDOR,
+  HILLSHADE,
+  INK,
+  INK_HALO,
+  MAP_GROUND,
+  MAP_STYLE,
+  MASK,
+  PARK_LINE,
+  PLACE,
+  WARM,
+} from "../lib/mapStyle";
+import MapControls from "../components/MapControls";
+import MapChrome from "../components/MapChrome";
 import type { BoundaryFile, LandmarksFile, Ring } from "../data/types";
 import CellDetail from "../components/CellDetail";
 import PlaceDetail from "../components/PlaceDetail";
-import PlanPanel from "../components/PlanPanel";
 import Tour from "../components/Tour";
 
 // Map sources, all free and keyless (BUILD_SPEC: zero cost; never Google):
@@ -57,7 +60,7 @@ import Tour from "../components/Tour";
 // The first version was OpenFreeMap "positron" alone: flat, grey, and the
 // same for every park. The park outline, relief and imagery are what make
 // this look like a map of Yellowstone rather than a diagram over it.
-const STYLE = "https://tiles.openfreemap.org/styles/liberty";
+const STYLE = MAP_STYLE;
 const USGS_IMAGERY = "https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}";
 // USGS_TOPO — BORROWED (The National Map's topographic basemap, public domain: the look of a paper park map)
 const USGS_TOPO = "https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}";
@@ -178,51 +181,32 @@ export default function MapPage() {
   const enterParkRef = useRef(useStore.getState().enterPark);
   const {
     cells,
-    species,
     boundary,
     landmarks,
     speciesFilter,
     yearRange,
-    setSpeciesFilter,
-    setYearRange,
     selectCell,
     selectedCell,
     reducedMotion,
     basemap,
-    setBasemap,
     terrain3d,
-    setTerrain3d,
     tour,
-    startTour,
     tourGo,
     plan,
     location,
-    openPlan,
     addSite,
     park,
     cameraPass,
     amenities,
     tourTab,
-    controlsOpen,
-    setControlsOpen,
     selectedPlace,
     selectPlace,
     roads,
-    showCameraPass,
-    setPage,
     driveMode,
     focusCell,
   } = useStore();
-  const climate = useStore((st) => st.climate);
-  const parkCard = PARKS_INDEX.parks.find((p) => p.key === park);
-  const weatherAt = climate
-    ? { lat: climate.lat, lon: climate.lon, at: climate.at }
-    : parkCard?.center
-      ? { lat: parkCard.center[1], lon: parkCard.center[0], at: undefined }
-      : null;
   // The amber swatch earns its place only where the camera pass found something.
   const hasModelCells = useMemo(() => (cells?.features ?? []).some((f) => f.properties.mp > 0), [cells]);
-  const [query, setQuery] = useState("");
   // Handlers are registered once on the map; refs keep them pointing at the live store actions.
   const selectCellRef = useRef(selectCell);
   selectCellRef.current = selectCell;
@@ -244,7 +228,7 @@ export default function MapPage() {
       if (f.properties.y0 !== null) lo = Math.min(lo, f.properties.y0);
       if (f.properties.y1 !== null) hi = Math.max(hi, f.properties.y1);
     }
-    return lo <= hi ? [lo, hi] : [1900, 2100];
+    return (lo <= hi ? [lo, hi] : [1900, 2100]) as [number, number];
   }, [cells]);
   const total = useMemo(() => features.reduce((a, f) => a + f.properties.count, 0), [features]);
   const stops = useMemo(() => tourStops(landmarks), [landmarks]);
@@ -268,6 +252,7 @@ export default function MapPage() {
     map.addControl(new maplibregl.NavigationControl({ showCompass: true, visualizePitch: true }), "bottom-right");
     map.on("load", () => {
       const layers = map.getStyle().layers;
+      if (map.getLayer("background")) map.setPaintProperty("background", "background-color", MAP_GROUND);
       const firstLine = layers.find((l) => l.type === "line")?.id;
       const firstSymbol = layers.find((l) => l.type === "symbol")?.id;
       fillIds.current = layers
@@ -323,16 +308,16 @@ export default function MapPage() {
           type: "hillshade",
           source: "dem",
           paint: {
-            "hillshade-exaggeration": 0.55,
-            "hillshade-shadow-color": "#4d4336",
-            "hillshade-highlight-color": "#ffffff",
-            "hillshade-accent-color": "#6e6a5f",
+            "hillshade-exaggeration": HILLSHADE.exaggeration,
+            "hillshade-shadow-color": HILLSHADE.shadow,
+            "hillshade-highlight-color": HILLSHADE.highlight,
+            "hillshade-accent-color": HILLSHADE.accent,
           },
         },
         firstLine,
       );
       map.addLayer(
-        { id: "mask", type: "fill", source: "mask", paint: { "fill-color": "#f4f3ee", "fill-opacity": 0.7 } },
+        { id: "mask", type: "fill", source: "mask", paint: { "fill-color": MASK, "fill-opacity": 0.6 } },
         firstSymbol,
       );
       // Where the roadside camera pass ran (or is queued): dashed boxes in the
@@ -343,7 +328,7 @@ export default function MapPage() {
           type: "line",
           source: "corridors",
           paint: {
-            "line-color": "#b86e00",
+            "line-color": CORRIDOR,
             "line-width": 1.6,
             "line-dasharray": [1.5, 1.5],
             "line-opacity": ["case", ["==", ["get", "status"], "planned"], 0.5, 0.9],
@@ -358,7 +343,7 @@ export default function MapPage() {
           id: "outline-casing",
           type: "line",
           source: "outline",
-          paint: { "line-color": "#ffffff", "line-width": 5, "line-opacity": 0.75 },
+          paint: { "line-color": MAP_GROUND, "line-width": 5, "line-opacity": 0.8 },
         },
         firstSymbol,
       );
@@ -367,7 +352,7 @@ export default function MapPage() {
           id: "outline",
           type: "line",
           source: "outline",
-          paint: { "line-color": "#14532d", "line-width": 2.5, "line-dasharray": [2.2, 1.4] },
+          paint: { "line-color": PARK_LINE, "line-width": 2.5, "line-dasharray": [2.2, 1.4] },
         },
         firstSymbol,
       );
@@ -414,7 +399,7 @@ export default function MapPage() {
           type: "line",
           source: "cells",
           filter: ["==", ["get", "cell"], ""],
-          paint: { "line-color": "#0b0b0b", "line-width": 2 },
+          paint: { "line-color": INK, "line-width": 2 },
         },
         firstSymbol,
       );
@@ -425,7 +410,7 @@ export default function MapPage() {
           type: "line",
           source: "route",
           layout: { "line-join": "round", "line-cap": "round" },
-          paint: { "line-color": "#ffffff", "line-width": 8, "line-opacity": 0.9 },
+          paint: { "line-color": MAP_GROUND, "line-width": 8, "line-opacity": 0.9 },
         },
         firstSymbol,
       );
@@ -435,7 +420,7 @@ export default function MapPage() {
           type: "line",
           source: "route",
           layout: { "line-join": "round", "line-cap": "round" },
-          paint: { "line-color": "#1d4ed8", "line-width": 4 },
+          paint: { "line-color": ACCENT, "line-width": 4 },
         },
         firstSymbol,
       );
@@ -448,7 +433,7 @@ export default function MapPage() {
         source: "landmarks",
         paint: {
           "circle-radius": ["case", ["get", "stop"], 7, 4],
-          "circle-color": ["case", ["get", "stop"], "#1f5f8b", "#5f5b52"],
+          "circle-color": ["case", ["get", "stop"], ACCENT, PLACE],
           "circle-stroke-color": "#ffffff",
           "circle-stroke-width": 1.5,
         },
@@ -472,8 +457,8 @@ export default function MapPage() {
             "text-optional": true,
           },
           paint: {
-            "text-color": stopsOnly ? "#12324a" : "#2b2a26",
-            "text-halo-color": "rgba(255,255,255,0.92)",
+            "text-color": INK,
+            "text-halo-color": INK_HALO,
             "text-halo-width": 1.4,
           },
         });
@@ -493,7 +478,7 @@ export default function MapPage() {
           "text-offset": [0.3, -0.3],
           "text-max-width": 14,
         },
-        paint: { "text-color": "#8a5200", "text-halo-color": "rgba(255,255,255,0.92)", "text-halo-width": 1.3 },
+        paint: { "text-color": WARM, "text-halo-color": INK_HALO, "text-halo-width": 1.3 },
       });
       // The open place: a trail drawn whole, or a ring around a point.
       map.addLayer({
@@ -502,7 +487,7 @@ export default function MapPage() {
         source: "focus",
         filter: ["==", ["geometry-type"], "LineString"],
         layout: { "line-join": "round", "line-cap": "round" },
-        paint: { "line-color": "#ffffff", "line-width": 7, "line-opacity": 0.9 },
+        paint: { "line-color": MAP_GROUND, "line-width": 7, "line-opacity": 0.9 },
       });
       map.addLayer({
         id: "focus-line",
@@ -510,7 +495,7 @@ export default function MapPage() {
         source: "focus",
         filter: ["==", ["geometry-type"], "LineString"],
         layout: { "line-join": "round", "line-cap": "round" },
-        paint: { "line-color": "#101010", "line-width": 3.5 },
+        paint: { "line-color": INK, "line-width": 3.5 },
       });
       map.addLayer({
         id: "focus-point",
@@ -519,8 +504,8 @@ export default function MapPage() {
         filter: ["==", ["geometry-type"], "Point"],
         paint: {
           "circle-radius": 13,
-          "circle-color": "rgba(16,16,16,0.12)",
-          "circle-stroke-color": "#101010",
+          "circle-color": "rgba(237,233,223,0.14)",
+          "circle-stroke-color": INK,
           "circle-stroke-width": 2.5,
         },
       });
@@ -531,9 +516,9 @@ export default function MapPage() {
         source: "things",
         paint: {
           "circle-radius": 5.5,
-          "circle-stroke-color": "#ffffff",
+          "circle-stroke-color": MAP_GROUND,
           "circle-stroke-width": 1.5,
-          "circle-color": "#475569",
+          "circle-color": PLACE,
         },
       });
       map.addLayer({
@@ -550,7 +535,7 @@ export default function MapPage() {
           "text-optional": true,
           "text-max-width": 10,
         },
-        paint: { "text-color": "#1f2937", "text-halo-color": "rgba(255,255,255,0.92)", "text-halo-width": 1.2 },
+        paint: { "text-color": INK, "text-halo-color": INK_HALO, "text-halo-width": 1.2 },
       });
       map.addLayer({
         id: "route-stop-dot",
@@ -558,8 +543,8 @@ export default function MapPage() {
         source: "route-stops",
         paint: {
           "circle-radius": 11,
-          "circle-color": "#1d4ed8",
-          "circle-stroke-color": "#ffffff",
+          "circle-color": ACCENT,
+          "circle-stroke-color": MAP_GROUND,
           "circle-stroke-width": 2,
         },
       });
@@ -573,13 +558,13 @@ export default function MapPage() {
           "text-size": 12,
           "text-allow-overlap": true,
         },
-        paint: { "text-color": "#ffffff" },
+        paint: { "text-color": MAP_GROUND },
       });
       map.addLayer({
         id: "me-halo",
         type: "circle",
         source: "me",
-        paint: { "circle-radius": 16, "circle-color": "#1a73e8", "circle-opacity": 0.18 },
+        paint: { "circle-radius": 16, "circle-color": ACCENT_DEEP, "circle-opacity": 0.22 },
       });
       map.addLayer({
         id: "me-dot",
@@ -587,8 +572,8 @@ export default function MapPage() {
         source: "me",
         paint: {
           "circle-radius": 7,
-          "circle-color": "#1a73e8",
-          "circle-stroke-color": "#ffffff",
+          "circle-color": ACCENT,
+          "circle-stroke-color": MAP_GROUND,
           "circle-stroke-width": 2.5,
         },
       });
@@ -859,8 +844,8 @@ export default function MapPage() {
     map.setLayoutProperty("hillshade", "visibility", sat || topo ? "none" : "visible");
     for (const id of fillIds.current)
       if (map.getLayer(id)) map.setLayoutProperty(id, "visibility", sat || topo ? "none" : "visible");
-    map.setPaintProperty("mask", "fill-color", sat ? "#0a1016" : "#f4f3ee");
-    map.setPaintProperty("mask", "fill-opacity", sat ? 0.55 : 0.7);
+    map.setPaintProperty("mask", "fill-color", MASK);
+    map.setPaintProperty("mask", "fill-opacity", sat || topo ? 0.5 : 0.6);
   }, [ready, basemap, overview]);
 
   useEffect(() => {
@@ -1187,220 +1172,18 @@ export default function MapPage() {
     };
   }, [ready, tour.active, reducedMotion]);
 
-  const options = useMemo(() => {
-    const list = (species?.species ?? []).filter((s) => s.suppression?.action !== "exclude");
-    const q = query.trim();
-    return q ? list.filter((s) => speciesMatches(s, q)).slice(0, 12) : [];
-  }, [species, query]);
-  const current = species?.species.find((s) => s.scientific_name === speciesFilter);
-
   return (
     <div className={"map-page" + (tour.active ? " touring" : "")}>
       <div ref={container} className="map" role="region" aria-label="Map of aggregated sightings" />
 
-      {!controlsOpen && (
-        <button className="controls-pill" onClick={() => setControlsOpen(true)} aria-label="Show filters and tools">
-          <SlidersHorizontal className="ico" aria-hidden="true" /> Filters
-          {current ? <span className="pill-chip">{current.common_name ?? current.scientific_name}</span> : null}
-          {plan.open ? <span className="pill-chip">route</span> : null}
-        </button>
-      )}
-      {!controlsOpen && weatherAt && (
-        <div className="weather-pill" aria-label="Weather now">
-          <WeatherChip lat={weatherAt.lat} lon={weatherAt.lon} compact />
-        </div>
-      )}
-      <div className="controls" role="group" aria-label="Filters" hidden={!controlsOpen}>
-        <button
-          className="icon-btn controls-hide"
-          onClick={() => setControlsOpen(false)}
-          aria-label="Hide filters and tools"
-          title="Hide panel"
-        >
-          <ChevronLeft className="ico" aria-hidden="true" />
-        </button>
-        <div className="control view-row">
-          {stops.length > 0 && !tour.active && (
-            <button className="primary" onClick={startTour}>
-              <Play className="ico" aria-hidden="true" /> Take the tour
-            </button>
-          )}
-          <div className="seg" role="group" aria-label="Basemap">
-            <button
-              className={basemap === "terrain" ? "on" : ""}
-              aria-pressed={basemap === "terrain"}
-              onClick={() => setBasemap("terrain")}
-            >
-              Terrain
-            </button>
-            <button
-              className={basemap === "satellite" ? "on" : ""}
-              aria-pressed={basemap === "satellite"}
-              onClick={() => setBasemap("satellite")}
-            >
-              Satellite
-            </button>
-            <button
-              className={basemap === "topo" ? "on" : ""}
-              aria-pressed={basemap === "topo"}
-              onClick={() => setBasemap("topo")}
-            >
-              Topo
-            </button>
-          </div>
-          <button
-            className={"toggle" + (terrain3d ? " on" : "")}
-            aria-pressed={terrain3d}
-            onClick={() => setTerrain3d(!terrain3d)}
-          >
-            3D
-          </button>
-          {!plan.open && (
-            <button className="toggle" onClick={openPlan}>
-              <Route className="ico" aria-hidden="true" /> Plan a visit
-            </button>
-          )}
-          <button
-            className={"toggle" + (overview ? " on" : "")}
-            aria-pressed={overview}
-            onClick={() => setOverview((v) => !v)}
-          >
-            <Globe className="ico" aria-hidden="true" /> All parks
-          </button>
-        </div>
-        <div className="control">
-          {weatherAt && <WeatherChip lat={weatherAt.lat} lon={weatherAt.lon} climate={climate} at={weatherAt.at} />}
-          {parkCard?.bbox && <ParkLive bbox={parkCard.bbox} parkName={parkCard.name} />}
-          <label htmlFor="species-search">Species</label>
-          {current ? (
-            <div className="chip-row">
-              <span className="chip">
-                {current.common_name ?? current.scientific_name}
-                <button
-                  className="chip-x"
-                  aria-label="Clear species filter"
-                  onClick={() => {
-                    setSpeciesFilter(null);
-                    setQuery("");
-                  }}
-                >
-                  ×
-                </button>
-              </span>
-            </div>
-          ) : (
-            <div className="search">
-              <input
-                id="species-search"
-                type="search"
-                placeholder="Search bison, elk, raven…"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                autoComplete="off"
-              />
-              {options.length > 0 && (
-                <ul className="suggest" role="listbox">
-                  {options.map((s) => (
-                    <li key={s.scientific_name} role="option" aria-selected="false">
-                      <button
-                        onClick={() => {
-                          setSpeciesFilter(s.scientific_name);
-                          setQuery("");
-                        }}
-                      >
-                        <span>{s.common_name ?? s.scientific_name}</span>
-                        <span className="muted small">{s.sightings.toLocaleString()}</span>
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          )}
-        </div>
-        <div className="control years">
-          <label>
-            Years{" "}
-            <span className="muted">
-              {yearRange[0]}–{yearRange[1]}
-            </span>
-          </label>
-          <div className="range-pair">
-            <input
-              type="range"
-              min={years[0]}
-              max={years[1]}
-              value={yearRange[0]}
-              aria-label="Start year"
-              onChange={(e) => setYearRange([Math.min(+e.target.value, yearRange[1]), yearRange[1]])}
-            />
-            <input
-              type="range"
-              min={years[0]}
-              max={years[1]}
-              value={yearRange[1]}
-              aria-label="End year"
-              onChange={(e) => setYearRange([yearRange[0], Math.max(+e.target.value, yearRange[0])])}
-            />
-          </div>
-        </div>
-        <p className="muted small stat">
-          {total.toLocaleString()} sightings in {features.length.toLocaleString()} cells
-        </p>
-        {plan.open && <PlanPanel />}
-      </div>
-
-      <div className="cam-ctrl" role="group" aria-label="Rotate and tilt">
-        <button
-          className="icon-btn"
-          onClick={() => turn(-45)}
-          aria-label="Rotate left"
-          title="Rotate left (or right-drag the map)"
-        >
-          <RotateCcw className="ico" aria-hidden="true" />
-        </button>
-        <button className="icon-btn" onClick={() => turn(45)} aria-label="Rotate right" title="Rotate right">
-          <RotateCw className="ico" aria-hidden="true" />
-        </button>
-        <button className="icon-btn" onClick={() => tilt(-15)} aria-label="Tilt down" title="Look from higher up">
-          <ChevronUp className="ico" aria-hidden="true" />
-        </button>
-        <button className="icon-btn" onClick={() => tilt(15)} aria-label="Tilt up" title="Look from lower down">
-          <ChevronDown className="ico" aria-hidden="true" />
-        </button>
-      </div>
-
-      <div className="legend" aria-label="Legend">
-        <span>
-          <i className="swatch human" /> people saw it
-        </span>
-        {hasModelCells && (
-          <span>
-            <i className="swatch model" /> roadside camera pass{" "}
-            <button className="link small" onClick={showCameraPass}>
-              what's that?
-            </button>
-          </span>
-        )}
-        <span>
-          <i className="dot stop" /> tour stop
-        </span>
-        <span>
-          <i className="dot" /> landmark
-        </span>
-        {cameraPass && cameraPass.corridors.length > 0 && (
-          <span>
-            <i className="swatch pass" /> camera pass area
-          </span>
-        )}
-        <span className="muted">
-          Cells ~170 m; larger for sensitive species. Empty means nobody looked. Rotate with the arrows, a right-drag or
-          two fingers.{" "}
-          <button className="link small" onClick={() => setPage("about")}>
-            About the data
-          </button>
-        </span>
-      </div>
+      <MapControls
+        overview={overview}
+        setOverview={setOverview}
+        years={years}
+        total={total}
+        cellCount={features.length}
+      />
+      <MapChrome turn={turn} tilt={tilt} hasModelCells={hasModelCells} />
 
       <CellDetail />
       <PlaceDetail />

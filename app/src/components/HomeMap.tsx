@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { MAP_GROUND, MAP_STYLE } from "../lib/mapStyle";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { addParksLayers, liveBounds, setParksData } from "../lib/parksOverlay";
@@ -9,7 +10,7 @@ import type { ParkCard } from "../data/types";
 // The country with every park on it. A live park opens on click; the rest
 // say what they are. Same style and fonts as the park map, no terrain: this
 // is a picker, not a place.
-const STYLE = "https://tiles.openfreemap.org/styles/liberty";
+const STYLE = MAP_STYLE;
 
 export default function HomeMap({ parks }: { parks: ParkCard[] }) {
   const container = useRef<HTMLDivElement>(null);
@@ -30,6 +31,7 @@ export default function HomeMap({ parks }: { parks: ParkCard[] }) {
     });
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "bottom-right");
     map.on("load", () => {
+      if (map.getLayer("background")) map.setPaintProperty("background", "background-color", MAP_GROUND);
       addParksLayers(map);
       setParksData(map, parks);
       if (b) map.fitBounds(b, { padding: 60, duration: 0, maxZoom: 6 });

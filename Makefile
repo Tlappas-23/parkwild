@@ -13,7 +13,7 @@ PARK ?= yellowstone
 TRACKA := $(BIN)/python scripts/track_a.py
 PHASE0   := $(BIN)/python scripts/phase0.py
 
-.PHONY: setup setup-ml test lint secrets hooks protect ship coverage pull download slice detect sample report notebook track-a track-b export bias smoke app app-data
+.PHONY: refresh batch publish probe setup setup-ml test lint secrets hooks protect ship coverage pull download slice detect sample report notebook track-a track-b export bias smoke app app-data
 
 $(BIN)/python:
 	$(PY) -m venv $(VENV)
@@ -104,3 +104,19 @@ smoke:
 
 notebook:
 	$(BIN)/python -m jupyter lab notebooks/ 2>/dev/null || /opt/anaconda3/bin/jupyter lab notebooks/
+
+## the fortnightly refresh, by hand (cron runs it on the 1st and 15th)
+refresh:
+	scripts/refresh.sh
+
+## bring parks live: make batch PARKS="arches bryce_canyon"
+batch:
+	scripts/parks_batch.sh $(PARKS)
+
+## publish existing exports as a data PR: make publish PARKS="arches" TITLE="..."
+publish:
+	scripts/publish_data.sh "$(TITLE)" $(PARKS)
+
+## watch the tour camera headless on the live site: make probe PARK=zion
+probe:
+	node app/scripts/tour-probe.mjs "https://tlappas-23.github.io/parkwild/?park=$(PARK)" /tmp/parkwild-probe 44 8
