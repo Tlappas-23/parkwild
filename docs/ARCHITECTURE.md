@@ -66,7 +66,7 @@ All files live in `app/public/data/<park>/` and are listed, with a SHA-256, in t
 | `roads.json` | Roads and trails as a graph: nodes, edges with length, kind, one-way flag, name, geometry | on first route or trail |
 | `amenities.json` | Campsites, lodging, trailheads, viewpoints, picnic sites, visitor centres, boat launches, named features; named trails summed from the graph | with the park |
 | `places.json` | Named trails, sites, campgrounds and facilities with the sightings recorded within reach (500 m / 300 m of a trail), top species, a count per month, Wikipedia readers a month for landmarks with an article | on first open of Places |
-| USGS live feeds (not files) | Earthquake Hazards Program events and NWIS stream gauges for the park's box, fetched by the browser (`app/src/lib/usgs.ts`), ten-minute cache | on the map panel |
+| USGS live feeds (not files) | Earthquake Hazards Program events and NWIS stream gauges for the park's box, and the Elevation Point Query Service for a place with no elevation tag, fetched by the browser (`app/src/lib/usgs.ts`), ten-minute cache | on the map panel; on a place page |
 | `climate.json` | Twelve monthly normals at the park's busiest place: typical high and low, rain, snow, wet days, from ten years of Open-Meteo's ERA5 archive | with the park |
 | `species_index.json` | Every species across the shipped parks: per park its sightings, verified and model counts, cell count and the three busiest cells with centres (coarse where the species is) | on first use of All parks or a species page, hash from parks.json |
 | `camera_pass.json` | Per corridor: frames scored, detections, sightings, named species, imagery months, Phase 0 precision with interval | with the park |

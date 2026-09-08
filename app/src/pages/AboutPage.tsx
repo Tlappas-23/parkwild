@@ -212,8 +212,9 @@ export default function AboutPage() {
         </li>
         <li>
           USGS: the Topo and Satellite basemaps and the relief (The National Map, 3DEP), the month's earthquakes inside
-          the park (Earthquake Hazards Program) and the stream gauges' flow and water temperature (National Water
-          Information System), all public domain and fetched live.
+          the park (Earthquake Hazards Program), the stream gauges' flow and water temperature (National Water
+          Information System), and the elevation of a place OpenStreetMap does not carry (Elevation Point Query Service,
+          3DEP), all public domain and fetched live.
         </li>
         <li>
           Weather: live conditions and the next days from

@@ -1,9 +1,10 @@
 // Live readings from the US Geological Survey, free and keyless, fetched by
 // the browser when a park is open: the last month of earthquakes inside the
-// park's box (the Earthquake Hazards Program feed) and the nearest stream
+// park's box (the Earthquake Hazards Program feed), the nearest stream
 // gauges with their current flow and water temperature (the National Water
-// Information System). Nothing is stored; a short cache keeps a tour from
-// asking twice.
+// Information System), and an elevation for a place that has none in
+// OpenStreetMap (the Elevation Point Query Service, a point read of the 3DEP
+// model). Nothing is stored; a short cache keeps a tour from asking twice.
 export interface Quake {
   mag: number;
   place: string;
@@ -27,6 +28,10 @@ export interface Gauge {
 // QUAKE_URL / WATER_URL — BORROWED (USGS FDSN event service; USGS NWIS instantaneous values)
 const QUAKE_URL = "https://earthquake.usgs.gov/fdsnws/event/1/query";
 const WATER_URL = "https://waterservices.usgs.gov/nwis/iv/";
+// ELEVATION_URL — BORROWED (USGS Elevation Point Query Service, a point read of the 3DEP elevation model)
+const ELEVATION_URL = "https://epqs.nationalmap.gov/v1/json";
+// ELEVATION_FLOOR_M — BORROWED (EPQS marks no data with -1,000,000; the lowest ground in any park is Badwater at -86 m)
+export const ELEVATION_FLOOR_M = -500;
 // QUAKE_DAYS — ARBITRARY (a month is long enough to say "active" or "quiet" about a park)
 export const QUAKE_DAYS = 30;
 // QUAKE_MIN_MAG — BORROWED (below about 1.5 the catalogue is incomplete outside dense networks)
@@ -118,6 +123,34 @@ export function fetchGauges(bbox: BBox): Promise<Gauge[]> {
       bySite.set(site, g);
     }
     return [...bySite.values()].filter((g) => g.flowCfs != null || g.tempC != null);
+  });
+}
+
+// The service answers HTTP 200 with the text "Call failed." for a point off
+// its raster and a value of -1,000,000 for no data, so the body is read as
+// text and anything that is not a finite number above the floor counts as no
+// elevation. Pure, so it can be tested against captured bodies.
+export function parseElevation(body: string): number | null {
+  let j: unknown;
+  try {
+    j = JSON.parse(body);
+  } catch {
+    return null;
+  }
+  const raw = (j as { value?: unknown } | null)?.value;
+  if (raw == null) return null;
+  const v = Number(raw);
+  return Number.isFinite(v) && v >= ELEVATION_FLOOR_M ? v : null;
+}
+
+export function fetchElevation(lon: number, lat: number): Promise<number | null> {
+  // Four decimals is about 11 m, the precision the weather request uses; the rounded pair also keys the cache.
+  const x = lon.toFixed(4);
+  const y = lat.toFixed(4);
+  return cached(`e:${x},${y}`, async () => {
+    const res = await fetch(`${ELEVATION_URL}?x=${x}&y=${y}&units=Meters`);
+    if (!res.ok) throw new Error(`elevation: HTTP ${res.status}`);
+    return parseElevation(await res.text());
   });
 }
 
